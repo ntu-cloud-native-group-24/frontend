@@ -53,7 +53,7 @@ const BaseLayout = () => {
                 <Sider breakpoint="lg" collapsed={collapsed}>
                     <Sidebar toggleCollapsed={toggleCollapsed}/>
                 </Sider>
-                <Content className="min-h-screen max-h-fit ml-[16px]">
+                <Content className="min-h-screen max-h-fit ml-[16px] ">
                     <Routes>
                         {PageRoutes.map((route) => route.subMenuKey === '' ? 
                             <Route key={route.id} path={route.path} element={(

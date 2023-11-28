@@ -101,7 +101,7 @@ export const PageRoutes = [
         path: "/setting",
         element: <></>,
         key: 'setting',
-        name: '訂單管理',
+        name: '編輯資料',
         icon: <ToolOutlined />,
         subMenuKey: 'sub2',
         childMenu: [
