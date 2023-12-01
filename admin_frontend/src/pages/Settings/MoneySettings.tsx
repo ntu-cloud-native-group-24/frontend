@@ -4,7 +4,8 @@ import {
     IssuesCloseOutlined,
 } from '@ant-design/icons';
 
-import branchData, { MyBranchInterface } from '../../data/bank';
+import branchData from '../../data/bank';
+import { MyBranchInterface } from '../../interfaces/BankInterface';
 import { useState, useEffect } from 'react';
 
 const MoneySettings = () => {

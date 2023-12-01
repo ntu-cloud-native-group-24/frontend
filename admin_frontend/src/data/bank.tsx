@@ -1,5 +1,5 @@
 import jsonData from './bank.json'
-
+import type { BankInterface } from '../interfaces/BankInterface';
 const bankData = JSON.parse(JSON.stringify(jsonData));
 const keys = Object.keys(bankData);
 const branchData = Array<BankInterface>();
@@ -9,16 +9,6 @@ export interface BranchInterface {
     branch_code: string;
 }
 
-export interface MyBranchInterface {
-    branchName: string;
-    branchCode: string;
-}
-
-export interface BankInterface {
-    bankName: string;
-    bankCode: string;
-    branches: Array<MyBranchInterface>;
-}
 
 for(let i = 0;i < keys.length;i++){
     const bankResult = {
