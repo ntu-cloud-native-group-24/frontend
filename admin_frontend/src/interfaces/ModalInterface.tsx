@@ -9,15 +9,8 @@ export interface MyModalProps {
     food: FoodType;
     tagList: (string)[];
     type: ModalType;
-    setImageSrcMain: React.Dispatch<React.SetStateAction<string>>;
-    setFoodNameMain: React.Dispatch<React.SetStateAction<string>>;
-    setFoodDescriptionMain: React.Dispatch<React.SetStateAction<string>>;
-    setFoodPriceMain: React.Dispatch<React.SetStateAction<number>>;
-    setFoodStatusMain: React.Dispatch<React.SetStateAction<boolean>>;
-    setFoodTagListMain: React.Dispatch<React.SetStateAction<string[]>>;
-    setFullTagListMain: React.Dispatch<React.SetStateAction<string[]>>;
-    SingleFormMain: FormInstance<FormInstance<object>>;
-    MultipleFormMain: FormInstance<FormInstance<object>>;
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface MyTagProps {

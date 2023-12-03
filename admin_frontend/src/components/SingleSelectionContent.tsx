@@ -1,5 +1,5 @@
-import { CloseOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, Space, InputNumber } from 'antd';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Space, InputNumber, Switch } from 'antd';
 import { SingleSelectionsProps } from '../interfaces/ModalInterface';
 import { useMemo } from 'react';
 
@@ -62,6 +62,10 @@ const SingleSelectionContent = ({ form, singleSelections } : SingleSelectionsPro
                                 </Form.Item>
                                 <Form.Item noStyle name={[subField.name, 'price']} rules={[{required: true, message: '請輸入價格'}]}>
                                     <InputNumber addonAfter="$" />
+                                </Form.Item>
+                                <Form.Item noStyle name={[subField.name, 'status']} valuePropName="checked">
+                                    <Switch checkedChildren={<CheckOutlined className='pl-3 pr-5' />}
+                                            unCheckedChildren={<CloseOutlined className='pl-3 pr-5'/>}  />
                                 </Form.Item>
                                 <CloseOutlined
                                     onClick={() => {

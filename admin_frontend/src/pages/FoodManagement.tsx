@@ -1,13 +1,12 @@
-import { Button, Flex, Table, Image, Badge, Tag, Space, Input, Modal, message, Form } from "antd"
+import { Button, Flex, Table, Image, Badge, Tag, Space, Input, Modal, message } from "antd"
 import { PlusOutlined,
          ClearOutlined,
 } from '@ant-design/icons';
 import type { TableProps } from 'antd';
-import type { FormInstance } from "antd/lib";
 import type { ColumnsType, FilterValue, SorterResult } from 'antd/es/table/interface';
 import { useState, useEffect, useMemo } from "react";
 import type { FoodType } from "../interfaces/FoodInterface";
-import { ExclamationCircleFilled, SaveOutlined } from '@ant-design/icons';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 import { dummyData, fallbackSRC } from "../interfaces/FoodInterface";
 import { ModalType } from "../interfaces/ModalInterface";
@@ -22,16 +21,20 @@ const FoodManagement = () => {
     const [sortedInfo, setSortedInfo] = useState<SorterResult<FoodType>>({});
     const [searchValue, setSearchValue] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
-
-    const [imageSrc, setImageSrc] = useState('');
-    const [foodName, setFoodName] = useState('');
-    const [foodDescription, setFoodDescription] = useState('');
-    const [foodPrice, setFoodPrice] = useState(0);
-    const [foodStatus, setFoodStatus] = useState(false);
-    const [foodTagList, setFoodTagList] = useState<(string)[]>([]);
-    const [fullTagList, setFullTagList] = useState<(string)[]>([])
-    const [SingleForm] = Form.useForm<FormInstance<object>>();
-    const [MultipleForm] = Form.useForm<FormInstance<object>>();
+    const [open, setOpen] = useState(false);
+    const [targetType, setTargetType] = useState<ModalType>(ModalType.NEW);
+    const [targetFood, setTargetFood] = useState<FoodType>({
+        key: Math.random() * 1000000000,
+        name: '',
+        price: 0,
+        status: false,
+        soldAmount: 0,
+        description: '',
+        picture: '',
+        tags: [],
+        singleSelections: [],
+        multipleSelections: [],
+    });
 
     useEffect(() => {
         setData(dummyData)
@@ -78,21 +81,6 @@ const FoodManagement = () => {
         setSortedInfo({});
         setSearchValue("");
     };
-    const handleSave = async () => {
-        console.log('TODO edit');
-        console.log(
-            imageSrc, 
-            foodName, 
-            foodDescription, 
-            foodPrice, 
-            foodStatus, 
-            foodTagList, 
-            fullTagList, 
-            SingleForm.getFieldsValue(), 
-            MultipleForm.getFieldsValue()
-        )
-        return true;
-    }
 
     // Open Modal
     const onClickAdd = () => {
@@ -108,44 +96,16 @@ const FoodManagement = () => {
             singleSelections: [],
             multipleSelections: [],
         };
-        
-        confirm({
-            title: '新增餐點',
-            content: (<FoodModalContent food={food} tagList={tagsList} type={ModalType.NEW} 
-                                        setImageSrcMain={setImageSrc} setFoodNameMain={setFoodName} setFoodDescriptionMain={setFoodDescription}
-                                        setFoodPriceMain={setFoodPrice} setFoodStatusMain={setFoodStatus} setFoodTagListMain={setFoodTagList}
-                                        setFullTagListMain={setFullTagList} SingleFormMain={SingleForm} MultipleFormMain={MultipleForm}
-                        />
-            ),
-            width: 700,
-            okText: (<Space><SaveOutlined />儲存</Space>),
-            okType: 'danger',
-            cancelText: '取消',
-            async onOk() {
-                await handleSave();
-            },
-        })
+        setTargetType(ModalType.NEW);
+        setTargetFood(food);
+        setOpen(true);
     }
     const onClickEdit = (key: number) => {
         const food = data.find((food) => food.key === key);
         if( !food ) return;
-        
-        confirm({
-            title: '編輯餐點',
-            content: (<FoodModalContent food={food} tagList={tagsList} type={ModalType.EDIT} 
-                setImageSrcMain={setImageSrc} setFoodNameMain={setFoodName} setFoodDescriptionMain={setFoodDescription}
-                setFoodPriceMain={setFoodPrice} setFoodStatusMain={setFoodStatus} setFoodTagListMain={setFoodTagList}
-                setFullTagListMain={setFullTagList} SingleFormMain={SingleForm} MultipleFormMain={MultipleForm}
-                />
-            ),
-            width: 700,
-            okText: (<Space><SaveOutlined />儲存</Space>),
-            okType: 'danger',
-            cancelText: '取消',
-            async onOk() {
-                await handleSave();
-            },
-        })
+        setTargetType(ModalType.EDIT)
+        setTargetFood(food);
+        setOpen(true);
     }
     const onClickDelete = (key: number) => {
         const food = data.find((food) => food.key === key);
@@ -292,8 +252,8 @@ const FoodManagement = () => {
             key: 'action',
             render: (_ ,food) => (
                 <Space size="middle">
-                    <Button type='link' onClick={() => onClickEdit(food.key)} >Edit</Button>
-                    <Button type='link' danger onClick={() => onClickDelete(food.key)}>Delete</Button>
+                    <Button type='link' onClick={() => onClickEdit(food.key)} >編輯</Button>
+                    <Button type='link' danger onClick={() => onClickDelete(food.key)}>刪除</Button>
                 </Space>
             )
         }
@@ -303,6 +263,12 @@ const FoodManagement = () => {
         <Flex vertical gap="middle">
             <p>餐點管理表單</p>
             {contextHolder}
+            <FoodModalContent food={targetFood} 
+                              tagList={tagsList}
+                              type={targetType}
+                              open={open}
+                              setOpen={setOpen} 
+            />
             <Flex justify="flex-start" align="center" gap="middle" wrap='wrap'>
                 <Search
                     placeholder="搜尋餐點名稱"
