@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { RestaurantContentProps } from "../interfaces/StoreInterface";
+import { RestaurantContentProps } from "../../interfaces/StoreInterface";
 import { Flex, Space, Typography } from 'antd';
 import FoodDisplay from './FoodDisplay';
 
@@ -28,6 +28,7 @@ const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentPr
             <Flex vertical className='pt-4 w-full' gap="large" >
                 {
                     foodList.map((item, i) => (
+                        item.foods.length > 0 ? (
                         <Space key={i} direction='vertical' size="small">
                             <Typography.Text className='font-bold text-xl'>
                                 {item.tag.toUpperCase()}
@@ -35,8 +36,9 @@ const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentPr
                             <Space key={'space' + i} direction='horizontal' size='middle' className='w-full overflow-x-auto p-3'>
                                 {item.foods.map((food) => <FoodDisplay key={food.key} food={food}/>)}
                             </Space>
-                        </Space>
-                    ))
+                        </Space>) : (<></>)
+                    )
+                    )
                 }
             </Flex>
         )

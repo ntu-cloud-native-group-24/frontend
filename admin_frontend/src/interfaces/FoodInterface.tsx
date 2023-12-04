@@ -42,6 +42,8 @@ export interface FoodFilterProps {
     filterTags: string[];
     fullTagsList: string[];
     foodMaxPrice: number;
+    initStoreStatus: boolean;
+    initStoreTimes: Date[];
 
     setSearchValue: React.Dispatch<React.SetStateAction<string>>;
     setSortValue: React.Dispatch<React.SetStateAction<SortType>>;

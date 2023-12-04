@@ -12,13 +12,13 @@ import { Flex,
     Button,
     Modal
 } from "antd";
-import { FoodFilterProps } from "../interfaces/FoodInterface";
+import { FoodFilterProps } from "../../interfaces/FoodInterface";
 import type { SearchProps } from "antd/es/input";
 import type { CheckboxValueType } from "antd/es/checkbox/Group";
 import type { RadioChangeEvent } from "antd/lib";
 import type { SelectProps } from "antd";
 import { useMemo, useState } from 'react';
-import { FilterType, SortType } from "../interfaces/StoreInterface";
+import { FilterType, SortType } from "../../interfaces/StoreInterface";
 
 const { Search } = Input;
 const { confirm } = Modal;

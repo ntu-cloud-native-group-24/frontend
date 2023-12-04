@@ -1,16 +1,15 @@
 import { useMemo, useState } from "react";
 import { FilterType, RestaurantProps, SortType } from "../../interfaces/StoreInterface";
 import { Layout, Typography, Badge } from "antd";
-import RestaurantContent from "../../components/RestaurantContent";
-import FoodFilter from "../../components/FoodFilter";
+import RestaurantContent from "../../components/ComputerViews/RestaurantContent";
+import FoodFilter from "../../components/ComputerViews/FoodFilter";
+import { fallbackSRC } from "../../interfaces/FoodInterface";
 
 const { Header, Sider, Content } = Layout;
 
-// backgroundURLClass = URL
-
 const ComputerRestaurantPage = ({ store, foods } : RestaurantProps ) => {
     const [collapsed, setCollapsed] = useState(true);
-
+    const [foodPicture, setFoodPicture] = useState(store.picture_url);
     
     const foodMaxPrice = useMemo(() => {
         return foods.reduce((prev, current) => (prev.price > current.price ? prev : current)).price;
@@ -51,8 +50,6 @@ const ComputerRestaurantPage = ({ store, foods } : RestaurantProps ) => {
             // TODO:
         }
 
-        
-        
         return result.filter((food) => {
             const foodStatus = food.status ? FilterType.ONSTOCK : FilterType.SOLDOUT;
             return ( 
@@ -65,16 +62,13 @@ const ComputerRestaurantPage = ({ store, foods } : RestaurantProps ) => {
                         ) 
                     )
         });
-        
     }, [foods, searchValue, sortValue, priceRange, filterArray, filterTags])
-
-    const backgroundURLClass = useMemo(() => {
-        return `bg-[url('${store.picture_url}')]`;
-    }, [store])
 
     return (
         <Layout className='w-full'>
-            <Header className={backgroundURLClass} />
+            <Header className="p-0 h-[100px]">
+                <img alt={store.name} src={foodPicture} onError={() => setFoodPicture(fallbackSRC)} />
+            </Header>
             <Layout hasSider>
                 <Content className="bg-white">
                     <div className="flex flex-col justify-center items-center">

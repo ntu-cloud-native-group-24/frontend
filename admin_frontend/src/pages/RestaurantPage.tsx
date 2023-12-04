@@ -37,12 +37,12 @@ const RestaurantPage = () => {
         //TODO: fetch data from backend
         setStore(dummyStore)
         setFoods(dummyData)
+        console.log(height)
     }, [])
 
     return (
         <div>
-            {width > 844 ? <ComputerRestaurantPage store={store} foods={foods}  /> : <MobileRestaurantPage />}
-            HI  {height} {width} 
+            {width > 844 ? <ComputerRestaurantPage store={store} foods={foods}  /> : <MobileRestaurantPage store={store} foods={foods} />}
         </div>
     )
 }

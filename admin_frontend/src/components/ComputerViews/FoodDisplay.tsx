@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { FoodDisplayProps, fallbackSRC } from "../interfaces/FoodInterface"
+import { FoodDisplayProps, fallbackSRC } from "../../interfaces/FoodInterface"
 import { Card } from 'antd';
 const { Meta } = Card;
-import FoodModalContent from "../components/FoodModalContent";
-import { ModalType } from '../interfaces/ModalInterface';
+import FoodModalContent from "../FoodModalContent";
+import { ModalType } from '../../interfaces/ModalInterface';
 
 const FoodDisplay = ({ food } : FoodDisplayProps) => {
 
@@ -21,7 +21,7 @@ const FoodDisplay = ({ food } : FoodDisplayProps) => {
                 style={{ width: 240, height: 280, padding: 10 }}
                 cover={<img alt={food.name} src={foodPicture} className="h-[180px]" onError={() => setFoodPicture(fallbackSRC)} />}
                 onClick={onClickEdit}
-                className={food.status ? '' : 'bg-gray-300'}
+                className={food.status ? '' : 'opacity-40'}
             >
                 <Meta title={food.name} description={`$ ${food.price}`} />
             </Card>
