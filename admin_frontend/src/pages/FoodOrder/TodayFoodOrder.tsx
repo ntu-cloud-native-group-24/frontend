@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import OrderLayoutComputer from '../../layout/FoodOrderLayout/OrderLayoutComputer';
+import OrderLayoutMobile from '../../layout/FoodOrderLayout/OrderLayoutMobile';
 
 function getWindowDimensions() {
     const { innerWidth: width, innerHeight: height } = window;
@@ -27,8 +29,14 @@ function useWindowDimensions() {
 const TodayFoodOrder = () => {
     const { height, width } = useWindowDimensions();
 
+    useEffect(() => {
+      console.log(height);
+    }, [height])
+  
     return (
-        <div>TodayFoodOrder</div>
+      <div>
+        {width > 844 ? <OrderLayoutComputer /> : <OrderLayoutMobile />}
+      </div>
     )
 }
 
