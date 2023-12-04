@@ -7,8 +7,8 @@ export enum SortType {
 }
 
 export enum FilterType {
-    ONSTOCK,
     SOLDOUT,
+    ONSTOCK,
 }
 
 export interface StoreType {
@@ -27,6 +27,8 @@ export interface RestaurantProps {
 
 export interface RestaurantContentProps {
     foods: FoodType[];
+    isInFilter: boolean;
+    tagsList: string[];
 }
 
 export const dummyStore: StoreType = {

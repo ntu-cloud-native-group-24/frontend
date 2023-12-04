@@ -21,6 +21,7 @@ const FoodDisplay = ({ food } : FoodDisplayProps) => {
                 style={{ width: 240, height: 280, padding: 10 }}
                 cover={<img alt={food.name} src={foodPicture} className="h-[180px]" onError={() => setFoodPicture(fallbackSRC)} />}
                 onClick={onClickEdit}
+                className={food.status ? '' : 'bg-gray-300'}
             >
                 <Meta title={food.name} description={`$ ${food.price}`} />
             </Card>

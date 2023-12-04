@@ -1,3 +1,5 @@
+import { FilterType, SortType } from "./StoreInterface";
+
 export interface FoodSelectionType {
     name: string;
     price: number;
@@ -31,8 +33,22 @@ export interface FoodDisplayProps {
     food: FoodType;
 }
 
+
 export interface FoodFilterProps {
     collapsed: boolean;
+    sortValue: SortType;
+    priceRange: number[];
+    filterArray: FilterType[];
+    filterTags: string[];
+    fullTagsList: string[];
+    foodMaxPrice: number;
+
+    setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+    setSortValue: React.Dispatch<React.SetStateAction<SortType>>;
+    setPriceRange: React.Dispatch<React.SetStateAction<number[]>>;
+    setFilterArray: React.Dispatch<React.SetStateAction<FilterType[]>>;
+    setFilterTags: React.Dispatch<React.SetStateAction<string[]>>;
+    clearFilter: () => void;
 }
 
 export const dummyData: FoodType[] = [
