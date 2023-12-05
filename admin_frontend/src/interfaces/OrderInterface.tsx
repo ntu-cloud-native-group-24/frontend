@@ -41,6 +41,16 @@ export interface OrderProps {
     order: OrderType;
 }
 
+export interface OrderDetailProps {
+    order: OrderType | undefined;
+}
+
+export interface OrderCProps {
+    order: OrderType;
+    targetOrder: OrderType | undefined;
+    setTargetOrder: React.Dispatch<React.SetStateAction<OrderType | undefined>>;
+}
+
 export const dummyOrder: OrderType[] = [
     {
         id: 1,

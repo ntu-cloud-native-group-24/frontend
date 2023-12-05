@@ -125,7 +125,7 @@ const OrderDisplay = ({ order } : OrderProps ) => {
                 <Divider />
                 <Flex vertical gap='small'>
                     {order.foods.map((food) => (
-                        <OrderFoodDisplay food={food}/>
+                        <OrderFoodDisplay key={food.key} food={food}/>
                     ))}
                 </Flex>
                 <Divider />
