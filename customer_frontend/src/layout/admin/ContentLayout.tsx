@@ -67,7 +67,7 @@ const ContentLayout = (items: ContentProps) => {
                 name={items.currentName}
                 description={items.description}
             />
-            <div className="bg-white min-h-full max-h-fit p-5 ">
+            <div className="bg-white min-h-full max-h-fit p-5">
                 {items.element}
             </div>
         </div>

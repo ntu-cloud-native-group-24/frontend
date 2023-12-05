@@ -1,12 +1,16 @@
 import { Flex, Space, Dropdown, Input, Button } from "antd";
 import type { MenuProps } from "antd";
 
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     BellOutlined,
     ShoppingCartOutlined,
     UserOutlined,
+    UserAddOutlined,
 } from "@ant-design/icons";
+
+import axios from "axios";
 
 const { Search } = Input;
 
@@ -21,6 +25,41 @@ const PageHeader = () => {
     // TODO: complete Props
     const onSearch = (value: string) => console.log(value);
 
+    // TODO: user login token
+    // const token = undefined;
+    const token = "y";
+
+    // name: "abcdefg"
+    // username: "abcdefgabcdefg"
+    // password: "abcdefgabcdefg"
+
+    // TODO: get user info save in cookies or session
+    // using @fastify/cors to get access to backend api
+    // add following code in app.ts
+    // await app.register(require('@fastify/cors'), {})
+    useEffect(() => {
+        axios
+            .post("http://127.0.0.1:3000/api/login", {
+                username: "abcdefgabcdefg",
+                password: "abcdefgabcdefg",
+            })
+            .then((response) => {
+                console.log(response);
+            });
+    }, []);
+
+    // handle button before login
+    const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        console.log("click Cart", e);
+        navigate("/register");
+    };
+
+    const handleLoginClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        console.log("click Cart", e);
+        navigate("/login");
+    };
+
+    // handle button after login
     const handleNotificationClick = (
         e: React.MouseEvent<HTMLButtonElement>
     ) => {
@@ -63,29 +102,43 @@ const PageHeader = () => {
             <Space>
                 <p className="text-xl">Meal Order</p>
             </Space>
-            <Space>
-                <Space.Compact>
-                    <Search
-                        placeholder="input search text"
-                        onSearch={onSearch}
-                    />
-                </Space.Compact>
-                <Button
-                    icon={<BellOutlined />}
-                    onClick={handleNotificationClick}
-                >
-                    Notification
-                </Button>
-                <Button
-                    icon={<ShoppingCartOutlined />}
-                    onClick={handleCartClick}
-                >
-                    Cart
-                </Button>
-                <Dropdown menu={menuProps}>
-                    <Button icon={<UserOutlined />}>Ruby</Button>
-                </Dropdown>
-            </Space>
+            {token ? (
+                <Space>
+                    <Space.Compact>
+                        <Search
+                            placeholder="input search text"
+                            onSearch={onSearch}
+                        />
+                    </Space.Compact>
+                    <Button
+                        icon={<BellOutlined />}
+                        onClick={handleNotificationClick}
+                    >
+                        Notification
+                    </Button>
+                    <Button
+                        icon={<ShoppingCartOutlined />}
+                        onClick={handleCartClick}
+                    >
+                        Cart
+                    </Button>
+                    <Dropdown menu={menuProps}>
+                        <Button icon={<UserOutlined />}>Ruby</Button>
+                    </Dropdown>
+                </Space>
+            ) : (
+                <Space>
+                    <Button
+                        icon={<UserAddOutlined />}
+                        onClick={handleRegisterClick}
+                    >
+                        Register
+                    </Button>
+                    <Button icon={<UserOutlined />} onClick={handleLoginClick}>
+                        Login
+                    </Button>
+                </Space>
+            )}
         </Flex>
     );
 };
