@@ -1,15 +1,20 @@
 import { Flex, Space, Dropdown } from "antd";
 import type { MenuProps } from 'antd';
 import { MenuOutlined, BellOutlined, NotificationOutlined } from '@ant-design/icons';
+import { useNavigate } from "react-router-dom";
 
 export interface HeaderProps {
-    username: string;
+    setLogin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const PageHeader = () => {
+const PageHeader = ({ setLogin } : HeaderProps) => {
 
-    const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        console.log('click left button', e);
+    const navigate = useNavigate()
+
+    const handleButtonClick = () => {
+        // TODO: backend logout
+        setLogin(false);
+        navigate('/logout')
     };
     
     const handleMenuClick: MenuProps['onClick'] = (e) => {

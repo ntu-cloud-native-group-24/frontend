@@ -1,53 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Layout } from "antd"
 import PageHeader from "../components/PageHeader";
 import Sidebar from "../components/Sidebar";
 import PageFooter from "../components/PageFooter";
 const { Header, Footer, Sider, Content } = Layout;
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import { PageRoutes } from "../data/routes";
 import ContentLayout from "./ContentLayout";
-/*
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    color: '#fff',
-    height: 64,
-    paddingInline: 50,
-    lineHeight: '64px',
-    backgroundColor: 'white',
-};
+import ErrorPage from "../pages/ErrorPage";
 
-const contentStyle: React.CSSProperties = {
-    textAlign: 'center',
-    minHeight: 120,
-    lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: '#108ee9',
-};
+export interface LoginProps {
+    login: boolean;
+    setLogin: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const siderStyle: React.CSSProperties = {
-    textAlign: 'center',
-    lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: 'white',
-};
-
-const footerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    color: '#fff',
-    backgroundColor: '#7dbcea',
-};
-*/
-
-const BaseLayout = () => {
+const BaseLayout = ({ login, setLogin } : LoginProps ) => {
+    const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false);
 
     const toggleCollapsed = () => setCollapsed(!collapsed)
 
+    useEffect(() => {
+        if( !login ){
+            navigate('/login')
+        }
+    }, [login, navigate])
+
     return (
         <Layout className="w-screen">
             <Header className="bg-white scoll-pl-6 leading-[64px] shadow-2xl drop-shadow-md">
-                <PageHeader />
+                <PageHeader setLogin={setLogin} />
             </Header>
             <Layout hasSider>
                 <Sider breakpoint="lg" collapsed={collapsed}>
@@ -79,6 +61,7 @@ const BaseLayout = () => {
                                 )}></Route>
                             ))
                         )}
+                        <Route path='/*' element={<ErrorPage />} />
                     </Routes>
                 </Content>
             </Layout>

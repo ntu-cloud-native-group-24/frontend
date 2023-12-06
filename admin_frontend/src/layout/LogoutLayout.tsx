@@ -1,26 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Result } from 'antd';
+import { useNavigate } from "react-router-dom";
 
 const LogoutLayout: React.FC = () => {
-
+    const navigate = useNavigate()
     const refTimer = useRef<number | null>(null);
     const [time, setTime] = useState(5);
 
     const jumpLogin = () => {
-        //TODO: jump to login page
-        console.log('TODO');
+        navigate('/login');
     }
 
-    const startTimer = () => {
+    const startTimer = useCallback(() => {
         if(refTimer.current !== null) return;
         refTimer.current = window.setTimeout(() => {
-            console.log('TODO')
+            navigate('/login')
         }, 5000);
-    }
+    }, [navigate])
 
     useEffect(() => {
         startTimer();
-    }, [])
+    }, [startTimer])
 
     useEffect(() => {
         window.setTimeout(() => {

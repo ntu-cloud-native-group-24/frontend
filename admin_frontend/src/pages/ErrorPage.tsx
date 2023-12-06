@@ -1,6 +1,12 @@
+import { Result } from 'antd'
+
 const ErrorPage = () => {
     return (
-        <div>ErrorPage</div>
+        <Result
+            status='404'
+            title='404'
+            subTitle='Not exists such page QAQ'
+        />
     )
 }
 
