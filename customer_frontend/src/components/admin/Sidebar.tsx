@@ -3,7 +3,7 @@ import type { MenuProps } from "antd";
 import { Menu } from "antd";
 import { NodeCollapseOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import { PageRoutes } from "../data/admin/adminRoutes";
+import { PageRoutes } from "../../data/admin/adminRoutes";
 
 type MenuItem = Required<MenuProps>["items"][number];
 

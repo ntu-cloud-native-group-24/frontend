@@ -1,7 +1,7 @@
 import { Breadcrumb } from "antd";
 import { useMemo } from "react";
 import { FolderOutlined } from "@ant-design/icons";
-import ContentHeader from "../../components/ContentHeader";
+import ContentHeader from "../../components/admin/ContentHeader";
 
 export interface ContentProps {
     subMenuName: string; // previous name

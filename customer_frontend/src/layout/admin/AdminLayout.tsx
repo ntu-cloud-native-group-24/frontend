@@ -1,15 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "antd";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../components/admin/Sidebar";
 const { Sider, Content } = Layout;
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { PageRoutes } from "../../data/admin/adminRoutes";
 import ContentLayout from "./ContentLayout";
+import ErrorPage from "../../pages/ErrorPage";
 
-const AdminLayout = () => {
+export interface AdminProps {
+    login: boolean;
+}
+
+const AdminLayout = ({ login }: AdminProps) => {
+    const navigate = useNavigate();
+
     const [collapsed, setCollapsed] = useState(false);
 
     const toggleCollapsed = () => setCollapsed(!collapsed);
+
+    useEffect(() => {
+        if (!login) {
+            navigate("/");
+        }
+    }, [login, navigate]);
 
     return (
         <Layout hasSider>
@@ -52,6 +65,7 @@ const AdminLayout = () => {
                             ))
                         )
                     )}
+                    <Route path="*" element={<ErrorPage />}></Route>
                 </Routes>
             </Content>
         </Layout>

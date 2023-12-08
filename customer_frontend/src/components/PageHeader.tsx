@@ -1,7 +1,6 @@
 import { Flex, Space, Dropdown, Input, Button } from "antd";
 import type { MenuProps } from "antd";
 
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     BellOutlined,
@@ -10,48 +9,24 @@ import {
     UserAddOutlined,
 } from "@ant-design/icons";
 
-import axios from "axios";
-
 const { Search } = Input;
 
 export interface HeaderProps {
-    username: string;
+    login: boolean;
+    setLogin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const PageHeader = () => {
+const PageHeader = ({ login, setLogin }: HeaderProps) => {
     // TODO: find more graceful navigate way
     const navigate = useNavigate();
 
     // TODO: complete Props
     const onSearch = (value: string) => console.log(value);
 
-    // TODO: user login token
-    // const token = undefined;
-    const token = "y";
-
-    // name: "abcdefg"
-    // username: "abcdefgabcdefg"
-    // password: "abcdefgabcdefg"
-
-    // TODO: get user info save in cookies or session
-    // using @fastify/cors to get access to backend api
-    // add following code in app.ts
-    // await app.register(require('@fastify/cors'), {})
-    useEffect(() => {
-        axios
-            .post("http://127.0.0.1:3000/api/login", {
-                username: "abcdefgabcdefg",
-                password: "abcdefgabcdefg",
-            })
-            .then((response) => {
-                console.log(response);
-            });
-    }, []);
-
     // handle button before login
-    const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSignUpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         console.log("click Cart", e);
-        navigate("/register");
+        navigate("/signup");
     };
 
     const handleLoginClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -74,6 +49,10 @@ const PageHeader = () => {
 
     const handleMenuClick: MenuProps["onClick"] = (e) => {
         console.log("click", e);
+        if (e.key == "/logout") {
+            setLogin(false);
+            navigate("/logout");
+        }
         navigate(e.key as string);
     };
 
@@ -102,7 +81,7 @@ const PageHeader = () => {
             <Space>
                 <p className="text-xl">Meal Order</p>
             </Space>
-            {token ? (
+            {login ? (
                 <Space>
                     <Space.Compact>
                         <Search
@@ -130,9 +109,9 @@ const PageHeader = () => {
                 <Space>
                     <Button
                         icon={<UserAddOutlined />}
-                        onClick={handleRegisterClick}
+                        onClick={handleSignUpClick}
                     >
-                        Register
+                        SignUp
                     </Button>
                     <Button icon={<UserOutlined />} onClick={handleLoginClick}>
                         Login
