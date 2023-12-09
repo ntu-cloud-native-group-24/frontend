@@ -2,6 +2,8 @@ import { Button, Card, Flex, Input, Space, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { apiRegister } from "../data/api";
+
 export interface SignUpProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,6 +11,7 @@ export interface SignUpProps {
 
 const SignUpPage = ({ login, setLogin }: SignUpProps) => {
     const navigate = useNavigate();
+    const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
@@ -38,13 +41,25 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
         });
     };
 
-    const onLogin = async () => {
-        console.log(username, password);
+    const onSignUp = async () => {
+        // console.log(name, username, password);
+        const registerData = {
+            name: name,
+            username: username,
+            password: password,
+        };
+        console.log(registerData);
+
         if (username.trim().length === 0 || password.trim().length === 0) {
             warning("Please input username or password!");
             return;
         }
         // TODO: Backend here
+        // CORS
+        // await apiRegister(registerData).then((response) => {
+        //     console.log(response);
+        // }).error((err) => { error(err) });
+
         const result = true;
         if (!result) {
             error("Sign up Fail!");
@@ -81,6 +96,11 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                 <Flex vertical gap="large">
                     <Flex vertical gap="middle">
                         <Input
+                            placeholder="input name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <Input
                             placeholder="input username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -100,8 +120,7 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                             Have an account?
                         </Button>
                     </Space>
-
-                    <Button type="primary" onClick={onLogin}>
+                    <Button type="primary" onClick={onSignUp}>
                         Sign Up
                     </Button>
                 </Flex>

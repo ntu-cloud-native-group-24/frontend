@@ -22,6 +22,12 @@ const LogoutPage: React.FC = () => {
 
     useEffect(() => {
         startTimer();
+        // Clear timer when component unmount
+        return () => {
+            if (refTimer.current !== null) {
+                clearTimeout(refTimer.current);
+            }
+        };
     }, [startTimer]);
 
     useEffect(() => {

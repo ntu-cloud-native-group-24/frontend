@@ -11,6 +11,8 @@ import PageHeader from "../components/PageHeader";
 import PageFooter from "../components/PageFooter";
 import CustomerPageFooter from "../components/customer/CustomerPageFooter";
 
+// import { apiMe } from "../data/api";
+
 const { Header, Footer } = Layout;
 
 const BaseLayout = () => {
@@ -21,6 +23,11 @@ const BaseLayout = () => {
     useEffect(() => {
         // TODO: checked if the user is already login...
         // TODO: find a better way to limit the routes
+
+        // if !login -> check token exists or not
+        // if token exists, do apiMe check
+        // then setLogin
+
         if (!login) {
             const { pathname } = location;
             if (["/", "/login", "/signup", "/logout"].indexOf(pathname) == -1) {
@@ -30,7 +37,7 @@ const BaseLayout = () => {
     }, [login, location, navigate]);
 
     return (
-        <Layout className="w-100 min-h-screen">
+        <Layout className="w-full min-h-screen">
             <Header className="bg-white scroll-pl-6 leading-[64px] shadow-2xl drop-shadow-md top-0 sticky">
                 <PageHeader login={login} setLogin={setLogin} />
             </Header>

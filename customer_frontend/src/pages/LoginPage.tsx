@@ -2,6 +2,8 @@ import { Button, Card, Flex, Input, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { apiLogin, apiMe } from "../data/api";
+
 export interface loginProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -39,13 +41,28 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
     };
 
     const onLogin = async () => {
-        console.log(username, password);
+        // console.log(username, password);
+        const loginData = {
+            username: username,
+            password: password,
+        };
+        console.log(loginData);
+
         if (username.length === 0 || password.length === 0) {
             warning("Please input username or password!");
             return;
         }
         // TODO: Backend here
-        const result = true;
+        // CORS
+        // await apiLogin(loginData).then((response) => {
+        //     console.log(response);
+        // }).error((err) => { error(err) });
+
+        // await apiMe("").then((res) => {
+        //     console.log(res);
+        // });
+
+        const result = false;
         if (!result) {
             error("Login Fail!");
         } else {
