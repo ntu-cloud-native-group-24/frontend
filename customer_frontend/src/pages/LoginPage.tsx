@@ -66,7 +66,7 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
             vertical
             justify="center"
             align="center"
-            className='h-screen w-100 bg-cover bg-[url("https://wallpaperaccess.com/full/1677786.jpg")]'
+            className='h-[calc(100vh_-_64px_-_30px)] w-full bg-cover bg-[url("/src/assets/background/bg_login.jpg")]'
         >
             {contextHolder}
             <Card

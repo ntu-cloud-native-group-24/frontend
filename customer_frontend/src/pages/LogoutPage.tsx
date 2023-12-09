@@ -33,7 +33,11 @@ const LogoutPage: React.FC = () => {
     const subTitle = `將會在 ${time > 0 ? time : 0} 秒後跳轉回登入頁面`;
 
     return (
-        <Flex justify="center" align="center">
+        <Flex
+            className="h-[calc(100vh_-_64px_-_30px)]"
+            justify="center"
+            align="center"
+        >
             <Result
                 status="success"
                 title="成功登出訂餐管理系統！"

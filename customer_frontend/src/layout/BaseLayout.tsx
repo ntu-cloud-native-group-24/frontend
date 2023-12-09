@@ -14,7 +14,7 @@ import CustomerPageFooter from "../components/customer/CustomerPageFooter";
 const { Header, Footer } = Layout;
 
 const BaseLayout = () => {
-    const [login, setLogin] = useState(true);
+    const [login, setLogin] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 

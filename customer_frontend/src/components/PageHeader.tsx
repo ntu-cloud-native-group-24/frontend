@@ -1,4 +1,4 @@
-import { Flex, Space, Dropdown, Input, Button } from "antd";
+import { Flex, Space, Dropdown, Input, Button, Typography } from "antd";
 import type { MenuProps } from "antd";
 
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,11 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
 
     // TODO: complete Props
     const onSearch = (value: string) => console.log(value);
+
+    const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        console.log("click home", e);
+        navigate("/");
+    };
 
     // handle button before login
     const handleSignUpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -79,7 +84,17 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
     return (
         <Flex align="center" justify="space-between">
             <Space>
-                <p className="text-xl">Meal Order</p>
+                <Button
+                    type="link"
+                    onClick={handleHomeClick}
+                    className="h-full"
+                >
+                    <Typography.Title
+                        style={{ padding: 10, margin: 0, fontSize: 24 }}
+                    >
+                        Meal Order
+                    </Typography.Title>
+                </Button>
             </Space>
             {login ? (
                 <Space>

@@ -66,7 +66,7 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
             vertical
             justify="center"
             align="center"
-            className='h-screen w-100 bg-[url("https://wallpaperaccess.com/full/1725723.jpg")] bg-cover'
+            className='h-[calc(100vh_-_64px_-_30px)] w-full bg-[url("/src/assets/background/bg_signup.jpg")] bg-cover'
         >
             {contextHolder}
             <Card
