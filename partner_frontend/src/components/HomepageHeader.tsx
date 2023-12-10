@@ -5,10 +5,7 @@ import { GlobalOutlined, UserOutlined } from '@ant-design/icons';
 
 const HomepageHeader: React.FC = () => {
 
-    const redirectLogin = () => {
-        //TODO: 
-        console.log('go login');
-    }
+    const redirectLogin = () => window.location = import.meta.env.VITE_STORE_SYSTEM_URL;
 
     return (
         <Flex align="center" justify='space-between' className='bg-white'>

@@ -1,11 +1,15 @@
-import { Button, Card, Flex, Input, Typography, Form, Upload, TimePicker } from "antd"
+import { Button, Card, Flex, Input, Typography, Form, Upload, message } from "antd"
 import TextArea from "antd/es/input/TextArea"
 import {
     PlusOutlined,
 } from '@ant-design/icons';
- 
+import { UploadChangeParam } from "antd/lib/upload/interface";
+import { userApi } from "../api/user";
+import { storeApi } from "../api/store";
+import { useState } from "react";
+import { CreateStoreApiType } from "../interfaces/StoreInterface";
 
-const normFile = (e: any) => {
+const normFile = (e: UploadChangeParam) => {
     if (Array.isArray(e)) {
       return e;
     }
@@ -14,11 +18,77 @@ const normFile = (e: any) => {
 
 const SignupLayout = () => {
 
-    // TODO: Store's Open_time -> Close_time and days (1, ..., 7)
+    const [messageApi, contextHolder] = message.useMessage();
+    const [loading, setLoading] = useState(false);
     const [form] = Form.useForm()
 
-    const onSignup = () => {
-        console.log(form.getFieldsValue())
+    const success = () => {
+        messageApi.open({
+            type: 'success',
+            content: 'Success!',
+        });
+    };
+
+    const error = (err: string) => {
+        messageApi.open({
+            type: 'error',
+            content: err,
+        });
+    };
+
+    const warning = (err: string) => {
+        messageApi.open({
+            type: 'warning',
+            content: err,
+        });
+    };
+
+    const onSignup = async () => {
+        setLoading(true);
+        // 0. check values
+        const name = form.getFieldValue('name')
+        const username = form.getFieldValue('username')
+        const password = form.getFieldValue('password')
+        if( !name || !username || !password || name.trim().length === 0 || username.trim().length === 0 || password.trim().length === 0 ) {
+            warning('Please fill in all the fields.')
+            setLoading(false); return;
+        }
+        if( !form.getFieldValue('store_name') || !form.getFieldValue('store_address') || !form.getFieldValue('store_phone') || !form.getFieldValue('store_email') ) {
+            warning('Please fill in all the fields.')
+            setLoading(false); return;
+        }
+
+        const storeData: CreateStoreApiType = {
+            name: form.getFieldValue('store_name').trim(),
+            description: form.getFieldValue('store_description') || '',
+            address: form.getFieldValue('store_address').trim(),
+            //TODO: picture
+            picture_url: form.getFieldValue('store_picture') || '',
+            status: true,
+            phone: form.getFieldValue('store_phone').trim(),
+            email: form.getFieldValue('store_email').trim(),
+        }
+
+        if( storeData.name.length === 0 || storeData.address.length === 0 || storeData.phone.length === 0 || storeData.email.length === 0 ) {
+            warning('Please fill in all the fields.')
+            setLoading(false); return;
+        }
+
+        const userResponse = await userApi.register(name.trim(), username.trim(), password.trim());
+        if( !userResponse || userResponse.status !== 200 ){
+            error(userResponse?.data.message || 'Server Encountered Error');
+            setLoading(false); return;
+        }
+
+        const storeResponse = await storeApi.createStore(storeData);
+        if( !storeResponse || storeResponse.status !== 200 ){
+            error(storeResponse?.data.message || 'Server Encountered Error');
+            setLoading(false); return;
+        }
+
+        success();
+        setLoading(false);
+        return;
     }
 
     return (
@@ -28,11 +98,14 @@ const SignupLayout = () => {
                     <Typography.Title>Sign up</Typography.Title>
                     <Flex vertical className="w-full" align="center">
                         <Form layout='vertical' className="w-1/2" form={form}>
+                            <Form.Item label='Name' name='name' rules={[{ required: true }]}>
+                                <Input placeholder="wzwr"/>
+                            </Form.Item>
                             <Form.Item label='Username' name='username' rules={[{ required: true }]}>
-                                <Input placeholder="username"/>
+                                <Input placeholder="wzwr1029"/>
                             </Form.Item>
                             <Form.Item label='Password' name='password' rules={[{ required: true }]}>
-                                <Input.Password placeholder="password" />
+                                <Input.Password placeholder="s3cr3t" />
                             </Form.Item>
                             <Form.Item label="Store's Name" name='store_name' rules={[{ required: true }]}>
                                 <Input placeholder="台大好吃餐廳"/>
@@ -46,7 +119,7 @@ const SignupLayout = () => {
                             <Form.Item label="Store's Phone" name='store_phone' rules={[{ required: true }]}>
                                 <Input placeholder="0967878787"/>
                             </Form.Item>
-                            <Form.Item label="Store's Email" name='store_email' rules={[{ required: true }]}>
+                            <Form.Item label="Store's Email" name='store_email' rules={[{ required: true, type: 'email' }]}>
                                 <Input placeholder="figma@so_hard.com"/>
                             </Form.Item>
                             <Form.Item label="Upload Store's banner" valuePropName="fileList" getValueFromEvent={normFile} name="store_picture">
@@ -61,10 +134,11 @@ const SignupLayout = () => {
                     </Flex>
                     <Flex vertical>
                         <p className="text-[10px] opacity-60">By continuing, you agree to the Self Service PSS and Privacy Policy.</p>
-                        <Button onClick={onSignup} type='primary' className="bg-blue-500">Continue</Button>
+                        <Button loading={loading} onClick={onSignup} type='primary' className="bg-blue-500">Continue</Button>
                     </Flex>
                 </Flex>
             </Card>
+            {contextHolder}
         </Flex>
     )
 }

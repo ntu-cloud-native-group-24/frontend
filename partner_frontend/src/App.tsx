@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import SignupLayout from "./layout/SignupLayout"
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>

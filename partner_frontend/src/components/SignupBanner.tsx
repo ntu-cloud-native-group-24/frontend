@@ -7,8 +7,7 @@ const SignupBanner = () => {
     }
 
     const onClickLogin = () => {
-        //TODO: redirect to login page
-        console.log('TODO')
+        window.location = import.meta.env.VITE_STORE_SYSTEM_URL;
     }
 
     return (
