@@ -13,5 +13,16 @@ export const storeApi = {
             const err = error as AxiosError
             return err.response;
         }
+    },
+    async getImageApi(type: string, prefix: string){
+        try{
+            const response = await api.post('/images', {
+                type, prefix
+            });
+            return response;
+        } catch (error) {
+            const err = error as AxiosError
+            return err.response;
+        }
     }
 }

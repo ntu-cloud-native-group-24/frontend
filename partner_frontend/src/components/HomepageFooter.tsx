@@ -21,7 +21,6 @@ const HomepageFooter: React.FC = () => {
                 </Flex>
             </Flex>
             <Flex align='center' gap={60}>
-                {/* TODO: put images on here */}
                 <a href='#google-play'><img alt="googleplay" src="https://freepngimg.com/download/android/67006-app-play-google-android-store-free-clipart-hd.png" width={128} height={128}></img></a>
                 <a href='#apple-play'><img alt="googleplay" src="https://digitopoly.files.wordpress.com/2016/06/app-store-logo.png" width={128} height={128}></img></a>
             </Flex>

@@ -8,6 +8,8 @@ import { userApi } from "../api/user";
 import { storeApi } from "../api/store";
 import { useState } from "react";
 import { CreateStoreApiType } from "../interfaces/StoreInterface";
+import { BlockBlobClient } from "@azure/storage-blob";
+import api from "../api/axiosClient";
 
 const normFile = (e: UploadChangeParam) => {
     if (Array.isArray(e)) {
@@ -43,13 +45,67 @@ const SignupLayout = () => {
         });
     };
 
+    const createUserToBackend = async (name: string, email: string, username: string, password: string, ) => {
+        const userResponse = await userApi.register(name, username, password, email);
+        if( !userResponse || userResponse.status !== 200 ){
+            if( userResponse?.data.message === 'User already exists' ){
+                return 'OK';
+            }
+            error(userResponse?.data.message || 'Server Encountered Error');
+            return undefined;
+        }
+        return userResponse;
+    }
+
+    const createImageToAzure = async () => {
+        const file_prefix = form.getFieldValue('store_picture')[0].originFileObj.name.split('.')[0].trim();
+        const file_type = form.getFieldValue('store_picture')[0].type;
+        const imageResponse = await storeApi.getImageApi(file_type, file_prefix);
+        console.log(imageResponse);
+        if( !imageResponse || imageResponse.status !== 200 ){
+            error(imageResponse?.data.message || 'Cannot get SAS Token');
+            return undefined;
+        }
+        const sas = imageResponse.data.upload.sas;
+        const client = new BlockBlobClient(sas);
+        console.log(sas, client);
+
+        const file = form.getFieldValue('store_picture')[0].originFileObj;
+        console.log(file);
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const arrayBuffer = reader.result as ArrayBuffer;
+            const blob = new Blob([arrayBuffer], { type: file.type });
+            console.log(arrayBuffer, blob)
+            const azureResponse = await client.uploadData(blob, {
+                blobHTTPHeaders: {
+                    blobContentType: file.type,
+                    blobCacheControl: 'public, max-age=86400'
+                }
+            });
+            console.log(azureResponse);
+        }
+        reader.readAsArrayBuffer(file);
+        return imageResponse.data;
+    }
+
+    const createStoreToBackend = async (storeData: CreateStoreApiType) => {
+        const storeResponse = await storeApi.createStore(storeData);
+        if( !storeResponse || storeResponse.status !== 200 ){
+            error(storeResponse?.data.message || 'Server Encountered Error');
+            return undefined;
+        }
+        return storeResponse;
+    }
+
     const onSignup = async () => {
         setLoading(true);
-        // 0. check values
+
         const name = form.getFieldValue('name')
         const username = form.getFieldValue('username')
         const password = form.getFieldValue('password')
-        if( !name || !username || !password || name.trim().length === 0 || username.trim().length === 0 || password.trim().length === 0 ) {
+        const email = form.getFieldValue('email')
+        if( !email || !name || !username || !password || name.trim().length === 0 || username.trim().length === 0 || password.trim().length === 0 || email.trim().length === 0 ) {
             warning('Please fill in all the fields.')
             setLoading(false); return;
         }
@@ -58,36 +114,45 @@ const SignupLayout = () => {
             setLoading(false); return;
         }
 
+        /* Danger Zone */
+        
+        const userResponse = await createUserToBackend(name, email, username, password);
+        if( !userResponse ) { setLoading(false); return; }
+        const loginResponse = await userApi.login(username, password);
+        console.log(loginResponse);
+        if (!loginResponse || loginResponse.status !== 200) {
+            error(loginResponse?.data.message || 'Server Encountered Error');
+            setLoading(false);
+            return;
+        }
+        // Set axios API headers
+        const token = loginResponse.data.token;
+        api.defaults.headers.common['x-api-key'] = token;
+
+        // Upload image if exists, otherwise skip this step
+        let picture_url = '';
+        if( form.getFieldValue('store_picture')[0] != undefined ){
+            const ImageData = await createImageToAzure();
+            if( !ImageData ) { setLoading( false ); return; } 
+            picture_url = ImageData.upload.url;
+        }
+
         const storeData: CreateStoreApiType = {
-            name: form.getFieldValue('store_name').trim(),
-            description: form.getFieldValue('store_description') || '',
-            address: form.getFieldValue('store_address').trim(),
-            //TODO: picture
-            picture_url: form.getFieldValue('store_picture') || '',
+            name: form.getFieldValue('store_name'),
+            description: form.getFieldValue('store_description'),
+            address: form.getFieldValue('store_address'),
+            phone: form.getFieldValue('store_phone'),
+            email: form.getFieldValue('store_email'),
             status: true,
-            phone: form.getFieldValue('store_phone').trim(),
-            email: form.getFieldValue('store_email').trim(),
+            picture_url: picture_url,
         }
 
-        if( storeData.name.length === 0 || storeData.address.length === 0 || storeData.phone.length === 0 || storeData.email.length === 0 ) {
-            warning('Please fill in all the fields.')
-            setLoading(false); return;
-        }
-
-        const userResponse = await userApi.register(name.trim(), username.trim(), password.trim());
-        if( !userResponse || userResponse.status !== 200 ){
-            error(userResponse?.data.message || 'Server Encountered Error');
-            setLoading(false); return;
-        }
-
-        const storeResponse = await storeApi.createStore(storeData);
-        if( !storeResponse || storeResponse.status !== 200 ){
-            error(storeResponse?.data.message || 'Server Encountered Error');
-            setLoading(false); return;
-        }
-
+        const storeResponse = await createStoreToBackend(storeData);
+        if( !storeResponse ) { setLoading(false); return; }
+        
         success();
         setLoading(false);
+        form.resetFields();
         return;
     }
 
@@ -100,6 +165,9 @@ const SignupLayout = () => {
                         <Form layout='vertical' className="w-1/2" form={form}>
                             <Form.Item label='Name' name='name' rules={[{ required: true }]}>
                                 <Input placeholder="wzwr"/>
+                            </Form.Item>
+                            <Form.Item label="Personal's Email" name='email' rules={[{ required: true, type: 'email' }]}>
+                                <Input placeholder="wzwr@cloud_native.com"/>
                             </Form.Item>
                             <Form.Item label='Username' name='username' rules={[{ required: true }]}>
                                 <Input placeholder="wzwr1029"/>
@@ -123,7 +191,7 @@ const SignupLayout = () => {
                                 <Input placeholder="figma@so_hard.com"/>
                             </Form.Item>
                             <Form.Item label="Upload Store's banner" valuePropName="fileList" getValueFromEvent={normFile} name="store_picture">
-                                <Upload action="/upload.do" listType="picture-card" maxCount={1}>
+                                <Upload beforeUpload={() => { return false; }}listType="picture-card" maxCount={1}>
                                     <div>
                                     <PlusOutlined />
                                     <div style={{ marginTop: 8 }}>Upload</div>
