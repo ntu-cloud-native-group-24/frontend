@@ -7,7 +7,7 @@ export default defineConfig({
   server:{
     proxy:{
       "/api": {
-        target: "https://meal-order-24.csie.org",
+        target: "https://backend.meal-order-24.csie.org",
         changeOrigin: true,
       }
     }
