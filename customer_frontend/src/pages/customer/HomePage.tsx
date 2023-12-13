@@ -222,22 +222,22 @@ const HomePage = ({ login }: CustomerProps) => {
                     <Flex vertical gap={0}>
                         <div className="h-[calc(100vh_-_64px)] w-full bg-cover bg-[url('/src/assets/background/bg_home.jpg')]">
                             <Flex
-                                className="h-full w-full text-white pl-32 bg-black bg-opacity-50"
+                                className="h-full w-full text-white pl-10 bg-black bg-opacity-50"
                                 align="center"
                             >
-                                <Flex vertical>
-                                    <Typography.Title
-                                        style={{ color: "white", fontSize: 72 }}
+                                <Flex vertical gap={10} className="w-full">
+                                    <Typography.Title 
+                                        style={{ color: "white", fontSize: 72 }} 
                                     >
                                         Choose The Foods
                                         <br />
                                         That Give You Energy
                                     </Typography.Title>
-                                    <Flex gap="large">
+                                    <Flex gap="large" className="h-full w-full">
                                         <Button
                                             onClick={onClickSignup}
                                             type="primary"
-                                            className="bg-black text-white w-[7rem] h-[3rem]"
+                                            className="bg-white text-black w-[7rem] h-[3rem]"
                                         >
                                             Sign up
                                         </Button>

@@ -38,7 +38,7 @@ const BaseLayout = () => {
 
     return (
         <Layout className="w-full min-h-screen">
-            <Header className="bg-white scroll-pl-6 leading-[64px] shadow-2xl drop-shadow-md top-0 sticky">
+            <Header className="bg-white scroll-pl-6 leading-[64px] shadow-2xl drop-shadow-md top-0 sticky z-10">
                 <PageHeader login={login} setLogin={setLogin} />
             </Header>
             <Routes>

@@ -62,7 +62,7 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
         //     console.log(res);
         // });
 
-        const result = false;
+        const result = true;
         if (!result) {
             error("Login Fail!");
         } else {

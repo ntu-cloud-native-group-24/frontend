@@ -87,10 +87,10 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                 <Button
                     type="link"
                     onClick={handleHomeClick}
-                    className="h-full"
+                    className='h-full relative top-1'
                 >
                     <Typography.Title
-                        style={{ padding: 10, margin: 0, fontSize: 24 }}
+                        style={{ padding: 15, margin: -50, fontSize: 24 }}
                     >
                         Meal Order
                     </Typography.Title>
@@ -122,15 +122,17 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                 </Space>
             ) : (
                 <Space>
-                    <Button
-                        icon={<UserAddOutlined />}
-                        onClick={handleSignUpClick}
-                    >
-                        SignUp
-                    </Button>
-                    <Button icon={<UserOutlined />} onClick={handleLoginClick}>
-                        Login
-                    </Button>
+                    <Flex wrap='wrap' gap={5} align='center' justify='space-between'>
+                        <Button
+                            icon={<UserAddOutlined />}
+                            onClick={handleSignUpClick}
+                        >
+                            Sign up
+                        </Button>
+                        <Button icon={<UserOutlined />} onClick={handleLoginClick}>
+                            Log in
+                        </Button>
+                    </Flex>
                 </Space>
             )}
         </Flex>
