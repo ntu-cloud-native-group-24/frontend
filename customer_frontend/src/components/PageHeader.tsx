@@ -82,22 +82,22 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
     };
 
     return (
-        <Flex align="center" justify="space-between">
-            <Space>
+        <Flex wrap="wrap" className="h-full" justify="space-between">
+            <Flex className="h-full">
                 <Button
                     type="link"
                     onClick={handleHomeClick}
-                    className="h-full relative top-1"
+                    className="h-full"
                 >
                     <Typography.Title
-                        style={{ padding: 15, margin: -50, fontSize: 24 }}
+                        style={{ padding: 0, margin: 0, fontSize: 24 }}
                     >
                         Meal Order
                     </Typography.Title>
                 </Button>
-            </Space>
+            </Flex>
             {login ? (
-                <Space>
+                <Flex>
                     <Space.Compact>
                         <Search
                             placeholder="input search text"
@@ -119,15 +119,10 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                     <Dropdown menu={menuProps}>
                         <Button icon={<UserOutlined />}>Ruby</Button>
                     </Dropdown>
-                </Space>
+                </Flex>
             ) : (
-                <Space>
-                    <Flex
-                        wrap="wrap"
-                        gap={5}
-                        align="center"
-                        justify="space-between"
-                    >
+                <Flex>
+                    <Flex gap={5} align="center" justify="space-between">
                         <Button
                             icon={<UserAddOutlined />}
                             onClick={handleSignUpClick}
@@ -141,7 +136,7 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                             Log in
                         </Button>
                     </Flex>
-                </Space>
+                </Flex>
             )}
         </Flex>
     );

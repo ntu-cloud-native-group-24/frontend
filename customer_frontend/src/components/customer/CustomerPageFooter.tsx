@@ -10,7 +10,7 @@ import {
 const CustomerPageFooter = () => {
     return (
         <Flex vertical gap={5}>
-            <Flex align="cent er" justify="space-between">
+            <Flex align="center" justify="space-between">
                 <Flex wrap="wrap" gap={10} align="center" justify="center">
                     <Button
                         size="large"
