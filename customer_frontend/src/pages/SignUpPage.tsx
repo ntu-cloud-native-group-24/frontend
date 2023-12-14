@@ -12,6 +12,7 @@ export interface SignUpProps {
 const SignUpPage = ({ login, setLogin }: SignUpProps) => {
     const navigate = useNavigate();
     const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
@@ -45,6 +46,7 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
         // console.log(name, username, password);
         const registerData = {
             name: name,
+            email: email,
             username: username,
             password: password,
         };
@@ -99,6 +101,11 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                             placeholder="input name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                        />
+                        <Input
+                            placeholder="input email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         <Input
                             placeholder="input username"
