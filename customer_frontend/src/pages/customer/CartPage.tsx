@@ -1,9 +1,10 @@
 
-import { Card, Flex, Button, Space, Table, Select } from 'antd';
+import { Card, Flex, Button, Space, Table, Select, Statistic, Col, Row } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 interface DataType {
     key: string;
+    image: string;
     name: string;
     note: string;
     price: number;
@@ -14,10 +15,16 @@ interface DataType {
 
 const handleChange = (value: string) => {
     console.log(`selected ${value}`);
-  };
+};
 
 
 const columns: ColumnsType<DataType> = [
+    {
+        title: '圖片',
+        dataIndex: 'image',
+        key: 'image',
+        render: (image) => <img src={image} alt="food" width={100} height={100} />,
+    },
     {
         title: '商品',
         dataIndex: 'name',
@@ -33,6 +40,7 @@ const columns: ColumnsType<DataType> = [
         title: '單價',
         dataIndex: 'price',
         key: 'price',
+        render: (price) => <>{'$'+price}</>,
     },
     {
         title: '數量',
@@ -51,6 +59,7 @@ const columns: ColumnsType<DataType> = [
         title: '小計',
         dataIndex: 'total',
         key: 'total',
+        render: (total) => <>{'$'+total}</>,
     },
     {
         title: '刪除',
@@ -66,6 +75,7 @@ const columns: ColumnsType<DataType> = [
 const data: DataType[] = [
     {
         key: '1',
+        image: 'pic1',
         name: '牛肉麵',
         note: '不要香菜',
         price: 120,
@@ -75,6 +85,7 @@ const data: DataType[] = [
     },
     {
         key: '2',
+        image: 'pic2',
         name: '花干',
         note: '不要醬油',
         price: 50,
@@ -84,6 +95,7 @@ const data: DataType[] = [
     },
     {
         key: '3',
+        image: 'pic3',
         name: '牛肉湯麵',
         note: '不要香菜',
         price: 100,
@@ -100,13 +112,20 @@ const CartPage = () => {
 
         <Card title="ML Pasta">
             <Table columns={columns} dataSource={data} />
-
         </Card>
-        
-
-        <Button type="primary" block style={{ width: '30%', marginLeft: 'auto' }}>
-            Go to Checkout
-        </Button>
+        <Row gutter={50} justify={"center"} align={"middle"}>
+            <Col span={3} offset={3} >
+                <Statistic title="共" value={3+"項"} />
+            </Col>
+            <Col span={3} offset={3}>
+                <Statistic title="總計" value={"$"+270} />
+            </Col>
+            <Col span={10} offset={2}>
+                <Button type="primary" block style={{ width: '60%'}}>
+                    Go to Checkout
+                </Button>
+            </Col>
+        </Row>
     </Flex>)
     )
         ;
