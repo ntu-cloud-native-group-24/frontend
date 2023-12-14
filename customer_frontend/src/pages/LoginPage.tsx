@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Input, Typography, message } from "antd";
+import { Button, Card, Flex, Input, Typography, message, Form } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,8 +11,8 @@ export interface loginProps {
 
 const LoginPage = ({ login, setLogin }: loginProps) => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    // const [username, setUsername] = useState("");
+    // const [password, setPassword] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSignUpClick = () => {
@@ -40,13 +40,9 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
         });
     };
 
-    const onLogin = async () => {
-        // console.log(username, password);
-        const loginData = {
-            username: username,
-            password: password,
-        };
+    const onLogin = async (loginData: any) => {
         console.log(loginData);
+        const { username, password } = loginData;
 
         if (username.length === 0 || password.length === 0) {
             warning("Please input username or password!");
@@ -92,11 +88,66 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                         Login
                     </Typography.Title>
                 }
-                style={{ width: 450 }}
+                style={{ width: "50%", minWidth: 350 }}
                 className="opacity-90"
             >
                 <Flex vertical gap="large">
-                    <Flex vertical gap="middle">
+                    <Form
+                        name="login"
+                        className="login-form"
+                        initialValues={{ remember: true }}
+                        onFinish={onLogin}
+                    >
+                        <Form.Item
+                            name="username"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your Username!",
+                                },
+                            ]}
+                        >
+                            <Input placeholder="input username" />
+                        </Form.Item>
+                        <Form.Item
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your Password!",
+                                },
+                            ]}
+                        >
+                            <Input
+                                type="password"
+                                placeholder="input password"
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Flex justify="space-between">
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={handleSignUpClick}
+                                >
+                                    Don't have an account?
+                                </Button>
+                                <Button type="link" size="small">
+                                    Forget password?
+                                </Button>
+                            </Flex>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className="w-full"
+                            >
+                                Login
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    {/* <Flex vertical gap="middle">
                         <Input
                             placeholder="input username"
                             value={username}
@@ -122,7 +173,7 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                     </Flex>
                     <Button type="primary" onClick={onLogin}>
                         Login
-                    </Button>
+                    </Button> */}
                 </Flex>
             </Card>
         </Flex>
