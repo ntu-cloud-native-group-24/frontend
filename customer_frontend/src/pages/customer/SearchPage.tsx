@@ -27,18 +27,25 @@ const SearchPage = () => {
                     >
                         <Flex vertical className="py-10">
                             <Typography.Title
-                                style={{ color: "white", fontSize: 48 }}
+                                style={{
+                                    color: "white",
+                                    fontSize: 48,
+                                    margin: 0,
+                                    padding: 0,
+                                }}
                             >
                                 Search Store
                             </Typography.Title>
                         </Flex>
                     </Flex>
                 </div>
+
                 <Flex
-                    className="grid md:grid-cols-6 grid-cols-1"
                     wrap="wrap"
-                    gap={10}
+                    className="grid 2xl:grid-cols-6 xl:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2"
+                    gap="small"
                 >
+                    {/* iterative store */}
                     <StoreDisplay store={dummyStore} foods={[]} />
                     <StoreDisplay store={dummyStore} foods={[]} />
                     <StoreDisplay store={dummyStore} foods={[]} />

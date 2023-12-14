@@ -9,7 +9,8 @@ const FoodDisplay = ({ food }: FoodDisplayProps) => {
     const navigate = useNavigate();
 
     const onStoreClick = () => {
-        navigate("/store/1");
+        // TODO: navigate to store/:store-id/:meal-id
+        navigate("/store/1/dsajk");
     };
 
     return (

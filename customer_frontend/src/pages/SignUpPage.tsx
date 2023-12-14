@@ -1,8 +1,8 @@
-import { Button, Card, Flex, Input, Space, Typography, message } from "antd";
+import { Button, Card, Flex, Input, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { apiRegister } from "../data/api";
+// import { apiRegister } from "../data/api";
 
 export interface SignUpProps {
     login: boolean;
@@ -92,10 +92,10 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                         Sign Up
                     </Typography.Title>
                 }
-                style={{ width: 450 }}
+                style={{ width: "50%", minWidth: 350 }}
                 className="opacity-90"
             >
-                <Flex vertical gap="large">
+                <Flex vertical gap="large" className="min-w-70">
                     <Flex vertical gap="middle">
                         <Input
                             placeholder="input name"
@@ -118,7 +118,7 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </Flex>
-                    <Space>
+                    <Flex>
                         <Button
                             type="link"
                             size="small"
@@ -126,7 +126,7 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                         >
                             Have an account?
                         </Button>
-                    </Space>
+                    </Flex>
                     <Button type="primary" onClick={onSignUp}>
                         Sign Up
                     </Button>

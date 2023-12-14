@@ -1,4 +1,3 @@
-
 import { Card, Flex, Button, Space, Table, Select, Statistic, Col, Row } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -16,7 +15,6 @@ interface DataType {
 const handleChange = (value: string) => {
     console.log(`selected ${value}`);
 };
-
 
 const columns: ColumnsType<DataType> = [
     {
@@ -107,6 +105,17 @@ const data: DataType[] = [
 
 
 const CartPage = () => {
+    const navigate = useNavigate();
+
+    const handlePayment = ()=>{
+        navigate("/payment");
+    }
+
+    return (
+        <Flex vertical gap="small" style={{ width: "100%" }}>
+            <Card title="ML Pasta">
+                <Table columns={columns} dataSource={data} />
+            </Card>
 
     return ((<Flex vertical gap="small" style={{ width: '100%' }}>
 
@@ -121,14 +130,13 @@ const CartPage = () => {
                 <Statistic title="總計" value={"$"+270} />
             </Col>
             <Col span={10} offset={2}>
-                <Button type="primary" block style={{ width: '60%'}}>
+                <Button type="primary" block style={{ width: '60%'}} onClick={handlePayment}>
                     Go to Checkout
                 </Button>
             </Col>
         </Row>
     </Flex>)
-    )
-        ;
+    );
 };
 
 export default CartPage;

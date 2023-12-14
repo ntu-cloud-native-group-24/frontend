@@ -4,6 +4,7 @@ import { SaveOutlined, IssuesCloseOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 
 const PasswordSettings = () => {
+
   const { Password } = Input;
 
   const [form] = Form.useForm<{
@@ -14,6 +15,7 @@ const PasswordSettings = () => {
 
   const onFinish = () => {
     //TODO: send these form to backend
+    // call post /api/me/password to change password
     console.log(form.getFieldsValue());
   };
   const onFinishFailed = () => console.log("submit failed!");

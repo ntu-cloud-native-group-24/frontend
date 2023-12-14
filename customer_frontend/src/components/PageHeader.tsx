@@ -21,7 +21,10 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
     const navigate = useNavigate();
 
     // TODO: complete Props
-    const onSearch = (value: string) => console.log(value);
+    const onSearch = (value: string) => {
+        console.log(value);
+        navigate("/search")
+    }
 
     const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         console.log("click home", e);
@@ -68,7 +71,7 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
         },
         {
             label: "Orders",
-            key: "/admin/order/pending",
+            key: "/admin/order",
         },
         {
             label: "Log out",
@@ -97,7 +100,7 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                 </Button>
             </Flex>
             {login ? (
-                <Flex>
+                <Flex align="center">
                     <Space.Compact>
                         <Search
                             placeholder="input search text"

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PCStoreSubPage from "./__subpage/PCStoreSubPage";
-import MobileStoreSubPage from "./__subpage/MobileStoreSubPage";
+
 import {
     StoreType,
     dummyData,
@@ -8,33 +8,33 @@ import {
 } from "../../../interfaces/StoreInterface";
 import { FoodType } from "../../../interfaces/FoodInterface";
 
-function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-        width,
-        height,
-    };
-}
+// function getWindowDimensions() {
+//     const { innerWidth: width, innerHeight: height } = window;
+//     return {
+//         width,
+//         height,
+//     };
+// }
 
-function useWindowDimensions() {
-    const [windowDimensions, setWindowDimensions] = useState(
-        getWindowDimensions()
-    );
+// function useWindowDimensions() {
+//     const [windowDimensions, setWindowDimensions] = useState(
+//         getWindowDimensions()
+//     );
 
-    useEffect(() => {
-        function handleResize() {
-            setWindowDimensions(getWindowDimensions());
-        }
+//     useEffect(() => {
+//         function handleResize() {
+//             setWindowDimensions(getWindowDimensions());
+//         }
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+//         window.addEventListener("resize", handleResize);
+//         return () => window.removeEventListener("resize", handleResize);
+//     }, []);
 
-    return windowDimensions;
-}
+//     return windowDimensions;
+// }
 
 const StorePage = () => {
-    const { height, width } = useWindowDimensions();
+    // const { height, width } = useWindowDimensions();
     const [store, setStore] = useState<StoreType>(dummyStore);
     const [foods, setFoods] = useState<FoodType[]>(dummyData);
 
@@ -42,7 +42,7 @@ const StorePage = () => {
         //TODO: fetch data from backend
         setStore(dummyStore);
         setFoods(dummyData);
-        console.log(height);
+        // console.log(height);
     }, []);
 
     return (
