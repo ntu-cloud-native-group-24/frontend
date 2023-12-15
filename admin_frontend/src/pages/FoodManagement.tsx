@@ -165,7 +165,7 @@ const FoodManagement = () => {
                 value: 1000,
             }),
             filteredValue: filteredInfo.price || null,
-            onFilter: (value: number, record) => { 
+            onFilter: (value: any, record) => { 
                 if( value >= 1000 ){
                     return record.price > value;
                 } else {
@@ -187,7 +187,7 @@ const FoodManagement = () => {
                 {text: 'SOLD OUT', value: false},
             ],
             filteredValue: filteredInfo.status || null,
-            onFilter: (value: boolean, record) => record.status === value,
+            onFilter: (value: any, record) => record.status === value,
             sorter: (a) => a.status ? 1 : -1,
             sortOrder: sortedInfo.columnKey === 'status' ? sortedInfo.order : null,
             render: (_ ,food) => (
@@ -210,7 +210,7 @@ const FoodManagement = () => {
                 value: 2000,
             }),
             filteredValue: filteredInfo.soldAmount || null,
-            onFilter: (value: number, record) => {
+            onFilter: (value: any, record) => {
                 if (value >= 2000){
                     return record.soldAmount > 2000
                 } else {

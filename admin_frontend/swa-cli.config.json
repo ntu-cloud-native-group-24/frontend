@@ -1,0 +1,14 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "admin-frontend": {
+      "appLocation": ".",
+      "outputLocation": "dist",
+      "appBuildCommand": "yarn build",
+      "run": "yarn dev",
+      "appDevserverUrl": "http://localhost:5173",
+      "appName": "admin-frontend",
+      "resourceGroup": "meal-order-24"
+    }
+  }
+}
