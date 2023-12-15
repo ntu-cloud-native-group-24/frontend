@@ -8,7 +8,7 @@
       "run": "yarn dev",
       "appDevserverUrl": "http://localhost:5173",
       "appName": "partner-frontend",
-      "resourceGroup": "partner-frontend-rg"
+      "resourceGroup": "meal-order-24"
     }
   }
 }
