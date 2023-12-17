@@ -3,28 +3,32 @@ import type { MenuProps } from "antd";
 
 import { useNavigate } from "react-router-dom";
 import {
-    BellOutlined,
     ShoppingCartOutlined,
     UserOutlined,
     UserAddOutlined,
 } from "@ant-design/icons";
+
+import { useCookies } from "react-cookie";
+import api from "../api/axiosClient";
 
 const { Search } = Input;
 
 export interface HeaderProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
+    currentUser: any;
 }
 
-const PageHeader = ({ login, setLogin }: HeaderProps) => {
+const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
     // TODO: find more graceful navigate way
     const navigate = useNavigate();
+    const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
     // TODO: complete Props
     const onSearch = (value: string) => {
         console.log(value);
-        navigate("/search")
-    }
+        navigate("/search");
+    };
 
     const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         console.log("click home", e);
@@ -43,13 +47,6 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
     };
 
     // handle button after login
-    const handleNotificationClick = (
-        e: React.MouseEvent<HTMLButtonElement>
-    ) => {
-        console.log("click Notification", e);
-        navigate("/admin/notification");
-    };
-
     const handleCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         console.log("click Cart", e);
         navigate("/cart");
@@ -58,7 +55,14 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
     const handleMenuClick: MenuProps["onClick"] = (e) => {
         console.log("click", e);
         if (e.key == "/logout") {
+            // clear user info in localStorage and cookies
+            removeCookie("token");
+            localStorage.removeItem("user");
+            api.defaults.headers.common["x-api-key"] = "";
+
+            // set axios default page header false
             setLogin(false);
+            // navigate to logout page
             navigate("/logout");
         }
         navigate(e.key as string);
@@ -105,14 +109,9 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                         <Search
                             placeholder="input search text"
                             onSearch={onSearch}
+                            style={{ width: 200 }}
                         />
                     </Space.Compact>
-                    <Button
-                        icon={<BellOutlined />}
-                        onClick={handleNotificationClick}
-                    >
-                        Notification
-                    </Button>
                     <Button
                         icon={<ShoppingCartOutlined />}
                         onClick={handleCartClick}
@@ -120,7 +119,9 @@ const PageHeader = ({ login, setLogin }: HeaderProps) => {
                         Cart
                     </Button>
                     <Dropdown menu={menuProps}>
-                        <Button icon={<UserOutlined />}>Ruby</Button>
+                        <Button icon={<UserOutlined />}>
+                            {currentUser.name}
+                        </Button>
                     </Dropdown>
                 </Flex>
             ) : (

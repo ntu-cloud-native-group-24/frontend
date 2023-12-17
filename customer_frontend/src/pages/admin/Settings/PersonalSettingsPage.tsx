@@ -1,28 +1,69 @@
-import { Flex, Form, Input, Button, Space, Typography } from "antd";
+import { Flex, Form, Input, Button, Space, message, Typography } from "antd";
 import { SaveOutlined, IssuesCloseOutlined } from "@ant-design/icons";
 
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 
-const PersonalSettings = () => {
+import { userApi } from "../../../api/user";
+
+const PersonalSettingsPage = () => {
     // const [form] = Form.useForm<{name: string; id: string; code: string; subcode: string; account: string;}>();
+    const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm<{
-        username: string;
+        name: string;
         email: string;
-        cellphone: string;
     }>();
 
-    const onFinish = () => {
-        //TODO: send these form to backend
-        // post /api/me to change email
-        console.log(form.getFieldsValue());
+    const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
+
+    const success = (msg: string) => {
+        messageApi.open({
+            type: "success",
+            content: msg,
+        });
     };
-    const onFinishFailed = () => console.log("submit failed!");
+
+    const error = (msg: string) => {
+        messageApi.open({
+            type: "error",
+            content: msg,
+        });
+    };
+
+    const warning = (msg: string) => {
+        messageApi.open({
+            type: "warning",
+            content: msg,
+        });
+    };
+
+    const onFinish = async () => {
+        console.log(form.getFieldsValue());
+
+        const { email } = form.getFieldsValue();
+        const name = currentUser.name;
+
+        const res = await userApi.updateEmail(name, email);
+        if (!res || res.status !== 200) {
+            error(res?.data.message);
+        } else {
+            console.log(res?.data);
+            success(res?.data.message);
+            currentUser.email = email;
+            localStorage.setItem("user", JSON.stringify({ ...currentUser }));
+        }
+    };
+    const onFinishFailed = () => warning("submit failed!");
+
     const onClear = () => {
         form.setFieldsValue({
             email: "",
-            cellphone: "",
         });
     };
+
+    useMemo(() => {
+        const userItem = localStorage.getItem("user");
+        userItem ? setCurrentUser(JSON.parse(userItem)) : null;
+    }, []);
 
     useEffect(() => {
         //TODO: receive initial data here
@@ -30,6 +71,7 @@ const PersonalSettings = () => {
 
     return (
         <Flex vertical gap={48}>
+            {contextHolder}
             <Form
                 form={form}
                 layout="vertical"
@@ -37,19 +79,24 @@ const PersonalSettings = () => {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
-                <Form.Item
-                    name="username"
-                    label="使用者名稱"
-                    rules={[{ required: true }]}
-                >
-                    <Input placeholder="Ruby" disabled />
+                <Form.Item name="name" label="稱謂">
+                    <Input placeholder={currentUser.name} disabled />
                 </Form.Item>
                 <Form.Item
                     name="email"
                     label="Email"
-                    rules={[{ required: true }]}
+                    rules={[
+                        {
+                            type: "email",
+                            message: "The input is not valid E-mail!",
+                        },
+                        {
+                            required: true,
+                            message: "Please enter your E-mail!",
+                        },
+                    ]}
                 >
-                    <Input placeholder="esxxxxxxxxxxx@gmail.com" />
+                    <Input placeholder={currentUser.email} />
                 </Form.Item>
                 {/* <Form.Item name="cellphone" label="手機號碼" rules={[{ required: true }]}>
           <Input placeholder="09********" />
@@ -85,4 +132,4 @@ const PersonalSettings = () => {
     );
 };
 
-export default PersonalSettings;
+export default PersonalSettingsPage;

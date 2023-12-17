@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PCOrderSubPage from "./__subpage/PCOrderSubPage";
 import MobileOrderSubPage from "./__subpage/MobileOrderSubPage";
 
-// import OrderLayoutMobile from "../../layout/FoodOrderLayout/OrderLayoutMobile";
+import { orderApi } from "../../../api/order";
 
 function getWindowDimensions() {
     const { innerWidth: width, innerHeight: height } = window;
@@ -29,19 +29,33 @@ function useWindowDimensions() {
     return windowDimensions;
 }
 
-const FoodOrder = () => {
+const FoodOrderPage = () => {
     const { height, width } = useWindowDimensions();
+    const [orders, setOrders] = useState([]);
 
     useEffect(() => {
-        console.log(height);
-    }, [height]);
+        const getOrders = async () => {
+            const res = await orderApi.getUserOrders();
+            console.log(res?.data);
+            if (!res || res.status !== 200) {
+                return;
+            } else {
+                setOrders(res?.data.orders);
+            }
+        };
+        getOrders();
+    }, []);
 
     return (
         <div>
             {/* <PCOrderSubPage /> */}
-            {width > 844 ? <PCOrderSubPage /> : <MobileOrderSubPage />}
+            {width > 844 ? (
+                <PCOrderSubPage orders={orders} />
+            ) : (
+                <MobileOrderSubPage orders={orders} />
+            )}
         </div>
     );
 };
 
-export default FoodOrder;
+export default FoodOrderPage;

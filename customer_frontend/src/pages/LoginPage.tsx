@@ -1,8 +1,10 @@
 import { Button, Card, Flex, Input, Typography, message, Form } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { apiLogin, apiMe } from "../data/api";
+import { useCookies } from "react-cookie";
+
+import { userApi } from "../api/user";
 
 export interface loginProps {
     login: boolean;
@@ -11,9 +13,13 @@ export interface loginProps {
 
 const LoginPage = ({ login, setLogin }: loginProps) => {
     const navigate = useNavigate();
-    // const [username, setUsername] = useState("");
-    // const [password, setPassword] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
+    const [cookies, setCookie] = useCookies(["token"]);
+
+    const [form] = Form.useForm<{
+        username: string;
+        password: string;
+    }>();
 
     const handleSignUpClick = () => {
         navigate("/signup");
@@ -40,33 +46,25 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
         });
     };
 
-    const onLogin = async (loginData: any) => {
-        console.log(loginData);
-        const { username, password } = loginData;
+    const onLogin = async () => {
+        console.log(form.getFieldsValue());
+        // console.log(loginData);
+        const { username, password } = form.getFieldsValue();
 
-        if (username.length === 0 || password.length === 0) {
-            warning("Please input username or password!");
-            return;
-        }
-        // TODO: Backend here
-        // CORS
-        // await apiLogin(loginData).then((response) => {
-        //     console.log(response);
-        // }).error((err) => { error(err) });
-
-        // await apiMe("").then((res) => {
-        //     console.log(res);
-        // });
-
-        const result = true;
-        if (!result) {
-            error("Login Fail!");
+        const res = await userApi.login(username, password);
+        if (!res || res.status !== 200) {
+            error(res?.data.message);
         } else {
-            setLogin(true);
-            success("Login Success!");
-            navigate("/");
+            console.log(res?.data);
+            success(res?.data.message);
+            setCookie("token", res?.data.token, { path: "/" });
+            await setTimeout(() => {
+                setLogin(res?.data.success);
+            }, 1000);
         }
     };
+
+    const onLoginFailed = () => warning("submit failed!");
 
     useEffect(() => {
         if (login) {
@@ -93,10 +91,12 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
             >
                 <Flex vertical gap="large">
                     <Form
+                        form={form}
                         name="login"
                         className="login-form"
                         initialValues={{ remember: true }}
                         onFinish={onLogin}
+                        onFinishFailed={onLoginFailed}
                     >
                         <Form.Item
                             name="username"
@@ -104,6 +104,7 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                                 {
                                     required: true,
                                     message: "Please input your Username!",
+                                    whitespace: true,
                                 },
                             ]}
                         >
@@ -115,6 +116,7 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                                 {
                                     required: true,
                                     message: "Please input your Password!",
+                                    whitespace: true,
                                 },
                             ]}
                         >
@@ -132,9 +134,9 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                                 >
                                     Don't have an account?
                                 </Button>
-                                <Button type="link" size="small">
+                                {/* <Button type="link" size="small">
                                     Forget password?
-                                </Button>
+                                </Button> */}
                             </Flex>
                         </Form.Item>
                         <Form.Item>
@@ -147,33 +149,6 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
                             </Button>
                         </Form.Item>
                     </Form>
-                    {/* <Flex vertical gap="middle">
-                        <Input
-                            placeholder="input username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <Input.Password
-                            placeholder="input password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </Flex>
-                    <Flex justify="space-between">
-                        <Button
-                            type="link"
-                            size="small"
-                            onClick={handleSignUpClick}
-                        >
-                            Don't have an account?
-                        </Button>
-                        <Button type="link" size="small">
-                            Forget password?
-                        </Button>
-                    </Flex>
-                    <Button type="primary" onClick={onLogin}>
-                        Login
-                    </Button> */}
                 </Flex>
             </Card>
         </Flex>

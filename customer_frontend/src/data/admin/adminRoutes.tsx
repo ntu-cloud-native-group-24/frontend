@@ -8,9 +8,8 @@ import {
 
 import Homepage from "../../pages/admin/Homepage";
 import HelperPage from "../../pages/admin/HelperPage";
-import NotificationPage from "../../pages/admin/NotificationPage";
 
-import FoodOrder from "../../pages/admin/FoodOrder/FoodOrder";
+import FoodOrder from "../../pages/admin/FoodOrder/FoodOrderPage";
 // import PendingFoodOrder from "../../pages/admin/FoodOrder/PendingFoodOrder";
 // import PreparedFoodOrder from "../../pages/admin/FoodOrder/PreparedFoodOrder";
 // import DoneFoodOrder from "../../pages/admin/FoodOrder/DoneFoodOrder";
@@ -63,8 +62,8 @@ import FoodOrder from "../../pages/admin/FoodOrder/FoodOrder";
 //     },
 // ],
 
-import PersonalSettings from "../../pages/admin/Settings/PersonalSettings";
-import PasswordSettings from "../../pages/admin/Settings/PasswordSettings";
+import PersonalSettings from "../../pages/admin/Settings/PersonalSettingsPage";
+import PasswordSettings from "../../pages/admin/Settings/PasswordSettingsPage";
 
 export const PageRoutes = [
     {
@@ -125,17 +124,6 @@ export const PageRoutes = [
     },
     {
         id: 6,
-        path: "/notification",
-        element: <NotificationPage />,
-        key: "notification",
-        name: "通知頁面",
-        icon: <NotificationOutlined />,
-        subMenuKey: "",
-        childMenu: [],
-        description: "檢視訂單通知",
-    },
-    {
-        id: 7,
         path: "/help",
         element: <HelperPage />,
         key: "helpCenter",

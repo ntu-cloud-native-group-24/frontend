@@ -5,13 +5,16 @@ import AdminLayout from "./admin/AdminLayout";
 import CustomerLayout from "./customer/CustomerLayout";
 
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 import PageHeader from "../components/PageHeader";
 import PageFooter from "../components/PageFooter";
 import CustomerPageFooter from "../components/customer/CustomerPageFooter";
 
-// import { apiMe } from "../data/api";
+import { useCookies } from "react-cookie";
+
+import api from "../api/axiosClient";
+import { userApi } from "../api/user";
 
 const { Header, Footer } = Layout;
 
@@ -19,27 +22,60 @@ const BaseLayout = () => {
     const [login, setLogin] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+    const [cookies] = useCookies(["token"]);
+    const [currentUser, setCurrentUser] = useState({ name: "" });
 
     useEffect(() => {
-        // TODO: checked if the user is already login...
-        // TODO: find a better way to limit the routes
+        const check = async () => {
+            console.log("cookie", cookies);
+            // console.log("login", login);
+            const user = localStorage.getItem("user");
+            // if (user) {
+            //     console.log("user: ", JSON.parse(user));
+            // }
 
-        // if !login -> check token exists or not
-        // if token exists, do apiMe check
-        // then setLogin
+            if (cookies.token && (!login || !user)) {
+                api.defaults.headers.common["x-api-key"] = cookies.token;
+                const res = await userApi.getCurrentUser();
+                console.log(res?.data);
+                if (!res || res.status !== 200) {
+                    setLogin(res?.data.success);
+                    return;
+                } else {
+                    setLogin(res?.data.success);
+                    setCurrentUser({ ...res?.data.user });
+                    localStorage.setItem(
+                        "user",
+                        JSON.stringify({ ...res?.data.user })
+                    );
+                }
 
-        if (!login) {
-            const { pathname } = location;
-            if (["/", "/login", "/signup", "/logout"].indexOf(pathname) == -1) {
-                navigate("/");
+                // await get api/me
+                // set axios default header with token
+                // setLogin(true);
             }
-        }
+            if (!login) {
+                const { pathname } = location;
+                // console.log(pathname);
+                if (
+                    ["/", "/login", "/signup", "/logout"].indexOf(pathname) ==
+                    -1
+                ) {
+                    navigate("/");
+                }
+            }
+        };
+        check();
     }, [login, location, navigate]);
 
     return (
         <Layout className="w-full min-h-screen">
             <Header className="bg-white scroll-pl-6 p-2 leading-[64px] shadow-2xl drop-shadow-md top-0 sticky z-10">
-                <PageHeader login={login} setLogin={setLogin} />
+                <PageHeader
+                    login={login}
+                    setLogin={setLogin}
+                    currentUser={currentUser}
+                />
             </Header>
             <Routes>
                 <Route

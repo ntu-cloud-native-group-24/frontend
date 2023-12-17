@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const LogoutPage: React.FC = () => {
     const navigate = useNavigate();
-
     const refTimer = useRef<number | null>(null);
     const [time, setTime] = useState(5);
 

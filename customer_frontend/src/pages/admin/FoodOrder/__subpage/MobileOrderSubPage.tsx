@@ -1,15 +1,15 @@
 import { Button, Flex } from "antd";
 import { useEffect, useState } from "react";
 import {
+    OrdersProps,
     OrderState,
     OrderType,
-    dummyOrder,
 } from "../../../../interfaces/OrderInterface";
 import OrderMobileDisplay from "../../../../components/customer/order/OrderMobileDisplay";
 
-const MobileOrderSubPage = () => {
+const MobileOrderSubPage = ({ orders }: OrdersProps) => {
     const [orderState, setOrderState] = useState(OrderState.PENDING);
-    const [orders, setOrders] = useState<OrderType[]>([]);
+    // const [orders, setOrders] = useState<OrderType[]>([]);
 
     const onClickButtonProps = {
         className: "bg-orange-500 text-white",
@@ -21,7 +21,7 @@ const MobileOrderSubPage = () => {
 
     useEffect(() => {
         // Backend here
-        setOrders(dummyOrder);
+        // setOrders(dummyOrder);
     }, [orderState]);
 
     return (
@@ -41,8 +41,8 @@ const MobileOrderSubPage = () => {
                     PENDING
                 </Button>
                 <Button
-                    onClick={() => setOrderState(OrderState.PREPARE)}
-                    {...(orderState === OrderState.PREPARE
+                    onClick={() => setOrderState(OrderState.PREPARING)}
+                    {...(orderState === OrderState.PREPARING
                         ? { ...onClickButtonProps }
                         : { ...nonClickButtonProps })}
                 >
@@ -67,7 +67,11 @@ const MobileOrderSubPage = () => {
             </Flex>
             <Flex vertical gap="middle">
                 {orders.map((order) => (
-                    <OrderMobileDisplay order={order} orderState={orderState} />
+                    <OrderMobileDisplay
+                        key={order.id}
+                        order={order}
+                        orderState={orderState}
+                    />
                 ))}
             </Flex>
         </Flex>

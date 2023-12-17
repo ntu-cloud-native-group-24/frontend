@@ -10,6 +10,7 @@ import {
     Col,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const { Content } = Layout;
 
@@ -19,6 +20,12 @@ export interface CustomerProps {
 
 const HomePage = ({ login }: CustomerProps) => {
     const navigate = useNavigate();
+
+    // const token = window.localStorage.getItem("key");
+
+    useEffect(() => {
+        // console.log("In Homepage", localStorage.token);
+    }, []);
 
     const onClickSignup = () => {
         navigate("/signup");
@@ -39,21 +46,11 @@ const HomePage = ({ login }: CustomerProps) => {
                             wrap="wrap"
                             gap={10}
                         >
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
+                            <Button type="primary">Login</Button>
+                            <Button type="primary">Login</Button>
+                            <Button type="primary">Login</Button>
+                            <Button type="primary">Login</Button>
+                            <Button type="primary">Login</Button>
                         </Flex>
 
                         {/* coupons component, maybe there's no coupons */}
@@ -153,11 +150,7 @@ const HomePage = ({ login }: CustomerProps) => {
                         </Flex>
                         {/* default stores */}
                         <Row>
-                            <Col span={6}>
-                                {/* todo sidebar */}
-                                <div>123</div>
-                            </Col>
-                            <Col span={18}>
+                            <Col span={24}>
                                 <Flex
                                     className="grid md:grid-cols-3 grid-cols-1"
                                     wrap="wrap"
@@ -225,20 +218,14 @@ const HomePage = ({ login }: CustomerProps) => {
                                 wrap="wrap"
                                 className="h-full w-full text-white pl-10 bg-black bg-opacity-50"
                                 align="center"
+                                gap={10}
                             >
                                 <Flex vertical>
-                                    <Typography.Title
-                                        style={{
-                                            color: "white",
-                                            padding: 0,
-                                            margin: 0,
-                                            fontSize: 72,
-                                        }}
-                                    >
+                                    <p className="text-white p-0 m-0 lg:text-7xl md:text-5xl text-5xl">
                                         Choose The Foods
                                         <br />
                                         That Give You Energy
-                                    </Typography.Title>
+                                    </p>
                                     <Flex
                                         gap="large"
                                         className="h-full w-full pt-2"
