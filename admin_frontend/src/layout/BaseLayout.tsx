@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Layout } from "antd"
 import PageHeader from "../components/PageHeader";
 import Sidebar from "../components/Sidebar";
@@ -8,7 +8,8 @@ import { Route, Routes, useNavigate } from 'react-router-dom'
 import { PageRoutes } from "../data/routes";
 import ContentLayout from "./ContentLayout";
 import ErrorPage from "../pages/ErrorPage";
-
+import useWindowDimensions from "../utilities/windows";
+import { StoreIdContext } from "../App";
 export interface LoginProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,6 +18,9 @@ export interface LoginProps {
 const BaseLayout = ({ login, setLogin } : LoginProps ) => {
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false);
+    const { height, width } = useWindowDimensions();
+
+    const storeId = useContext<number>(StoreIdContext);
 
     const toggleCollapsed = () => setCollapsed(!collapsed)
 
@@ -26,15 +30,27 @@ const BaseLayout = ({ login, setLogin } : LoginProps ) => {
         }
     }, [login, navigate])
 
+    useEffect(() => {
+        console.log(height);
+    }, [height])
+
+    useEffect(() => {
+        if( storeId === -1 ){
+            navigate('/store')
+        }
+    }, [storeId, navigate])
+
     return (
         <Layout className="w-screen">
             <Header className="bg-white scoll-pl-6 leading-[64px] shadow-2xl drop-shadow-md">
                 <PageHeader setLogin={setLogin} />
             </Header>
             <Layout hasSider>
-                <Sider breakpoint="lg" collapsed={collapsed}>
-                    <Sidebar toggleCollapsed={toggleCollapsed}/>
-                </Sider>
+                {
+                    width <= 844 ? <></> : <Sider breakpoint="lg" collapsed={collapsed}>
+                        <Sidebar toggleCollapsed={toggleCollapsed}/>
+                    </Sider>
+                }
                 <Content className="min-h-screen max-h-fit ml-[16px] ">
                     <Routes>
                         {PageRoutes.map((route) => route.subMenuKey === '' ? 

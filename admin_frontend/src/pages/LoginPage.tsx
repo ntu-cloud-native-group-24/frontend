@@ -1,6 +1,8 @@
 import { Button, Card, Flex, Input, Typography, message } from "antd"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { userApi } from "../api/user";
+import { setToken } from "../api/axiosUtility";
 
 export interface loginProps {
     login: boolean;
@@ -35,19 +37,22 @@ const LoginPage = ({ login, setLogin } : loginProps) => {
     };
 
     const onLogin = async () => {
-        console.log(username, password)
         if( username.length === 0 || password.length === 0 ){
             warning("Please input username or password!")
             return
         } 
-        // TODO: Backend here
-        const result = true;
-        if( !result ){
-            error("Login Fail!")
+
+        const response = await userApi.login(username, password);
+        if( response && response.status === 200 ){
+            success('Login success!');
+            setToken(response.data.token);
+            localStorage.setItem('token', response.data.token);
+            setLogin(true);
+            nagivate('/store');
         } else {
-            setLogin(true)
-            success("Login Success!")
-            nagivate('/');
+            error(response?.data.message || 'Server Encounter Error!');
+            setUsername('');
+            setPassword('');
         }
     }
 
@@ -70,11 +75,11 @@ const LoginPage = ({ login, setLogin } : loginProps) => {
             >
                 <Flex vertical gap="large">
                     <Flex vertical gap="middle">
-                        <Input placeholder="input username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                        <Input.Password placeholder="input password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                        <Input data-testid='username-input' placeholder="input username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <Input.Password data-testid='password-input' placeholder="input password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                     </Flex>
                     <Button type="link" size="small" >Forget password?</Button>
-                    <Button type="primary" onClick={onLogin}>Login</Button>
+                    <Button data-testid='btn-input' type="primary" onClick={onLogin}>Login</Button>
                 </Flex>
             </Card>
         </Flex>

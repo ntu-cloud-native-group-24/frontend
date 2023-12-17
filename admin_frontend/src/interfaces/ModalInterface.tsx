@@ -1,4 +1,4 @@
-import { FoodMultipleSelectionType, FoodSingleSelectionType, FoodType } from "./FoodInterface";
+import { FoodCategory, FoodType, FoodSelectionItem } from "./FoodInterface";
 import type { FormInstance } from "antd/lib";
 export enum ModalType {
     NEW,
@@ -7,25 +7,23 @@ export enum ModalType {
 
 export interface MyModalProps {
     food: FoodType;
-    tagList: (string)[];
+    tagList: (FoodCategory)[];
     type: ModalType;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    fetchMeals: () => Promise<void>;
 }
 
 export interface MyTagProps {
-    tagList: (string)[];
-    fullTagList: (string)[];
-    setFullTagList: React.Dispatch<React.SetStateAction<string[]>>;
-    setTagList: React.Dispatch<React.SetStateAction<string[]>>;
+    tagList: (FoodCategory)[];
 }
 
 export interface SingleSelectionsProps {
     form: FormInstance<object>;
-    singleSelections: Array<FoodSingleSelectionType>;
+    singleSelections: Array<FoodSelectionItem>;
 }
 
 export interface MultipleSelectionsProps {
     form: FormInstance<object>;
-    multipleSelections: Array<FoodMultipleSelectionType>;
+    multipleSelections: Array<FoodSelectionItem>;
 }

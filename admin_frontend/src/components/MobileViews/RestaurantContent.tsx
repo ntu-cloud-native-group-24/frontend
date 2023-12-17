@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import FoodDisplay from "./FoodDisplay";
 import { Flex, Space, Typography } from "antd";
 
-const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentProps ) => {
+const RestaurantContent = ({ foods, isInFilter, tagsList, fetchMeals } : RestaurantContentProps ) => {
 
     // foodList = [{ tag: string; foods: Array<FoodType>; }]
     const foodList = useMemo(() => {
         const myTagsList = tagsList.sort()
-        const RECOMMEND_INDEX = myTagsList.findIndex((tag) => tag.toUpperCase() === 'RECOMMEND');
+        const RECOMMEND_INDEX = myTagsList.findIndex((tag) => tag.name.toUpperCase() === 'RECOMMEND');
         if( RECOMMEND_INDEX !== -1 ) {
             //SWAP WITH Recommend
             const temp = myTagsList[RECOMMEND_INDEX];
@@ -18,7 +18,7 @@ const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentPr
         return myTagsList.map((tag) => {
             return {
                 tag: tag,
-                foods: foods.filter((food) => food.tags.findIndex((ftag) => ftag === tag) !== -1)
+                foods: foods.filter((food) => food.categories.findIndex((ftag) => ftag.id === tag.id) !== -1)
             }
         })
     }, [tagsList, foods])
@@ -32,13 +32,13 @@ const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentPr
                         item.foods.length > 0 ? (
                         <Space key={'asdf' + i} direction='vertical' size="small" className="w-full">
                             <Typography.Text key={i + 'TAG'} className='font-bold text-xl'>
-                                {item.tag.toUpperCase()}
+                                {item.tag.name.toUpperCase()}
                             </Typography.Text>
                             <Space key={'space' + i} direction='vertical' size='small' className="w-full">
-                                {item.foods.map((food, i) => <FoodDisplay key={food.key + i} food={food}/>)}
+                                {item.foods.map((food, i) => <FoodDisplay key={food.key + i} food={food} fetchMeals={fetchMeals} tagsList={tagsList}/>)}
                             </Space>
                         </Space>
-                    ) : (<></>)
+                    ) : (<div key={i}></div>)
                     )
                     )
                 }
@@ -54,7 +54,7 @@ const RestaurantContent = ({ foods, isInFilter, tagsList } : RestaurantContentPr
                 </Typography.Text>
                 <Space direction="vertical" className="w-full">
                     {
-                        foods.map((food) => <FoodDisplay key={food.key} food={food} />)
+                        foods.map((food) => <FoodDisplay key={food.key} food={food} fetchMeals={fetchMeals} tagsList={tagsList} />)
                     }
                 </Space>
             </Flex>

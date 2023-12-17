@@ -4,7 +4,7 @@ import PastFoodOrder from "../pages/FoodOrder/PastFoodOrder";
 import TodayFoodOrder from "../pages/FoodOrder/TodayFoodOrder";
 import HelperPage from "../pages/HelperPage";
 import Homepage from "../pages/Homepage";
-import NotificationPage from "../pages/NotificationPage";
+//import NotificationPage from "../pages/NotificationPage";
 import RestaurantPage from "../pages/RestaurantPage";
 import MoneySettings from "../pages/Settings/MoneySettings";
 import RestaurantSettings from "../pages/Settings/RestaurantSettings";
@@ -12,10 +12,12 @@ import { ShopOutlined,
     PlusOutlined,
     DatabaseOutlined, 
     ToolOutlined,
-    NotificationOutlined,
+    //NotificationOutlined,
     QuestionCircleOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
+import UserSettings from "../pages/Settings/UserSettings";
+import WorkTimeSettings from "../pages/Settings/WorkTimeSettings";
 
 export const PageRoutes = [
     {
@@ -106,6 +108,17 @@ export const PageRoutes = [
         subMenuKey: 'sub2',
         childMenu: [
             {
+                id: 12,
+                path: '/setting/user',
+                element: <UserSettings />,
+                key: 'userSetting',
+                name: '使用者資料管理',
+                icon: <></>  ,
+                subMenuKey: '',
+                childMenu: [],
+                description: '檢視及編輯使用者資料'
+            },
+            {
                 id: 9,
                 path: "/setting/restaurant",
                 element: <RestaurantSettings />,
@@ -115,6 +128,17 @@ export const PageRoutes = [
                 subMenuKey: '',
                 childMenu: [],
                 description: '檢視及編輯餐廳資料',
+            },
+            {
+                id: 13,
+                path: "/setting/worktime",
+                element: <WorkTimeSettings />,
+                key: 'timeSetting',
+                name: '餐廳營業時間管理',
+                icon: <></>,
+                subMenuKey: '',
+                childMenu: [],
+                description: '檢視及編輯餐廳營業時間',
             },
             {
                 id: 10,
@@ -130,6 +154,7 @@ export const PageRoutes = [
         ],
         description: '',
     },
+    /*
     {
         id: 11,
         path: "/notification",
@@ -141,6 +166,7 @@ export const PageRoutes = [
         childMenu: [],
         description: '檢視訂單通知',
     },
+    */
     {
         id: 12,
         path: "/help",

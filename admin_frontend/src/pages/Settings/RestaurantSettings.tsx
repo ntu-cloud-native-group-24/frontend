@@ -1,52 +1,106 @@
-import { useEffect } from 'react';
-import { Flex, Form, Input, Button, Space, Typography } from "antd"
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { Flex, Form, Input, Button, Space, Typography, message, Switch, Modal, Spin } from "antd"
 import { 
     SaveOutlined,
     IssuesCloseOutlined,
-    FacebookFilled,
-    InstagramFilled,
 } from '@ant-design/icons';
+import { storeApi } from '../../api/store';
+import { StoreIdContext } from '../../App';
+import { StoreType } from '../../interfaces/StoreInterface';
 
 const placeholder_desc = "A design system for enterprise-level products. Create an efficient an enjoyable work experiences"
+const { confirm } = Modal;
 
 const RestaurantSettings = () => {
-    const [form] = Form.useForm<{name: string; address: string; description: string; email: string, phone: string}>();
+    const [messageApi, contextHolder] = message.useMessage();
+    const [spinning, setSpinning] = useState<boolean>(true);
+    const storeId = useContext<number>(StoreIdContext);
+    const [store, setStore] = useState<StoreType>();
+    const [form] = Form.useForm<{name: string; address: string; description: string; email: string, phone: string, status: boolean}>();
 
-    const onFinish = () => {
-        //TODO: send these form to backend
-        console.log(form.getFieldsValue());
-    }
-    const onFinishFailed = () => console.log('submit failed!');
-    const onFill = () => {
-        form.setFieldsValue({
-          description: '',
-          email: '',
+    const success = (msg: string) => {
+        messageApi.open({
+          type: 'success',
+          content: msg,
         });
     };
+    
+    const error = useCallback((err: string) => {
+    messageApi.open({
+        type: 'error',
+        content: err,
+        });
+    }, [messageApi])
 
-    const onClickAuthFB = () => {
-        // TODO: oAuth FB
-        console.log(`FB`);
-    }
+    const onFinish = async () => {
+        setSpinning(true);
+        const name = form.getFieldValue('name');
+        const address = form.getFieldValue('address');
+        const description = form.getFieldValue('description');
+        const email = form.getFieldValue('email');
+        const phone = form.getFieldValue('phone');
+        const status = form.getFieldValue('status');
+        const picture_url = store?.picture_url || '';
 
-    const onClickAuthINSTA = () => {
-        // TODO: oAuth FB
-        console.log(`INSTA`);
+        if( name.length === 0 || address.length === 0 || email.length === 0 || phone.length === 0 ){
+            error('Please fill in the form correctly!');
+            setSpinning(false);
+            return;
+        }
+
+        const response = await storeApi.updateStoreData(storeId, name, description, address, picture_url, status, phone, email);
+        if( response && response.status === 200 ){
+            success('Successfully updated store data!');
+            await fetchStore();
+        } else {
+            error(response.data.message);
+        }
+        setSpinning(false);
     }
+    const onFinishFailed = () => error('Please fill in the form correctly!');
+    const onFill = () => form.resetFields();
+    
+    const fetchStore = useCallback(async () => {
+        const response = await storeApi.getStoreById(storeId);
+        if( response && response.status === 200 ){
+            const store = response.data.store;
+            setStore(store);
+            form.setFieldsValue({
+                name: store.name,
+                address: store.address,
+                description: store.description,
+                email: store.email,
+                phone: store.phone,
+                status: store.status,
+            })
+            
+        } else {
+            error(response.data.message);
+        }
+    }, [error, form, storeId])
 
     useEffect(() => {
-        //TODO: set the initial value of data
-        form.setFieldsValue({
-            name: '台大好吃餐廳',
-            address: '校總區 106319 臺北市羅斯福路四段一號02-33663366訪客交通資訊',
-            description: '',
-            phone: '0987878787',
-            email: 'figma@so_hard.com',
+        fetchStore();
+        setSpinning(false);
+    }, [form, fetchStore])
+
+
+    const showConfirm = () => {
+        confirm({
+            title: 'Are you sure to save these data?',
+            content: 'Please make sure all the data are correct!',
+            async onOk(){
+                await onFinish();
+            },
+            onCancel(){}
         })
-    }, [form])
+    }
+
 
     return (
         <Flex vertical gap={48}>
+            {contextHolder}
+            <Spin spinning={spinning} fullscreen />
             <Form
                 form={form}
                 layout="vertical"
@@ -55,44 +109,35 @@ const RestaurantSettings = () => {
                 autoComplete='off'
             >
                 <Form.Item name="name" label="餐廳名稱" rules={[{ required: true }, ]} >
-                    <Input placeholder='台大好吃餐廳' disabled />
+                    <Input placeholder='台大好吃餐廳' data-testid='input-name' />
                 </Form.Item>
                 <Form.Item name="address" label="餐廳地址" rules={[{ required: true }, ]} >
-                    <Input placeholder='校總區 106319 臺北市羅斯福路四段一號02-33663366訪客交通資訊' disabled />
+                    <Input placeholder='校總區 106319 臺北市羅斯福路四段一號02-33663366訪客交通資訊' data-testid='input-address'/>
                 </Form.Item>
                 <Form.Item name="description" label="餐廳資訊 (optional)" rules={[{ required: false }, ]} >
-                    <Input placeholder={placeholder_desc} showCount maxLength={100} />
+                    <Input placeholder={placeholder_desc} showCount maxLength={100} data-testid='input-desc' />
                 </Form.Item>
                 <Form.Item name="phone" label="商務電話" rules={[{ required: true }, ]} >
-                    <Input placeholder='0987878787' disabled />
+                    <Input placeholder='0987878787' data-testid='input-phone' />
                 </Form.Item>
                 <Form.Item name="email" label="商務信箱" rules={[{ required: true }, ]} >
-                    <Input placeholder='figma@so_hard.com' />
+                    <Input placeholder='figma@so_hard.com' data-testid='input-email' />
+                </Form.Item>
+                <Form.Item name='status' label='營業狀況' valuePropName="checked">
+                    <Switch checkedChildren='OPENING' unCheckedChildren='CLOSED' data-testid='input-status' />
                 </Form.Item>
                 <Form.Item>
                     <Flex justify='center' align='center' gap={32}>
-                        <Button htmlType="button" onClick={onFill} icon={<IssuesCloseOutlined />}>
+                        <Button data-testid='btn-clean' htmlType="button" onClick={onFill} icon={<IssuesCloseOutlined />}>
                             重置
                         </Button>
-                        <Button danger type='primary' htmlType="submit" icon={<SaveOutlined />}>
+                        <Button data-testid='btn-submit' danger type='primary' onClick={showConfirm} icon={<SaveOutlined />}>
                             儲存
                         </Button>
                     </Flex>
                 </Form.Item>
             </Form>
-            <Space direction='vertical'>
-                <Typography.Text>社群帳號綁定</Typography.Text>
-                <Space>
-                    <FacebookFilled />
-                    <p>Facebook:</p>
-                    <Button className='bg-blue-500 text-white' type='primary' onClick={onClickAuthFB}>點我驗證</Button>
-                </Space>
-                <Space>
-                    <InstagramFilled />
-                    <p>Instagram:</p>
-                    <Button className='bg-[#e1306c] text-white' onClick={onClickAuthINSTA}>點我驗證</Button>
-                </Space>
-            </Space>
+            
             <Space direction='vertical'>
                 <Typography.Text>注意事項</Typography.Text>
                 <Flex vertical gap={2}>

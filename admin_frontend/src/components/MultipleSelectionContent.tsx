@@ -1,25 +1,8 @@
 import { Button, Card, Form, Input, Space, InputNumber, Switch } from 'antd';
 import { MultipleSelectionsProps } from '../interfaces/ModalInterface';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useMemo } from 'react';
 
-
-const MultipleSelectionContent = ({ form, multipleSelections } : MultipleSelectionsProps) => {
-
-    const initialItems = useMemo(() => {
-        return multipleSelections.map((selections) => {
-            return {
-                name: selections.title,
-                list: selections.selections.map((childSelections) => {
-                    return {
-                        name: childSelections.name,
-                        price: childSelections.price,
-                        status: childSelections.status,
-                    }
-                })
-            }
-        })
-    }, [multipleSelections])
+const MultipleSelectionContent = ({ form } : MultipleSelectionsProps) => {
 
     return (
         <Form
@@ -29,7 +12,6 @@ const MultipleSelectionContent = ({ form, multipleSelections } : MultipleSelecti
             name="dynamic_multiple_form_complex"
             style={{ maxWidth: 600 }}
             autoComplete="off"
-            initialValues={{ items: initialItems }}
         >
         <Form.List name="items">
             {(fields, { add, remove }) => (
@@ -64,7 +46,7 @@ const MultipleSelectionContent = ({ form, multipleSelections } : MultipleSelecti
                                 <Form.Item noStyle name={[subField.name, 'price']} rules={[{required: true, message: '請輸入價格'}]}>
                                     <InputNumber addonAfter="$" />
                                 </Form.Item>
-                                <Form.Item noStyle name={[subField.name, 'status']} valuePropName="checked">
+                                <Form.Item noStyle name={[subField.name, 'enabled']} valuePropName="checked">
                                     <Switch checkedChildren={<CheckOutlined className='pl-3 pr-5' />}
                                             unCheckedChildren={<CloseOutlined className='pl-3 pr-5'/>}  />
                                 </Form.Item>

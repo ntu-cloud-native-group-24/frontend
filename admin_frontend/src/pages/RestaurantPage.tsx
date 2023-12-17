@@ -1,48 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import ComputerRestaurantPage from './RestaurantSubPage/ComputerRestaurantPage';
 import MobileRestaurantPage from './RestaurantSubPage/MobileRestaurantPage';
-import { StoreType, dummyData, dummyStore } from '../interfaces/StoreInterface';
-import { FoodType } from '../interfaces/FoodInterface';
+import useWindowDimensions from '../utilities/windows';
 
-function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-      width,
-      height
-    };
-}
-
-function useWindowDimensions() {
-    const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-  
-    useEffect(() => {
-      function handleResize() {
-        setWindowDimensions(getWindowDimensions());
-      }
-  
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-  
-    return windowDimensions;
-}
+/*
+1. Order -> Add one more type, COMPLETE (完成取餐) in OrderState
+2.       -> 變成只有今日訂單管理及過去訂單管理
+            -> 今日訂單管理就原樣
+            -> 過去訂單管理 就變成顯示已經完成或是取消的訂單，並且兩者分開 categorys
+            -> 這些order都以時間排序
+3. 月結部分=-=
+*/
 
 const RestaurantPage = () => {
 
     const { height, width } = useWindowDimensions();
-    const [store, setStore] = useState<StoreType>(dummyStore);
-    const [foods, setFoods] = useState<FoodType[]>(dummyData);
 
     useEffect(() => {
-        //TODO: fetch data from backend
-        setStore(dummyStore)
-        setFoods(dummyData)
-        console.log(height)
-    }, [])
+    }, [height])
 
     return (
         <div>
-            {width > 844 ? <ComputerRestaurantPage store={store} foods={foods}  /> : <MobileRestaurantPage store={store} foods={foods} />}
+            {width > 844 ? <ComputerRestaurantPage /> : <MobileRestaurantPage />}
         </div>
     )
 }
