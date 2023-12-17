@@ -35,6 +35,10 @@ function App() {
     if( localStorage.getItem('token') ){
       setToken(localStorage.getItem('token') || '');
       checkLogin();
+    } else {
+      if( window.location.href.substring(window.location.href.length - 5) !== 'login' ){
+        window.location.href = '/login';
+      }
     }
 
     setSpinning(false);
