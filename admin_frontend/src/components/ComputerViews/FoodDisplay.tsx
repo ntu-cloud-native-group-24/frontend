@@ -8,7 +8,7 @@ import { ModalType } from '../../interfaces/ModalInterface';
 const FoodDisplay = ({ food, fetchMeals, tagsList } : FoodDisplayProps) => {
 
     const [open, setOpen] = useState(false);
-    const [foodPicture, setFoodPicture] = useState(food.picture);
+    const [foodPicture, setFoodPicture] = useState(food.picture ? food.picture : fallbackSRC);
 
     const onClickEdit = () => {
         setOpen(true);

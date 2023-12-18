@@ -1,11 +1,10 @@
 import api from "./axiosClient";
 import { AxiosError } from "axios";
-import { Customizations } from "../interfaces/FoodInterface";
 
-export const mealApi = {
-    async getMealById(storeId: number, mealId: number){
+export const orderApi = {
+    async getAllOrder(storeId: number){
         try{
-            const response = await api.get(`/store/${storeId}/meals/${mealId}`);
+            const response = await api.get(`/store/${storeId}/orders`);
             return {
                 data: response.data,
                 status: response.status
@@ -18,21 +17,14 @@ export const mealApi = {
             }
         }
     },
-    async createMeal(storeId: number, name: string, description: string, price: number, picture: string, is_available: boolean, customizations: Customizations){
+    async getOrderDetail(orderId: number){
         try{
-            const response = await api.post(`/store/${storeId}/meals`, {
-                name: name,
-                description: description,
-                price: price,
-                picture: picture,
-                is_available: is_available,
-                customizations: customizations
-            });
+            const response = await api.get(`/orders/${orderId}`);
             return {
                 data: response.data,
                 status: response.status
             }
-        } catch (err){
+        } catch (err) {
             const error = err as AxiosError;
             return {
                 data: error.response?.data,
@@ -40,48 +32,10 @@ export const mealApi = {
             }
         }
     },
-    async addCategoryToMeal(storeId: number, mealId: number, category_id: number){
+    async acceptOrder(orderId: number){
         try{
-            const response = await api.post(`/store/${storeId}/meals/${mealId}/categories`, {
-                category_id: category_id
-            });
-            return {
-                data: response.data,
-                status: response.status
-            }
-        } catch (err){
-            const error = err as AxiosError;
-            return {
-                data: error.response?.data,
-                status: error.response?.status
-            }
-        }
-    },
-    async deleteCategoryFromMeal(storeId: number, mealId: number, category_id: number){
-        try{
-            const response = await api.delete(`/store/${storeId}/meals/${mealId}/categories/${category_id}`);
-            return {
-                data: response.data,
-                status: response.status
-            }
-        } catch (err){
-            const error = err as AxiosError;
-            return {
-                data: error.response?.data,
-                status: error.response?.status
-            }
-        }
-    },
-    async updateMeal(storeId: number, mealId: number, name: string, description: string, price: number, picture: string, is_available: boolean, customizations: Customizations){
-        try{
-            const response = await api.put(`/store/${storeId}/meals/${mealId}`, {
-                id: mealId,
-                name: name,
-                description: description,
-                price: price,
-                picture: picture,
-                is_available: is_available,
-                customizations: customizations
+            const response = await api.patch(`/orders/${orderId}`, {
+                state: "preparing"
             });
             return {
                 data: response.data,
@@ -95,9 +49,45 @@ export const mealApi = {
             }
         }
     },
-    async deleteMeal(storeId: number, mealId: number){
+    async rejectOrder(orderId: number){
         try{
-            const response = await api.delete(`/store/${storeId}/meals/${mealId}`);
+            const response = await api.patch(`/orders/${orderId}`, {
+                state: "cancelled"
+            });
+            return {
+                data: response.data,
+                status: response.status
+            }
+        } catch (err) {
+            const error = err as AxiosError;
+            return {
+                data: error.response?.data,
+                status: error.response?.status
+            }
+        }
+    },
+    async preparedOrder(orderId: number){
+        try{
+            const response = await api.patch(`/orders/${orderId}`, {
+                state: "prepared"
+            });
+            return {
+                data: response.data,
+                status: response.status
+            }
+        } catch (err) {
+            const error = err as AxiosError;
+            return {
+                data: error.response?.data,
+                status: error.response?.status
+            }
+        }
+    },
+    async completeOrder(orderId: number){
+        try{
+            const response = await api.patch(`/orders/${orderId}`, {
+                state: "completed"
+            });
             return {
                 data: response.data,
                 status: response.status

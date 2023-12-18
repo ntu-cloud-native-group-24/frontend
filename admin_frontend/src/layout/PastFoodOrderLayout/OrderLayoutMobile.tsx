@@ -9,7 +9,7 @@ import { orderApi } from "../../api/order";
 const OrderLayoutMobile = ( ) => {
 
 
-    const [orderStatus, setOrderStatus] = useState('pending');
+    const [orderStatus, setOrderStatus] = useState('all');
     const [orders, setOrders] = useState<OrderType[]>([])
     const storeId = useContext<number>(StoreIdContext);
 
@@ -39,20 +39,14 @@ const OrderLayoutMobile = ( ) => {
 
     useEffect(() => {
         fetchOrders();
-    }, [])
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            fetchOrders();
-        }, 5000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [fetchOrders]);
+        
+    }, [fetchOrders])
 
     const filterOrders = useMemo(() => {
         if( !orders ) return [];
+        if( orderStatus === 'all' ) return orders.filter((order) => {
+            return order.state === 'completed' || order.state === 'cancelled';
+        })
         return orders.filter((order) => {
             return order.state === orderStatus;
         });
@@ -61,9 +55,9 @@ const OrderLayoutMobile = ( ) => {
     return (
         <Flex vertical gap="large" className="w-full">
             <Flex justify="flex-start" align="center" gap="small" className="overflow-x-auto">
-            <Button onClick={() => {setOrderStatus('pending')}} {...orderStatus === 'pending' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PENDING</Button>
-                    <Button onClick={() => {setOrderStatus('preparing');}} {...orderStatus === 'preparing' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARING</Button>
-                    <Button onClick={() => {setOrderStatus('prepared'); }} {...orderStatus === 'prepared' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARED</Button>
+            <Button onClick={() => {setOrderStatus('all')}} {...orderStatus === 'all' ? {...onClickButtonProps} : {...nonClickButtonProps} }>ALL</Button>
+                    <Button onClick={() => {setOrderStatus('completed');}} {...orderStatus === 'completed' ? {...onClickButtonProps} : {...nonClickButtonProps} }>COMPLETED</Button>
+                    <Button onClick={() => {setOrderStatus('cancelled'); }} {...orderStatus === 'cancelled' ? {...onClickButtonProps} : {...nonClickButtonProps} }>CANCELLED</Button>
             </Flex>
             <Flex vertical gap="middle">
                 {

@@ -1,5 +1,4 @@
 import FoodManagement from "../pages/FoodManagement";
-import FutureFoodOrder from "../pages/FoodOrder/FutureFoodOrder";
 import PastFoodOrder from "../pages/FoodOrder/PastFoodOrder";
 import TodayFoodOrder from "../pages/FoodOrder/TodayFoodOrder";
 import HelperPage from "../pages/HelperPage";
@@ -73,6 +72,7 @@ export const PageRoutes = [
                 childMenu: [],
                 description: '檢視今日訂單',
             },
+            /*
             {
                 id: 6,
                 path: "/order/future",
@@ -84,6 +84,7 @@ export const PageRoutes = [
                 childMenu: [],
                 description: '檢視未來訂單',
             },
+            */
             {
                 id: 7,
                 path: "/order/past",
