@@ -1,4 +1,5 @@
 import { FoodCategory, FoodType } from "./FoodInterface";
+import { OrderType } from "./OrderInterface";
 
 export enum SortType {
     NONE,
@@ -40,4 +41,9 @@ export interface RestaurantContentProps {
     isInFilter: boolean;
     tagsList: FoodCategory[];
     fetchMeals: () => Promise<void>;
+}
+
+export interface OrderResultType {
+    month: string;
+    orders: OrderType[];
 }

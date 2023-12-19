@@ -110,5 +110,20 @@ export const storeApi = {
                 data: error.response?.data
             }
         }
+    },
+    async getMonthRevenue(storeId: number){
+        try{
+            const response = await api.get(`/store/${storeId}/orders/monthly`);
+            return {
+                status: response.status,
+                data: response.data,
+            }
+        } catch (err) {
+            const error = err as AxiosError
+            return {
+                status: error.response?.status,
+                data: error.response?.data
+            }
+        }
     }
 }
