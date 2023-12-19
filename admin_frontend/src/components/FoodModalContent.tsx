@@ -315,13 +315,9 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
             }
         }))
     }, [food, SingleForm, MultipleForm])
-    
+
     const props: UploadProps = {
         name: 'file',
-        action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
-        headers: {
-          authorization: 'authorization-text',
-        },
         async onChange(info) {
           if (info.file.status !== 'uploading') {
             //console.log(info.file);
@@ -345,6 +341,12 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
         },
     }
 
+    const dummyRequest = async ({ onSuccess }: any) => {
+        setTimeout(() => {
+            onSuccess('ok');
+        }, 0);
+    }
+
     return (
         <Modal title={type === ModalType.NEW ? '新增餐點' : '編輯餐點'} 
                open={open} 
@@ -357,7 +359,7 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
         >
         <Flex wrap='wrap' vertical gap={50} className="pt-8 pb-8">
             <Space wrap direction="vertical">
-                <Upload maxCount={1} {...props}>
+                <Upload customRequest={dummyRequest} maxCount={1} {...props}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                 </Upload>
                 <Image src={imageSrc} fallback={fallbackSRC} width={250} height={250}/>
