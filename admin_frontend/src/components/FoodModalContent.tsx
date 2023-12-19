@@ -365,23 +365,35 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
                 <Image src={imageSrc} fallback={fallbackSRC} width={250} height={250}/>
             </Space>
             <Space wrap direction="vertical" size="middle">
-                <Typography.Text className="text-xl" editable={{ onChange: setFoodName }}>{foodName}</Typography.Text>
-                <Select mode='multiple' 
-                        style= {{ width: '100%' }} 
-                        placeholder='Select category for meal here'
-                        onChange={onCategoryChange}
-                        options={options}
-                        key={'SANXIAO'}
-                        value={foodEditCategory}
-                />
-                <InputNumber addonAfter="$" defaultValue={0} value={foodPrice} onChange={(value: number | null) => setFoodPrice(value === null ? 0 : value)} />
-                <Input.TextArea rows={4} 
-                                placeholder="Enter Description here" 
-                                showCount 
-                                maxLength={100} 
-                                value={foodDescription}
-                                onChange={(e) => setFoodDescription(e.target.value)}
-                />
+                <Space wrap direction="vertical" size="small">
+                    <Typography.Text>餐點名稱</Typography.Text>
+                    <Input placeholder="Enter Food Name here" value={foodName} onChange={(e) => setFoodName(e.target.value)} />
+                </Space>
+                <Space wrap direction="vertical" size="small" className="w-full">
+                    <Typography.Text>餐點分類</Typography.Text>
+                    <Select mode='multiple' 
+                            style= {{ width: '100%' }} 
+                            placeholder='Select category for meal here'
+                            onChange={onCategoryChange}
+                            options={options}
+                            key={'SANXIAO'}
+                            value={foodEditCategory}
+                    />
+                </Space>
+                <Space wrap direction="vertical" size="small">
+                    <Typography.Text>餐點價格</Typography.Text>
+                    <InputNumber addonAfter="$" defaultValue={0} value={foodPrice} onChange={(value: number | null) => setFoodPrice(value === null ? 0 : value)} />
+                </Space>
+                <Space wrap direction="vertical" size="small" className="w-full">
+                    <Typography.Text>餐點說明</Typography.Text>
+                    <Input.TextArea rows={4} 
+                                    placeholder="Enter Description here" 
+                                    showCount 
+                                    maxLength={100} 
+                                    value={foodDescription}
+                                    onChange={(e) => setFoodDescription(e.target.value)}
+                    />
+                </Space>
                 <Space wrap direction="vertical" size="small">
                     <Typography.Text>餐點狀況</Typography.Text>
                     <Switch checkedChildren="ON STOCK" unCheckedChildren="SOLD OUT" checked={foodStatus} onChange={(checked: boolean) => setFoodStatus(checked)} />
