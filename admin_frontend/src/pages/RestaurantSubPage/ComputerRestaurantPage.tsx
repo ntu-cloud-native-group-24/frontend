@@ -160,33 +160,42 @@ const ComputerRestaurantPage = ( ) => {
           if (info.file.status === 'done') {
             //console.log(`${info.file} file uploaded successfully`)
             if( info.file.originFileObj !== undefined ){
-                try{
+                try {
                     const file_prefix = info.file.originFileObj.name.split('.')[0].trim();
                     const file_type = info.file.type || '';
                     const imageResponse = await imageApi.getImageApi(file_type, file_prefix);
-                    //console.log(imageResponse);
                     const sas = imageResponse.data.upload.sas;
                     const client = new BlockBlobClient(sas);
                     const reader = new FileReader();
-                    reader.onload = async () => {
-                        const arrayBuffer = reader.result as ArrayBuffer;
-                        const blob = new Blob([arrayBuffer], { type: info.file.type });
-                        console.log(arrayBuffer, blob)
-                        const azureResponse = await client.uploadData(blob, {
-                            blobHTTPHeaders: {
-                                blobContentType: info.file.type,
-                                blobCacheControl: 'public, max-age=86400'
+                    const uploadDataPromise = new Promise((resolve, reject) => {
+                        reader.onload = async () => {
+                            try {
+                                const arrayBuffer = reader.result as ArrayBuffer;
+                                const blob = new Blob([arrayBuffer], { type: info.file.type });
+                                const azureResponse = await client.uploadData(blob, {
+                                    blobHTTPHeaders: {
+                                        blobContentType: info.file.type,
+                                        blobCacheControl: 'public, max-age=86400'
+                                    }
+                                });
+                                resolve(azureResponse);
+                            } catch (err) {
+                                reject(err);
                             }
-                        });
-                        console.log(azureResponse);
-                    }
-                    reader.readAsArrayBuffer(info.file.originFileObj)
+                        };
+                        reader.onerror = (error) => {
+                            reject(error);
+                        };
+                    });
+                    reader.readAsArrayBuffer(info.file.originFileObj);
                     const new_picture_url = imageResponse.data.upload.url;
-                    if( !store ) {window.location.reload(); return; }
-                    const response = await storeApi.updateStoreData(store.id, store.name, store.description, store.address, new_picture_url, store.status, store.phone, store.email);
-                    console.log(response);
+                    if (!store) {
+                        window.location.reload();
+                        return;
+                    }
+                    const updateStoreDataPromise = storeApi.updateStoreData(store.id, store.name, store.description, store.address, new_picture_url, store.status, store.phone, store.email);
+                    await Promise.all([uploadDataPromise, updateStoreDataPromise]);
                     window.location.reload();
-                    
                 } catch (err) {
                     console.log(err);
                     window.location.reload();
