@@ -14,7 +14,6 @@ const MoneySettings = () => {
     const [branchSelection, setBranchSelection] = useState(Array<MyBranchInterface>());
 
     const onFinish = () => {
-        //TODO: send these form to backend
         console.log(form.getFieldsValue());
     }
     const onFinishFailed = () => console.log('submit failed!');
@@ -34,7 +33,6 @@ const MoneySettings = () => {
     }, [bank, form])
 
     useEffect(() => {
-        //TODO: receive initial data here
     }, [])
 
     return (
@@ -47,20 +45,20 @@ const MoneySettings = () => {
                 autoComplete='off'
             >
                 <Form.Item name="name" label="戶名" rules={[{ required: true }, ]}>
-                    <Input placeholder='WzWr' disabled />
+                    <Input placeholder='WzWr' disabled data-testid='input-name' />
                 </Form.Item>
                 <Form.Item name="id" label="銀行開戶之身分 ID" rules={[{ required: true }, ]}>
-                    <Input placeholder='A*********' disabled />
+                    <Input placeholder='A*********' disabled data-testid='input-id'/>
                 </Form.Item>
                 <Form.Item name="code" label="銀行代號" rules={[{ required: true}, ]}>
-                    <Select>
+                    <Select data-testid='input-code'>
                         {branchData.map((bank) => (
                             <Select.Option key={bank.bankCode} value={bank.bankCode}>{bank.bankCode} {bank.bankName}</Select.Option>
                         ))}
                     </Select>
                 </Form.Item>
                 <Form.Item name="subcode" label="分行" rules={[{ required: true}, ]}>
-                    <Select>
+                    <Select data-testid='input-subcode'>
                         {branchSelection === undefined ? (<></>) : 
                         branchSelection.map((bank, i) => (
                             <Select.Option key={bank.branchCode + i} value={bank.branchCode}>{bank.branchCode} {bank.branchName}</Select.Option>
@@ -68,11 +66,11 @@ const MoneySettings = () => {
                     </Select>
                 </Form.Item>
                 <Form.Item name="account" label="銀行帳號" rules={[{ required: true }, ]}>
-                    <Input placeholder='878787891' />
+                    <Input placeholder='878787891' data-testid='input-account' />
                 </Form.Item>
                 <Form.Item>
                     <Flex justify='center' align='center' gap={32}>
-                        <Button htmlType="button" onClick={onClear} icon={<IssuesCloseOutlined />}>
+                        <Button data-testid='btn-clear' htmlType="button" onClick={onClear} icon={<IssuesCloseOutlined />}>
                             重置
                         </Button>
                         <Button danger type='primary' htmlType="submit" icon={<SaveOutlined />}>

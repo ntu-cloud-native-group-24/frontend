@@ -1,209 +1,171 @@
-import { Button, Flex, Modal, Space, Typography, Input, Divider, Slider, Checkbox, Select, Radio, Switch, TimePicker } from "antd"
-import { FoodFilterProps } from "../../interfaces/FoodInterface"
-
+import { Button, Checkbox, Drawer, Flex, Input, Radio, Select, Slider, Typography } from "antd";
 import {
     ClearOutlined,
 } from '@ant-design/icons';
+import { useState } from "react";
 import { FilterType, SortType } from "../../interfaces/StoreInterface";
+import { CheckboxValueType } from "antd/es/checkbox/Group";
+import { FoodCategory } from "../../interfaces/FoodInterface";
 import { SelectProps } from "antd/lib";
-import { useState } from 'react';
-import type { CheckboxValueType } from "antd/es/checkbox/Group";
-
-const { Search } = Input;
 
 export interface ModalProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FoodFilter = ({
-    sortValue, priceRange, filterArray, filterTags, fullTagsList, foodMaxPrice, initStoreStatus, initStoreTimes,
-    setSearchValue, setSortValue, setPriceRange, setFilterArray, setFilterTags, clearFilter 
-} : FoodFilterProps) => {
-    
-    const [openFilterTags, setOpenFilterTags] = useState(false);
-    const [openSort, setOpenSort] = useState(false);
+export interface MobileFoodFilterProps {
+    defaultSearchValue: string;
+    foodMinPrice: number;
+    foodMaxPrice: number;
+    defaultPrice: number[];
+    defaultFilterStatus: FilterType[];
+    defaultSortValue: SortType;
+    defaultFilterTags: string[];
+    tagsList: FoodCategory[];
+    onFilter: (newSearchValue: string, newPriceRange: number[], newFoodStatus: FilterType[]) => void;
+    onSort: (newSortValue: SortType) => void;
+    onFilterByCategory: (newFilterTags: string[]) => void;
+    onClean: () => void;
+}
+
+const FoodFilter = (
+    { defaultSearchValue, foodMinPrice, foodMaxPrice, defaultPrice, defaultFilterStatus, defaultSortValue, defaultFilterTags, tagsList, onFilter, onSort, onFilterByCategory, onClean } : MobileFoodFilterProps
+) => {
+
     const [openFilter, setOpenFilter] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    
-    const options: SelectProps['options'] = fullTagsList.map((tag) => {
-        return {
-            label: tag.toUpperCase(),
-            value: tag.toUpperCase(),
-        }
-    });
+    const [openSort, setOpenSort] = useState(false);
+    const [openFilterTags, setOpenFilterTags] = useState(false);
 
-    const FilterContentTag = ({ open, setOpen } : ModalProps) => {
-
-        const [tags, setTags] = useState(filterTags);
-
-        const handleChangeTags = (value: string[]) => {
-            setTags(value)
-        }
-
-        const handleApply = () => {
-            setFilterTags(tags);
-            setOpen(false);
-        }
-
-        return (
-            <Modal
-                title='FilterTags'
-                okText='Apply'
-                okType='primary'
-                cancelText='Cancel'
-                open={open}
-                onOk={handleApply}
-                onCancel={() => setOpen(false)}
-            >
-                <Select
-                    mode="multiple"
-                    style={{ width: '100%' }}
-                    placeholder="Select filters tag"
-                    value={tags}
-                    onChange={handleChangeTags}
-                    options={options}
-                />
-            </Modal>
-        )
-    }
+    const onOpenFilter = () => setOpenFilter(true);
+    const onOpenFilterTags = () => setOpenFilterTags(true);
+    const onOpenSort = () => setOpenSort(true);
 
     const FilterContent = ({ open, setOpen } : ModalProps) => {
-        
-        const [value, setValue] = useState('')
-        const [price, setPrice] = useState(priceRange)
-        const [filter, setFilter] = useState(filterArray)
 
-        const handleApply = () => {
-            setSearchValue(value);
-            setFilterArray(filter)
-            setPriceRange(price)
-            setOpen(false);
-        }
+        const [value, setValue] = useState(defaultSearchValue);
+        const [price, setPrice] = useState(defaultPrice);
+        const [filterStatus, setFilterStatus] = useState(defaultFilterStatus);
 
         const onChangeBox = (checkedValues: CheckboxValueType[]) => {
-            setFilter(checkedValues.map((check) => {
+            setFilterStatus(checkedValues.map((check) => {
                 return check === FilterType.ONSTOCK ? FilterType.ONSTOCK : FilterType.SOLDOUT
             }));
         }
 
+        const onClickSave = () => {
+            onFilter(value, price, filterStatus)
+            setOpen(false);
+        }
+
         return (
-            <Modal
-                title='Filter'
-                okText= 'Apply'
-                okType='primary'
-                cancelText='Cancel'
-                onOk={handleApply}
-                onCancel={() => setOpen(false)}
-                open={open}
-            >
-                <Divider />
+            <Drawer title='Filter Menu'
+                    placement="bottom"
+                    closable={true}
+                    onClose={() => setOpen(false)}
+                    open={open}
+                    height={450}
+                    key="bottom">
                 <Flex vertical gap='large'>
-                    <Space direction='vertical'>
+                    <Flex vertical gap='small'>
                         <Typography.Text>Filter by name</Typography.Text>
-                        <Search placeholder='Beef Noodle' allowClear  value={value} onChange={(e) => setValue(e.target.value)} />
-                    </Space>
-                    <Space direction='vertical'>
+                        <Input.Search placeholder="Search by name" allowClear value={value} onChange={(e) => setValue(e.target.value)} />
+                    </Flex>
+                    <Flex vertical gap='small'>
                         <Typography.Text>Price Range</Typography.Text>
-                        <Slider className="w-full" range max={foodMaxPrice} min={0} defaultValue={price} onAfterChange={(value: number[]) => setPrice(value)} />
-                    </Space>
-                    <Space direction='vertical'>
+                        <Slider className="w-full" range min={foodMinPrice} max={foodMaxPrice} defaultValue={defaultPrice} onAfterChange={(value: number[]) => setPrice(value)} />
+                    </Flex>
+                    <Flex vertical gap='small'>
                         <Typography.Text>Food Status</Typography.Text>
-                        <Checkbox.Group style={{ width: '100%' }} onChange={onChangeBox} value={filter}>
-                        <Space direction="vertical">
-                            <Checkbox value={FilterType.ONSTOCK}> On Stock </Checkbox>
-                            <Checkbox value={FilterType.SOLDOUT}> Sold out</Checkbox>
-                        </Space>
-                    </Checkbox.Group>
-                    </Space>
+                        <Checkbox.Group style={{ width: '100%' }} onChange={onChangeBox} value={filterStatus} defaultValue={defaultFilterStatus}>
+                            <Flex vertical gap='small'>
+                                <Checkbox value={FilterType.ONSTOCK}> ON STOCK </Checkbox>
+                                <Checkbox value={FilterType.SOLDOUT}> SOLD OUT</Checkbox>
+                            </Flex>
+                        </Checkbox.Group>
+                    </Flex>
+                    <Button onClick={onClickSave} type='primary' style={{ backgroundColor: 'black'}}>Save</Button>
                 </Flex>
-            </Modal>
+            </Drawer>
         )
     }
 
-    const SortContent = ({ open, setOpen }: ModalProps) => {
-
-        const [value, setValue] = useState(sortValue)
-
-        const handleApply = () => {
-            setSortValue(value);
-            setOpen(false)
+    const SortContent = ({ open, setOpen } : ModalProps) => {
+        const [sortValue, setSortValue] = useState(defaultSortValue);
+        const onClickSave = () => {
+            onSort(sortValue);
+            setOpen(false);
         }
         return (
-            <Modal
-                title='Sort'
-                okText='Apply'
-                okType='primary'
-                cancelText='Cancel'
-                open={open}
-                onOk={handleApply}
-                onCancel={() => setOpen(false)}
-            >
-                <Radio.Group onChange={(e) => setValue(e.target.value)} value={value}>
-                    <Space direction="vertical">
-                        <Radio value={SortType.NONE}>None</Radio>
-                        <Radio value={SortType.RATING}>Rating</Radio>
-                        <Radio value={SortType.POPULAR}>Most Popular All Time</Radio>
-                    </Space>
-                </Radio.Group>
-            </Modal>
+            <Drawer title='Sort Menu'
+                    placement="bottom"
+                    closable={true}
+                    onClose={() => setOpen(false)}
+                    open={open}
+                    height={250}
+                    key="bottom">
+                <Flex vertical gap='large'>
+                    <Flex vertical gap='small'>
+                        <Typography.Text>Food Sorting</Typography.Text>
+                        <Radio.Group style={{ width: '100%' }} onChange={(e) => setSortValue(e.target.value)} value={sortValue}>
+                            <Flex vertical gap='small'>
+                                <Radio value={SortType.NONE}> NONE </Radio>
+                                <Radio value={SortType.POPULAR}> POPULAR </Radio>
+                            </Flex>
+                        </Radio.Group>
+                    </Flex>
+                    <Button onClick={onClickSave} type='primary' style={{ backgroundColor: 'black'}}>Save</Button>
+                </Flex>
+            </Drawer>
         )
     }
 
-    const EditContent = ({ open, setOpen } : ModalProps ) => {
-
-        const [value, setValue] = useState(initStoreStatus)
-        //TODO: timeline
-
-        const handleApply = () => {
-            //TODO: backend
-            console.log('TODO')
-            setOpen(false)
+    const FilterContentTag = ({ open, setOpen } : ModalProps) => {
+        const [tags, setTags] = useState(defaultFilterTags);
+        const options: SelectProps['options'] = tagsList.map((tag) => {
+            return {
+                label: tag.name.toUpperCase(),
+                value: `${tag.id}`
+            }
+        });
+        const onClickSave = () => {
+            onFilterByCategory(tags);
+            setOpen(false);
         }
 
         return (
-            <Modal
-                title='Edit Restaurant Status'
-                okText='Apply'
-                okType="danger"
-                cancelText='Cancel'
-                open={open}
-                onOk={handleApply}
-                onCancel={() => setOpen(false)}
-            >
-                <Flex vertical gap="large" className='pt-4'>
-                    <Space direction="vertical">
-                        <Typography.Text>Open Times</Typography.Text>
-                        <TimePicker.RangePicker format={'HH:mm'} placement='bottomLeft' showNow />
-                    </Space>
-                    <Space direction="vertical">
-                        <Typography.Text>Restaurant's Status</Typography.Text>
-                        <Switch checkedChildren="OPEN" unCheckedChildren="CLOSE" checked={value} onChange={(checked: boolean) => setValue(checked)} />
-                    </Space>
+            <Drawer title='Filter By Categories Menu'
+                    placement="bottom"
+                    closable={true}
+                    onClose={() => setOpen(false)}
+                    open={open}
+                    key="bottom">
+                <Flex vertical gap='large'>
+                    <Typography.Text>Filter By Category</Typography.Text>
+                    <Select
+                        mode='multiple'
+                        style={{ width: '100%' }}
+                        placeholder='Select Filters Categories'
+                        value={tags}
+                        onChange={(value: string[]) => setTags(value)}
+                        options={options}
+                    />
+                    <Button onClick={onClickSave} type='primary' style={{ backgroundColor: 'black'}}>Save</Button>
                 </Flex>
-            </Modal>
+            </Drawer>
         )
     }
-
-
-    const onOpenFilterTags = () => setOpenFilterTags(true)
-    const onOpenSort = () => setOpenSort(true)
-    const onOpenFilter = () => setOpenFilter(true);
-    const onOpenEdit = () => setOpenEdit(true)
 
     return (
-        <Flex className="w-full pb-4 overflow-x-auto pr-4" gap="middle" align="center">
+        <Flex className="w-full pb-8 pt-4 overflow-x-auto pr-4" gap="middle" align="center">
             <Button onClick={onOpenFilter} className="bg-gray-200">Filter</Button>
-            <Button onClick={onOpenFilterTags} className="bg-gray-200">Filter Tags</Button>
+            <Button onClick={onOpenFilterTags} className="bg-gray-200">Filter By Categories</Button>
             <Button onClick={onOpenSort} className="bg-gray-200">Sort</Button>
-            <Button onClick={onOpenEdit} type='primary' danger>Edit Restaurant</Button>
-            <Button icon={<ClearOutlined />} className="bg-gray-200" onClick={clearFilter} shape="circle"/>
-            <FilterContentTag open={openFilterTags} setOpen={setOpenFilterTags} />
+            <Button icon={<ClearOutlined />} className="bg-gray-200" onClick={onClean} shape="circle"/>
             <SortContent open={openSort} setOpen={setOpenSort} />
             <FilterContent open={openFilter} setOpen={setOpenFilter} />
-            <EditContent open={openEdit} setOpen={setOpenEdit} />
+            <FilterContentTag open={openFilterTags} setOpen={setOpenFilterTags} />
         </Flex>
     )
 }
 
-export default FoodFilter
+export default FoodFilter;

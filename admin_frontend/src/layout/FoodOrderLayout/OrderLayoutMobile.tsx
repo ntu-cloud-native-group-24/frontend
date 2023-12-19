@@ -1,36 +1,74 @@
 import { Button, Flex } from "antd";
-import { useEffect, useState } from "react";
-import { OrderStatus, OrderType, dummyOrder } from "../../interfaces/OrderInterface";
+import { useEffect, useState, useContext, useCallback, useMemo } from "react";
+import { OrderType } from "../../interfaces/OrderInterface";
 import OrderDisplay from "../../components/MobileViews/OrderDisplay";
 
+import { StoreIdContext } from "../../App";
+import { orderApi } from "../../api/order";
+
 const OrderLayoutMobile = ( ) => {
-    const [orderStatus, setOrderStatus] = useState(OrderStatus.PENDING)
+
+
+    const [orderStatus, setOrderStatus] = useState('pending');
     const [orders, setOrders] = useState<OrderType[]>([])
+    const storeId = useContext<number>(StoreIdContext);
 
     const onClickButtonProps = {
-        className: 'bg-orange-500 text-white',
+        style: {
+            backgroundColor: '#ff7a45',
+            color: 'white',
+        }
     }
 
     const nonClickButtonProps = {
-        className: 'bg-gray-300',
+        style: {
+            backgroundColor: 'gray',
+            color: 'black',
+        }
     }
 
+    const fetchOrders = useCallback( async () => {
+        const response = await orderApi.getAllOrder(storeId);
+        if( response && response.status === 200 ){
+            setOrders(response.data.orders);
+        } else {
+            console.log(response);
+        }
+        
+    }, [storeId]);
+
     useEffect(() => {
-        // Backend here
-        setOrders(dummyOrder)
-    }, [orderStatus])
+        fetchOrders();
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchOrders();
+        }, 5000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [fetchOrders]);
+
+    const filterOrders = useMemo(() => {
+        if( !orders ) return [];
+        return orders.filter((order) => {
+            return order.state === orderStatus;
+        });
+    }, [orders, orderStatus])
 
     return (
         <Flex vertical gap="large" className="w-full">
             <Flex justify="flex-start" align="center" gap="small" className="overflow-x-auto">
-                <Button onClick={() => setOrderStatus(OrderStatus.PENDING)} {...orderStatus === OrderStatus.PENDING ? {...onClickButtonProps} : {...nonClickButtonProps} }>PENDING</Button>
-                <Button onClick={() => setOrderStatus(OrderStatus.PREPARED)} {...orderStatus === OrderStatus.PREPARED ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARE</Button>
-                <Button onClick={() => setOrderStatus(OrderStatus.DONE)} {...orderStatus === OrderStatus.DONE ? {...onClickButtonProps} : {...nonClickButtonProps} }>DONE</Button>
+            <Button onClick={() => {setOrderStatus('pending')}} {...orderStatus === 'pending' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PENDING</Button>
+                    <Button onClick={() => {setOrderStatus('preparing');}} {...orderStatus === 'preparing' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARING</Button>
+                    <Button onClick={() => {setOrderStatus('prepared'); }} {...orderStatus === 'prepared' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARED</Button>
             </Flex>
             <Flex vertical gap="middle">
                 {
-                    orders.map((order) => (
-                        <OrderDisplay order={order} />
+                    filterOrders.map((order) => (
+                        <OrderDisplay key={order.id} order={order} fetchOrders={fetchOrders} />
                     ))
                 }
             </Flex>

@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
 
-import { RestaurantProps } from "../../../interfaces/StoreInterface";
+import { StoreProps } from "../../../interfaces/StoreInterface";
 
 const { Meta } = Card;
 
-const StoreDisplay = ({ store }: RestaurantProps) => {
+const StoreDisplay = ({ store }: StoreProps) => {
     const navigate = useNavigate();
 
     const onStoreClick = () => {

@@ -40,7 +40,7 @@ const HelperPage = () => {
             return {
               key: i,
               label: p.title,
-              children: p.description
+              children: p.description,
             }
           })
         })
@@ -58,6 +58,7 @@ const HelperPage = () => {
                             className={selectedButton === i ? onClickStyle : onCloseStyle} 
                             key={i}
                             onClick={() => onClickBtn(i)}
+                            data-testid='btn-question'
                       >
                         {question.section}
                       </Button>

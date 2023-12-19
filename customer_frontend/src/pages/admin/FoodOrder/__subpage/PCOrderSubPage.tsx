@@ -1,16 +1,16 @@
 import { Button, Flex } from "antd";
 import { useEffect, useState } from "react";
 import {
+    OrdersProps,
     OrderState,
     OrderType,
-    dummyOrder,
 } from "../../../../interfaces/OrderInterface";
 import OrderDisplay from "../../../../components/customer/order/OrderDisplay";
 import OrderDetailDisplay from "../../../../components/customer/order/OrderDetailDisplay";
 
-const PCOrderSubPage = () => {
+const PCOrderSubPage = ({ orders }: OrdersProps) => {
     const [orderState, setOrderState] = useState(OrderState.PENDING);
-    const [orders, setOrders] = useState<OrderType[]>([]);
+    // const [orders, setOrders] = useState<OrderType[]>([]);
     const [targetOrder, setTargetOrder] = useState<OrderType>();
 
     const onClickButtonProps = {
@@ -23,7 +23,7 @@ const PCOrderSubPage = () => {
 
     useEffect(() => {
         //TODO: backend here
-        setOrders(dummyOrder);
+        // setOrders(dummyOrder);
     }, [orderState]);
 
     return (
@@ -44,8 +44,8 @@ const PCOrderSubPage = () => {
                         PENDING
                     </Button>
                     <Button
-                        onClick={() => setOrderState(OrderState.PREPARE)}
-                        {...(orderState === OrderState.PREPARE
+                        onClick={() => setOrderState(OrderState.PREPARING)}
+                        {...(orderState === OrderState.PREPARING
                             ? { ...onClickButtonProps }
                             : { ...nonClickButtonProps })}
                     >
@@ -69,7 +69,7 @@ const PCOrderSubPage = () => {
                     </Button>
                 </Flex>
                 <Flex vertical gap="middle">
-                    {orders.map((order) => (
+                    {orders.map((order: OrderType) => (
                         <OrderDisplay
                             key={order.id}
                             order={order}

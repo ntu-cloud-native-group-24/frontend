@@ -12,7 +12,7 @@ export interface ContentProps {
     description: string;
 }
 
-//TODO: Content.tsx
+
 const ContentLayout = (items: ContentProps) => {
 
     const BreadCrumbItems = useMemo(() => {

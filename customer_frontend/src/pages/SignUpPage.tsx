@@ -1,8 +1,10 @@
-import { Button, Card, Flex, Input, Typography, message } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Card, Flex, Form, Input, Typography, message } from "antd";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// import { apiRegister } from "../data/api";
+import { useCookies } from "react-cookie";
+
+import { userApi } from "../api/user";
 
 export interface SignUpProps {
     login: boolean;
@@ -11,11 +13,15 @@ export interface SignUpProps {
 
 const SignUpPage = ({ login, setLogin }: SignUpProps) => {
     const navigate = useNavigate();
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
+    const [cookies, setCookie] = useCookies(["token"]);
+
+    const [form] = Form.useForm<{
+        name: string;
+        email: string;
+        username: string;
+        password: string;
+    }>();
 
     const handleLoginClick = () => {
         navigate("/login");
@@ -43,34 +49,29 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
     };
 
     const onSignUp = async () => {
-        // console.log(name, username, password);
-        const registerData = {
-            name: name,
-            email: email,
-            username: username,
-            password: password,
-        };
-        console.log(registerData);
+        const { name, email, username, password } = form.getFieldsValue();
 
-        if (username.trim().length === 0 || password.trim().length === 0) {
-            warning("Please input username or password!");
-            return;
-        }
-        // TODO: Backend here
-        // CORS
-        // await apiRegister(registerData).then((response) => {
-        //     console.log(response);
-        // }).error((err) => { error(err) });
-
-        const result = true;
-        if (!result) {
-            error("Sign up Fail!");
+        const res = await userApi.register(name, email, username, password);
+        if (!res || res.status !== 200) {
+            error(res?.data.message);
         } else {
-            setLogin(true);
-            success("Sign up Success!");
-            navigate("/");
+            console.log(res?.data);
+            success(res?.data.message);
+        }
+
+        const loginRes = await userApi.login(username, password);
+        if (!loginRes || loginRes.status !== 200) {
+            error(loginRes?.data.message);
+        } else {
+            console.log(loginRes?.data);
+            setCookie("token", loginRes?.data.token, { path: "/" });
+            await setTimeout(() => {
+                setLogin(loginRes?.data.success);
+            }, 1000);
         }
     };
+
+    const onSignUpFailed = () => warning("submit failed!");
 
     useEffect(() => {
         if (login) {
@@ -95,41 +96,86 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
                 style={{ width: "50%", minWidth: 350 }}
                 className="opacity-90"
             >
-                <Flex vertical gap="large" className="min-w-70">
-                    <Flex vertical gap="middle">
-                        <Input
-                            placeholder="input name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        <Input
-                            placeholder="input email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <Input
-                            placeholder="input username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <Input.Password
-                            placeholder="input password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </Flex>
-                    <Flex>
-                        <Button
-                            type="link"
-                            size="small"
-                            onClick={handleLoginClick}
+                <Flex vertical gap="large">
+                    <Form
+                        form={form}
+                        name="signup"
+                        className="signup-form"
+                        initialValues={{ remember: true }}
+                        onFinish={onSignUp}
+                        onFinishFailed={onSignUpFailed}
+                    >
+                        <Form.Item
+                            name="name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your Name!",
+                                    whitespace: true,
+                                },
+                            ]}
                         >
-                            Have an account?
-                        </Button>
-                    </Flex>
-                    <Button type="primary" onClick={onSignUp}>
-                        Sign Up
-                    </Button>
+                            <Input placeholder="input username" />
+                        </Form.Item>
+                        <Form.Item
+                            name="email"
+                            rules={[
+                                {
+                                    type: "email",
+                                    message: "The input is not valid E-mail!",
+                                },
+                                {
+                                    required: true,
+                                    message: "Please input your E-mail!",
+                                },
+                            ]}
+                        >
+                            <Input type="email" placeholder="input email" />
+                        </Form.Item>
+                        <Form.Item
+                            name="username"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your Username!",
+                                },
+                            ]}
+                        >
+                            <Input placeholder="input username" />
+                        </Form.Item>
+                        <Form.Item
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your Password!",
+                                },
+                            ]}
+                        >
+                            <Input
+                                type="password"
+                                placeholder="input password"
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button
+                                type="link"
+                                size="small"
+                                onClick={handleLoginClick}
+                            >
+                                Have an account?
+                            </Button>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className="w-full"
+                            >
+                                Sign Up
+                            </Button>
+                        </Form.Item>
+                    </Form>
                 </Flex>
             </Card>
         </Flex>

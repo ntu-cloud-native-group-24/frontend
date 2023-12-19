@@ -131,7 +131,7 @@ const SignupLayout = () => {
 
         // Upload image if exists, otherwise skip this step
         let picture_url = '';
-        if( form.getFieldValue('store_picture')[0] != undefined ){
+        if( form.getFieldValue('store_picture') && form.getFieldValue('store_picture')[0] != undefined ){
             const ImageData = await createImageToAzure();
             if( !ImageData ) { setLoading( false ); return; } 
             picture_url = ImageData.upload.url;

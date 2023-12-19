@@ -1,30 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import OrderLayoutComputer from '../../layout/FoodOrderLayout/OrderLayoutComputer';
 import OrderLayoutMobile from '../../layout/FoodOrderLayout/OrderLayoutMobile';
-
-function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-      width,
-      height
-    };
-}
-
-function useWindowDimensions() {
-    const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-  
-    useEffect(() => {
-      function handleResize() {
-        setWindowDimensions(getWindowDimensions());
-      }
-  
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-  
-    return windowDimensions;
-}
-
+import useWindowDimensions from '../../utilities/windows';
 
 const TodayFoodOrder = () => {
     const { height, width } = useWindowDimensions();
