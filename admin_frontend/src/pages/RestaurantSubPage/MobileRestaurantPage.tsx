@@ -1,4 +1,4 @@
-import { Badge, Flex, Spin, Typography } from "antd"
+import { Badge, Button, Flex, Spin, Typography, Upload } from "antd"
 import { FilterType, SortType, StoreType } from "../../interfaces/StoreInterface"
 import { useState, useContext, useEffect, useCallback, useMemo } from "react"
 import { FoodBackendType, FoodCategory, FoodType, fallbackSRC } from "../../interfaces/FoodInterface"
@@ -7,6 +7,10 @@ import FoodFilter from "../../components/MobileViews/FoodFilter"
 import { StoreIdContext } from "../../App"
 import { storeApi } from "../../api/store"
 import { categoryApi } from "../../api/category"
+import { UploadOutlined } from '@ant-design/icons';
+import { UploadProps } from "antd/lib"
+import { imageApi } from "../../api/image"
+import { BlockBlobClient } from "@azure/storage-blob"
 
 const MobileRestaurantPage = () => {
     const storeId = useContext<number>(StoreIdContext);
@@ -138,10 +142,67 @@ const MobileRestaurantPage = () => {
         return foods && foods.length > 0 ? foods.reduce((prev, current) => (prev.price > current.price ? prev : current)).price : 0;
     }, [foods])
 
+    const dummyRequest = async ({ onSuccess }: any) => {
+        setTimeout(() => {
+            onSuccess('ok');
+        }, 0);
+    }
+    const imageProps: UploadProps = {
+        name: 'file',
+        async onChange(info) {
+          if (info.file.status !== 'uploading') {
+            //console.log(info.file);
+          }
+          if (info.file.status === 'done') {
+            //console.log(`${info.file} file uploaded successfully`)
+            if( info.file.originFileObj !== undefined ){
+                try{
+                    const file_prefix = info.file.originFileObj.name.split('.')[0].trim();
+                    const file_type = info.file.type || '';
+                    const imageResponse = await imageApi.getImageApi(file_type, file_prefix);
+                    console.log(imageResponse);
+                    const sas = imageResponse.data.upload.sas;
+                    const client = new BlockBlobClient(sas);
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        const blob = new Blob([arrayBuffer], { type: info.file.type });
+                        console.log(arrayBuffer, blob)
+                        const azureResponse = await client.uploadData(blob, {
+                            blobHTTPHeaders: {
+                                blobContentType: info.file.type,
+                                blobCacheControl: 'public, max-age=86400'
+                            }
+                        });
+                        console.log(azureResponse);
+                    }
+                    reader.readAsArrayBuffer(info.file.originFileObj)
+                    const new_picture_url = imageResponse.data.upload.url;
+                    if( !store ) {window.location.reload(); return; }
+                    const response = await storeApi.updateStoreData(store.id, store.name, store.description, store.address, new_picture_url, store.status, store.phone, store.email);
+                    console.log(response);
+                    window.location.reload();
+                    
+                } catch (err) {
+                    console.log(err);
+                    window.location.reload();
+                }
+            }
+          } else if (info.file.status === 'error') {
+            //console.log(`${info.file.name} file upload failed.`)
+          }
+        },
+    }
+
     return (
         <Flex vertical className="w-full">
             <Spin spinning={spinning}/>
-            <img alt={store?.name} src={foodPicture} onError={() => setFoodPicture(fallbackSRC)} className="h-[150px]"/>
+            <div className="w-full">
+                <Upload className="absolute right-16 top-[256px]" customRequest={dummyRequest} {...imageProps}>
+                    <Button shape='circle' icon={<UploadOutlined/> } />
+                </Upload>
+                <img alt={store?.name} src={foodPicture} onError={() => setFoodPicture(fallbackSRC)} className="h-[150px] w-full"/>
+            </div>
             <div className="flex flex-col justify-center items-center pb-4">
                 <Typography.Title className="flex flex-row justify-center pt-4">{store?.name}</Typography.Title>
                 <Badge status={store?.status ? 'success' : 'default' } text={store?.status ? 'OPENING' : 'CLOSE'} />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useContext } from "react";
 import { FilterType, SortType, StoreType } from "../../interfaces/StoreInterface";
-import { Layout, Typography, Badge, FloatButton, Spin } from "antd";
+import { Layout, Typography, Badge, FloatButton, Spin, Button, Upload } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
 import RestaurantContent from "../../components/ComputerViews/RestaurantContent";
 import FoodFilter from "../../components/ComputerViews/FoodFilter";
 import { FoodBackendType, FoodCategory, FoodType, fallbackSRC } from "../../interfaces/FoodInterface";
@@ -10,6 +11,9 @@ import { storeApi } from "../../api/store";
 import {
     SettingOutlined,
 } from '@ant-design/icons';
+import { UploadProps } from "antd/lib";
+import { imageApi } from "../../api/image";
+import { BlockBlobClient } from "@azure/storage-blob";
 
 const { Header, Content } = Layout;
 
@@ -142,12 +146,66 @@ const ComputerRestaurantPage = ( ) => {
    }, [foods, searchValue, sortValue, priceRange, filterArray, filterTags])
 
     const showFilter = () => setOpenFilter(true);
+    const dummyRequest = async ({ onSuccess }: any) => {
+        setTimeout(() => {
+            onSuccess('ok');
+        }, 0);
+    }
+    const imageProps: UploadProps = {
+        name: 'file',
+        async onChange(info) {
+          if (info.file.status !== 'uploading') {
+            //console.log(info.file);
+          }
+          if (info.file.status === 'done') {
+            //console.log(`${info.file} file uploaded successfully`)
+            if( info.file.originFileObj !== undefined ){
+                try{
+                    const file_prefix = info.file.originFileObj.name.split('.')[0].trim();
+                    const file_type = info.file.type || '';
+                    const imageResponse = await imageApi.getImageApi(file_type, file_prefix);
+                    //console.log(imageResponse);
+                    const sas = imageResponse.data.upload.sas;
+                    const client = new BlockBlobClient(sas);
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        const blob = new Blob([arrayBuffer], { type: info.file.type });
+                        console.log(arrayBuffer, blob)
+                        const azureResponse = await client.uploadData(blob, {
+                            blobHTTPHeaders: {
+                                blobContentType: info.file.type,
+                                blobCacheControl: 'public, max-age=86400'
+                            }
+                        });
+                        console.log(azureResponse);
+                    }
+                    reader.readAsArrayBuffer(info.file.originFileObj)
+                    const new_picture_url = imageResponse.data.upload.url;
+                    if( !store ) {window.location.reload(); return; }
+                    const response = await storeApi.updateStoreData(store.id, store.name, store.description, store.address, new_picture_url, store.status, store.phone, store.email);
+                    console.log(response);
+                    window.location.reload();
+                    
+                } catch (err) {
+                    console.log(err);
+                    window.location.reload();
+                }
+            }
+          } else if (info.file.status === 'error') {
+            //console.log(`${info.file.name} file upload failed.`)
+          }
+        },
+    }
 
     return (
         <Layout className='w-full'>
             <Spin spinning={spinning} fullscreen tip={'Loading...'}/>
             <FloatButton onClick={showFilter} className='w-12 h-12 mr-12' tooltip={<div>Filter</div>} type="primary" icon={<SettingOutlined />}/>
             <Header className="p-0 h-[100px]">
+                <Upload className="absolute right-16 top-[240px]" customRequest={dummyRequest} {...imageProps}>
+                    <Button shape='circle' icon={<UploadOutlined/> } />
+                </Upload>
                 <img alt={store?.name} src={foodPicture} onError={() => setFoodPicture(fallbackSRC)}
                 className="w-full h-full" />
             </Header>
