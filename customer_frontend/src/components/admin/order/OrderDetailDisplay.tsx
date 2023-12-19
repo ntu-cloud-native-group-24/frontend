@@ -15,36 +15,49 @@ import {
     PaymentType,
 } from "../../../interfaces/OrderInterface";
 import { useState, useMemo, useEffect } from "react";
+import { fallbackSRC } from "../../../interfaces/FoodInterface";
+
 import {
-    FoodDisplayProps,
-    MealType,
-    fallbackSRC,
-} from "../../../interfaces/FoodInterface";
+    OrderMealDisplayProps,
+    OrderMealType,
+} from "../../../interfaces/OrderInterface";
+
 import { orderApi } from "../../../api/order";
 import { storeApi } from "../../../api/store";
 
 // get order detail using /api/orders/{order_id}
 
-const OrderFoodDisplay = ({ food }: FoodDisplayProps) => {
+const OrderFoodDisplay = ({ food }: OrderMealDisplayProps) => {
     const OthersDisplay = () => {
         if (food.customizations.selectionGroups.length === 0) {
             return <></>;
         } else {
             return (
                 <>
-                    {food.customizations.selectionGroups.map((selection) => (
-                        <Flex vertical>
-                            <p className="opacity-100 text-[14px]">
-                                {selection.title}
-                            </p>
-                            {selection.items.map((childSelection) => (
-                                <p className="opacity-70 text-[12px]">
-                                    {childSelection.name} ($
-                                    {childSelection.price})
+                    {food.customizations.selectionGroups.map(
+                        (selection, index) => (
+                            <Flex vertical key={index}>
+                                <p className="opacity-100 text-[14px]">
+                                    {selection.title}：
                                 </p>
-                            ))}
-                        </Flex>
-                    ))}
+                                {selection.items.map(
+                                    (childSelection, index) => {
+                                        if (childSelection.selected) {
+                                            return (
+                                                <p
+                                                    className="opacity-70 text-[12px]"
+                                                    key={index}
+                                                >
+                                                    {childSelection.name} ($
+                                                    {childSelection.price})
+                                                </p>
+                                            );
+                                        }
+                                    }
+                                )}
+                            </Flex>
+                        )
+                    )}
                 </>
             );
         }
@@ -95,7 +108,7 @@ const OrderFoodDisplay = ({ food }: FoodDisplayProps) => {
 
 const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
     const [orderDetail, setOrderDetail] = useState<OrderDetailType>();
-    const [mealDetail, setMealDetail] = useState<MealType[]>([]);
+    const [mealDetail, setMealDetail] = useState<OrderMealType[]>([]);
     const [user, setUser] = useState({ name: "" });
 
     // get user info
@@ -113,6 +126,7 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
                 return;
             } else {
                 const tmpOrderDetail = orderDetailedRes?.data.order;
+                const tmpMealDetail = [];
                 setOrderDetail(tmpOrderDetail);
                 // get food info
                 // console.log(tmpOrderDetail.details);
@@ -127,18 +141,23 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
                     } else {
                         if (
                             !mealDetail.some(
-                                (mealD) => mealD.order_id === tmpOrderDetail.id
+                                (mealD) =>
+                                    mealD.order_id === tmpOrderDetail.id &&
+                                    mealD.id === meal.id
                             )
                         ) {
+                            console.log("tmpOrderDetail", meal);
+
                             const tmpMeal = {
                                 ...meal,
                                 picture: mealRes?.data.meal.picture,
                                 name: mealRes?.data.meal.name,
                             };
-                            setMealDetail([...mealDetail, tmpMeal]);
+                            tmpMealDetail.push(tmpMeal);
                         }
                     }
                 }
+                setMealDetail(tmpMealDetail);
             }
         };
 
@@ -177,12 +196,14 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
             return "PENDING";
         } else if (orderDetail?.state === OrderState.PREPARING) {
             return "PREPARE";
-        } else if (orderDetail?.state === OrderState.DONE) {
-            return "DONE";
+        } else if (orderDetail?.state === OrderState.PREPARED) {
+            return "PREPARED";
+        } else if (orderDetail?.state === OrderState.COMPLETED) {
+            return "COMPLETED";
         } else if (orderDetail?.state === OrderState.CANCELED) {
             return "CANCELED";
         } else {
-            return "REJECTED BY CUSTOMERS";
+            return "REJECTED BY STORE";
         }
     }, [order, orderDetail]);
 
@@ -197,11 +218,30 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
             OrderState.CANCELED
         );
         if (!updateOrderRes || updateOrderRes.status !== 200) {
-            console.log("Mobile change order state error.");
+            console.log("Mobile change order state to cancelled error.");
             return;
         } else {
             order.state = OrderState.CANCELED;
-            window.location.reload(false);
+            window.location.reload();
+        }
+    };
+
+    const onCompleteOrder = async () => {
+        if (!order) {
+            return;
+        }
+        console.log(order.id);
+        console.log(order.state);
+        const updateOrderRes = await orderApi.cancelUserOrder(
+            order.id,
+            OrderState.COMPLETED
+        );
+        if (!updateOrderRes || updateOrderRes.status !== 200) {
+            console.log("Mobile change order state to completed error.");
+            return;
+        } else {
+            order.state = OrderState.COMPLETED;
+            window.location.reload();
         }
     };
 
@@ -268,15 +308,13 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
                             ?.filter(
                                 (food) => food.order_id === orderDetail?.id
                             )
-                            .map((ffood) => {
+                            .map((ffood, index) => {
+                                console.log("meal", mealDetail);
                                 return (
-                                    <>
-                                        <OrderFoodDisplay
-                                            key={ffood.id}
-                                            food={ffood}
-                                        />
-                                        <Divider dashed />
-                                    </>
+                                    <OrderFoodDisplay
+                                        key={index}
+                                        food={ffood}
+                                    />
                                 );
                             })
                             .slice(0, orderDetail?.details.length)}
@@ -289,7 +327,7 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
                                 $
                             </Typography.Text>
                             <Typography.Text className="text-xl">
-                                {orderDetail?.total_price}
+                                {orderDetail?.calculated_total_price}
                             </Typography.Text>
                         </Flex>
                     </Flex>
@@ -299,6 +337,15 @@ const OrderDetailDisplay = ({ order }: OrderDetailProps) => {
                 <Flex gap="large" justify="flex-end" align="center">
                     <Button type="primary" danger onClick={onRejectOrder}>
                         Cancel Order
+                    </Button>
+                </Flex>
+            ) : (
+                <></>
+            )}
+            {orderDetail?.state === OrderState.PREPARED ? (
+                <Flex gap="large" justify="flex-end" align="center">
+                    <Button type="primary" onClick={onCompleteOrder}>
+                        Complete Order
                     </Button>
                 </Flex>
             ) : (

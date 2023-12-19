@@ -1,16 +1,9 @@
-import {
-    Button,
-    Flex,
-    Layout,
-    Typography,
-    Card,
-    Space,
-    Tag,
-    Row,
-    Col,
-} from "antd";
+import { Button, Flex, Layout, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { storeApi } from "../../api/store";
+import { StoreType, TagType } from "../../interfaces/StoreInterface";
+import StoreDisplay from "../../components/customer/store/StoreDisplay";
 
 const { Content } = Layout;
 
@@ -20,20 +13,55 @@ export interface CustomerProps {
 
 const HomePage = ({ login }: CustomerProps) => {
     const navigate = useNavigate();
+    const [tags, setTags] = useState<TagType[]>([]);
+    const [stores, setStores] = useState<StoreType[]>([]);
 
-    // const token = window.localStorage.getItem("key");
-
-    useEffect(() => {
-        // console.log("In Homepage", localStorage.token);
-    }, []);
-
+    // before Login
     const onClickSignup = () => {
         navigate("/signup");
     };
-
     const onClickLogin = () => {
         navigate("/login");
     };
+
+    useEffect(() => {
+        const getAllStores = async () => {
+            // get tags
+            const tagsRes = await storeApi.getAllTags();
+            console.log(tagsRes?.data);
+            if (!tagsRes || tagsRes.status !== 200) {
+                return;
+            } else {
+                setTags(tagsRes?.data.tags);
+            }
+
+            // get stores and store tags
+            const storesRes = await storeApi.getAllStores();
+            console.log(storesRes?.data);
+            if (!storesRes || storesRes.status !== 200) {
+                return;
+            } else {
+                const tmpStores = [];
+                for (let i = 0; i < storesRes?.data.stores.length; i++) {
+                    const storeTagsRes = await storeApi.getStoreTags(
+                        storesRes?.data.stores[i].id
+                    );
+                    console.log(storeTagsRes?.data);
+                    if (!storeTagsRes || storeTagsRes.status !== 200) {
+                        return;
+                    } else {
+                        const tmpStore = {
+                            ...storesRes?.data.stores[i],
+                            tags: storeTagsRes?.data.tags,
+                        };
+                        tmpStores.push(tmpStore);
+                    }
+                }
+                setStores(tmpStores);
+            }
+        };
+        getAllStores();
+    }, []);
 
     return (
         <Flex>
@@ -42,32 +70,30 @@ const HomePage = ({ login }: CustomerProps) => {
                     <Flex vertical gap={10} className="px-6">
                         {/* TODO: wrap into a tag component */}
                         <Flex
-                            className="grid lg:grid-cols-12 md:grid-cols-8 grid-cols-6"
+                            className="grid xl:grid-cols-10 lg:grid-cols-8 md:grid-cols-6 grid-cols-5"
                             wrap="wrap"
                             gap={10}
                         >
-                            <Button type="primary">Login</Button>
-                            <Button type="primary">Login</Button>
-                            <Button type="primary">Login</Button>
-                            <Button type="primary">Login</Button>
-                            <Button type="primary">Login</Button>
-                        </Flex>
-
-                        {/* coupons component, maybe there's no coupons */}
-                        <Flex
-                            className="grid lg:grid-cols-6 md:grid-cols-4 grid-cols-3"
-                            wrap="wrap"
-                            gap={10}
-                        >
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
-                            <Button type="primary" onClick={onClickSignup}>
-                                Login
-                            </Button>
+                            {tags.map((tag) => {
+                                return (
+                                    <Button
+                                        type="primary"
+                                        className="p-0 xl:h-20 h-10 lg:text-lg md:text-md text-sm font-bold"
+                                        key={tag.id}
+                                        value={tag.id}
+                                        onClick={() => {
+                                            navigate(`/search`, {
+                                                state: { keyTag: tag.name },
+                                            });
+                                        }}
+                                    >
+                                        {tag.name}
+                                    </Button>
+                                );
+                            })}
                         </Flex>
                         {/* suggest meal component */}
-                        <Flex
+                        {/* <Flex
                             className="grid md:grid-cols-3 grid-cols-1"
                             wrap="wrap"
                             gap={10}
@@ -147,7 +173,7 @@ const HomePage = ({ login }: CustomerProps) => {
                                 <p>Card content</p>
                                 <p>Card content</p>
                             </Card>
-                        </Flex>
+                        </Flex> */}
                         {/* default stores */}
                         <Row>
                             <Col span={24}>
@@ -156,55 +182,16 @@ const HomePage = ({ login }: CustomerProps) => {
                                     wrap="wrap"
                                     gap={10}
                                 >
-                                    <Card
-                                        bordered={false}
-                                        size="small"
-                                        cover={
-                                            <img
-                                                alt="example"
-                                                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                                    {stores.map((store) => {
+                                        console.log(stores);
+                                        return (
+                                            <StoreDisplay
+                                                key={store.id}
+                                                store={store}
+                                                foods={[]}
                                             />
-                                        }
-                                    >
-                                        <div>
-                                            <Space>
-                                                <Tag>23 456</Tag>
-                                            </Space>
-                                            <Typography.Title
-                                                level={3}
-                                                style={{ fontSize: 16 }}
-                                            >
-                                                ML PASTA
-                                            </Typography.Title>
-                                        </div>
-                                    </Card>
-                                    <Card
-                                        bordered={false}
-                                        size="small"
-                                        cover={
-                                            <img
-                                                alt="example"
-                                                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                                            />
-                                        }
-                                    >
-                                        <div>
-                                            <Space>
-                                                <Tag>23 456</Tag>
-                                            </Space>
-                                            <Typography.Title
-                                                level={3}
-                                                style={{ fontSize: 16 }}
-                                            >
-                                                ML PASTA
-                                            </Typography.Title>
-                                        </div>
-                                    </Card>
-                                    <Card bordered={false}>
-                                        <p>Card content</p>
-                                        <p>Card content</p>
-                                        <p>Card content</p>
-                                    </Card>
+                                        );
+                                    })}
                                 </Flex>
                             </Col>
                         </Row>

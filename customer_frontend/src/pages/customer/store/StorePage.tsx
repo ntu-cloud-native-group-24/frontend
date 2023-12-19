@@ -1,53 +1,81 @@
 import { useState, useEffect } from "react";
 import PCStoreSubPage from "./__subpage/PCStoreSubPage";
 
-import {
-    StoreType,
-    dummyData,
-    dummyStore,
-} from "../../../interfaces/StoreInterface";
+import { useLocation } from "react-router-dom";
+import { storeApi } from "../../../api/store";
+
 import { FoodType } from "../../../interfaces/FoodInterface";
-
-// function getWindowDimensions() {
-//     const { innerWidth: width, innerHeight: height } = window;
-//     return {
-//         width,
-//         height,
-//     };
-// }
-
-// function useWindowDimensions() {
-//     const [windowDimensions, setWindowDimensions] = useState(
-//         getWindowDimensions()
-//     );
-
-//     useEffect(() => {
-//         function handleResize() {
-//             setWindowDimensions(getWindowDimensions());
-//         }
-
-//         window.addEventListener("resize", handleResize);
-//         return () => window.removeEventListener("resize", handleResize);
-//     }, []);
-
-//     return windowDimensions;
-// }
+import { CategoryType, StoreType } from "../../../interfaces/StoreInterface";
 
 const StorePage = () => {
-    // const { height, width } = useWindowDimensions();
-    const [store, setStore] = useState<StoreType>(dummyStore);
-    const [foods, setFoods] = useState<FoodType[]>(dummyData);
+    const location = useLocation();
+
+    const pathnameSplited = location.pathname.split("/");
+    const store_id = pathnameSplited[pathnameSplited.length - 1];
+
+    const [foods, setFoods] = useState<FoodType[]>([]);
+    const [store, setStore] = useState<StoreType>();
 
     useEffect(() => {
-        //TODO: fetch data from backend
-        setStore(dummyStore);
-        setFoods(dummyData);
+        const getAllMeals = async () => {
+            // get store from store_id
+            const storeRes = await storeApi.getStore(Number(store_id));
+            console.log(storeRes?.data);
+            if (!storeRes || storeRes.status !== 200) {
+                return;
+            } else {
+                setStore(storeRes?.data.store);
+            }
+
+            // get meals from store
+            const foodsRes = await storeApi.getStoreMeals(store_id);
+            console.log(foodsRes?.data);
+            if (!foodsRes || foodsRes.status !== 200) {
+                return;
+            } else {
+                const tmpFoods = [];
+                for (let i = 0; i < foodsRes?.data.meals.length; i++) {
+                    const foodCategoriesRes =
+                        await storeApi.getStoreMealCategories(
+                            store_id,
+                            foodsRes?.data.meals[i].id
+                        );
+
+                    console.log(foodCategoriesRes?.data);
+                    if (
+                        !foodCategoriesRes ||
+                        foodCategoriesRes.status !== 200
+                    ) {
+                        return;
+                    } else {
+                        const tmpFood = {
+                            ...foodsRes?.data.meals[i],
+                            categories: foodCategoriesRes?.data.categories.map(
+                                (category: CategoryType) => {
+                                    return category.name;
+                                }
+                            ),
+                        };
+                        tmpFoods.push(tmpFood);
+                    }
+                }
+                setFoods(tmpFoods);
+                console.log("tmpFoods", tmpFoods);
+            }
+        };
+        getAllMeals();
+        // setStore(dummyStore);
+        // setFoods(dummyData);
         // console.log(height);
-    }, []);
+    }, [store_id]);
 
     return (
         <div>
-            <PCStoreSubPage store={store} foods={foods} />
+            {store && foods.length ? (
+                <PCStoreSubPage store={store} foods={foods} />
+            ) : (
+                <></>
+            )}
             {/* {width > 844 ? <PCStoreSubPage store={store} foods={foods}  /> : <MobileStoreSubPage store={store} foods={foods} />} */}
         </div>
     );

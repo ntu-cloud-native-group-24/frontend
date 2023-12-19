@@ -1,16 +1,20 @@
 import { useNavigate } from "react-router-dom";
-import { Card } from "antd";
+import { Card, Flex, Tag } from "antd";
 
 import { StoreProps } from "../../../interfaces/StoreInterface";
+import { fallbackSRC } from "../../../interfaces/FoodInterface";
+import { useState } from "react";
 
 const { Meta } = Card;
 
 const StoreDisplay = ({ store }: StoreProps) => {
     const navigate = useNavigate();
 
+    const [storePicture, setStorePicture] = useState(store.picture_url);
+
     const onStoreClick = () => {
         // navigate store/:id
-        navigate("/store/1");
+        navigate(`/store/${store.id}`);
     };
 
     return (
@@ -20,14 +24,20 @@ const StoreDisplay = ({ store }: StoreProps) => {
                 style={{ padding: 10 }}
                 cover={
                     <img
-                        alt="example"
-                        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                        className="h-[180px]"
+                        alt={store.name}
+                        src={storePicture}
+                        className="h-[180px] object-cover"
+                        onError={() => setStorePicture(fallbackSRC)}
                     />
                 }
                 onClick={onStoreClick}
             >
-                <Meta title={store.name} description={`$123`} />
+                <Flex>
+                    {store.tags.map((tag) => (
+                        <Tag>{tag.name}</Tag>
+                    ))}
+                </Flex>
+                <Meta title={store.name} description={store.address} />
             </Card>
         </>
     );

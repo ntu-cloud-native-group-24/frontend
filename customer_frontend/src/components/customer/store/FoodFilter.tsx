@@ -10,31 +10,34 @@ import {
     Select,
     Button,
 } from "antd";
-import { FoodFilterProps } from "../../../interfaces/FoodInterface";
+import {
+    FoodCategoryType,
+    FoodFilterProps,
+} from "../../../interfaces/FoodInterface";
 import type { SearchProps } from "antd/es/input";
 import type { CheckboxValueType } from "antd/es/checkbox/Group";
-import type { RadioChangeEvent } from "antd/lib";
+// import type { RadioChangeEvent } from "antd/lib";
 import type { SelectProps } from "antd";
 import { useMemo, useState } from "react";
-import { FilterType, SortType } from "../../../interfaces/StoreInterface";
+import { FilterType } from "../../../interfaces/StoreInterface";
 
 const { Search } = Input;
 
 const FoodFilter = ({
     collapsed,
-    sortValue,
+    // sortValue,
     priceRange,
     filterArray,
-    filterTags,
-    fullTagsList,
+    filterCategories,
+    fullCategoriesList,
     foodMaxPrice,
     initStoreStatus,
     initStoreTimes,
     setSearchValue,
-    setSortValue,
+    // setSortValue,
     setPriceRange,
     setFilterArray,
-    setFilterTags,
+    setFilterCategories,
     clearFilter,
 }: FoodFilterProps) => {
     const [storeStatus, setStoreStatus] = useState(initStoreStatus);
@@ -44,28 +47,28 @@ const FoodFilter = ({
         setSearchValue(value.trim().toUpperCase());
 
     const options: SelectProps["options"] = useMemo(() => {
-        return fullTagsList.map((tag) => {
+        return fullCategoriesList.map((category) => {
             return {
-                label: tag.toUpperCase(),
-                value: tag.toUpperCase(),
+                label: category.toUpperCase(),
+                value: category.toUpperCase(),
             };
         });
-    }, [fullTagsList]);
+    }, [fullCategoriesList]);
 
-    const onChangeRadio = (e: RadioChangeEvent) => {
-        setSortValue(e.target.value);
-    };
-    // const onChangeCheckbox = (checkedValues: CheckboxValueType[]) => {
-    //     setFilterArray(
-    //         checkedValues.map((check) => {
-    //             return check === FilterType.ONSTOCK
-    //                 ? FilterType.ONSTOCK
-    //                 : FilterType.SOLDOUT;
-    //         })
-    //     );
+    // const onChangeRadio = (e: RadioChangeEvent) => {
+    //     setSortValue(e.target.value);
     // };
-    const handleChangeTags = (value: string[]) => {
-        setFilterTags(value);
+    const onChangeCheckbox = (checkedValues: CheckboxValueType[]) => {
+        setFilterArray(
+            checkedValues.map((check) => {
+                return check === FilterType.ONSTOCK
+                    ? FilterType.ONSTOCK
+                    : FilterType.SOLDOUT;
+            })
+        );
+    };
+    const handleChangeCategories = (value: string[]) => {
+        setFilterCategories(value);
     };
 
     const Content = () => {
@@ -80,7 +83,7 @@ const FoodFilter = ({
                         style={{ width: 170 }}
                     />
                 </Space>
-                <Space direction="vertical">
+                {/* <Space direction="vertical">
                     <Typography.Text>Sort</Typography.Text>
                     <Radio.Group onChange={onChangeRadio} value={sortValue}>
                         <Space direction="vertical">
@@ -91,7 +94,7 @@ const FoodFilter = ({
                             </Radio>
                         </Space>
                     </Radio.Group>
-                </Space>
+                </Space> */}
                 <Space direction="vertical">
                     <Typography.Text>Price Range</Typography.Text>
                     <Slider
@@ -105,7 +108,7 @@ const FoodFilter = ({
                         }
                     />
                 </Space>
-                {/* <Space direction="vertical">
+                <Space direction="vertical">
                     <Typography.Text>Filter</Typography.Text>
                     <Checkbox.Group
                         style={{ width: "100%" }}
@@ -116,22 +119,22 @@ const FoodFilter = ({
                             <Checkbox value={FilterType.ONSTOCK}>
                                 {" "}
                                 On Stock{" "}
-                            </Checkbox> */}
-                            {/* <Checkbox value={FilterType.SOLDOUT}>
+                            </Checkbox>
+                            <Checkbox value={FilterType.SOLDOUT}>
                                 {" "}
                                 Sold out
-                            </Checkbox> */}
-                        {/* </Space>
+                            </Checkbox>
+                        </Space>
                     </Checkbox.Group>
-                </Space> */}
+                </Space>
                 <Space direction="vertical">
-                    <Typography.Text>Filter Tags</Typography.Text>
+                    <Typography.Text>Filter Categories</Typography.Text>
                     <Select
                         mode="multiple"
                         style={{ width: "100%" }}
-                        placeholder="Select filters tag"
-                        value={filterTags}
-                        onChange={handleChangeTags}
+                        placeholder="Select filters categories"
+                        value={filterCategories}
+                        onChange={handleChangeCategories}
                         options={options}
                     />
                 </Space>

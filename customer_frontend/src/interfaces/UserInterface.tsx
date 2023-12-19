@@ -1,4 +1,6 @@
 export interface UserType {
+    email: string;
+    id: string;
     name: string;
-    picture_url: string;
+    privileges: string[];
 }

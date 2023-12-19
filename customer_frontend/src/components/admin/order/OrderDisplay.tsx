@@ -49,7 +49,7 @@ const OrderDisplay = ({
             <Flex justify="space-between" align="center" gap={20}>
                 <Flex vertical className="w-3/4">
                     <p className="text-lg font-bold">Order #{order.id}</p>
-                    {/* <p>$ {totalMoney}</p> */}
+                    <p>$ {order.calculated_total_price}</p>
                     <p className="truncate opacity-60">
                         {new Date(order.created_at).toLocaleString()}
                     </p>

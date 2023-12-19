@@ -3,28 +3,36 @@ import { StoreContentProps } from "../../../interfaces/StoreInterface";
 import { Flex, Typography } from "antd";
 import FoodDisplay from "./FoodDisplay";
 
-const StoreContent = ({ foods, isInFilter, tagsList }: StoreContentProps) => {
-    // foodList = [{ tag: string; foods: Array<FoodType>; }]
+const StoreContent = ({
+    foods,
+    isInFilter,
+    categoriesList,
+    store,
+}: StoreContentProps) => {
+    // foodList = [{ category: {id; string, name: string}; foods: Array<FoodType>; }]
     const foodList = useMemo(() => {
-        const myTagsList = tagsList.sort();
-        const RECOMMEND_INDEX = myTagsList.findIndex(
-            (tag) => tag.toUpperCase() === "RECOMMEND"
+        const myCategoriesList = categoriesList.sort();
+        const RECOMMEND_INDEX = myCategoriesList.findIndex(
+            (category) => category.toUpperCase() === "RECOMMEND"
         );
         if (RECOMMEND_INDEX !== -1) {
             //SWAP WITH Recommend
-            const temp = myTagsList[RECOMMEND_INDEX];
-            myTagsList[RECOMMEND_INDEX] = myTagsList[0];
-            myTagsList[0] = temp;
+            const temp = myCategoriesList[RECOMMEND_INDEX];
+            myCategoriesList[RECOMMEND_INDEX] = myCategoriesList[0];
+            myCategoriesList[0] = temp;
         }
-        return myTagsList.map((tag) => {
+        return myCategoriesList.map((category) => {
             return {
-                tag: tag,
+                category: category,
                 foods: foods.filter(
-                    (food) => food.tags.findIndex((ftag) => ftag === tag) !== -1
+                    (food) =>
+                        food.categories.findIndex(
+                            (fcategory) => fcategory === category
+                        ) !== -1
                 ),
             };
         });
-    }, [tagsList, foods]);
+    }, [categoriesList, foods]);
 
     const NormalDisplay = () => {
         return (
@@ -33,7 +41,7 @@ const StoreContent = ({ foods, isInFilter, tagsList }: StoreContentProps) => {
                     item.foods.length > 0 ? (
                         <Flex key={i} vertical gap="large">
                             <Typography.Text className="font-bold text-xl">
-                                {item.tag.toUpperCase()}
+                                {item.category.toUpperCase()}
                             </Typography.Text>
                             <Flex
                                 key={"space" + i}
@@ -42,7 +50,11 @@ const StoreContent = ({ foods, isInFilter, tagsList }: StoreContentProps) => {
                                 gap="small"
                             >
                                 {item.foods.map((food) => (
-                                    <FoodDisplay key={food.key} food={food} />
+                                    <FoodDisplay
+                                        key={food.id}
+                                        food={food}
+                                        store={store}
+                                    />
                                 ))}
                             </Flex>
                         </Flex>
@@ -66,7 +78,11 @@ const StoreContent = ({ foods, isInFilter, tagsList }: StoreContentProps) => {
                     gap="small"
                 >
                     {foods.map((food) => (
-                        <FoodDisplay key={food.key} food={food} />
+                        <FoodDisplay
+                            key={food.id}
+                            food={food}
+                            store={store}
+                        />
                     ))}
                 </Flex>
             </Flex>

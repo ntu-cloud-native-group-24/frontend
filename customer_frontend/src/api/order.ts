@@ -1,6 +1,5 @@
 import api from "./axiosClient";
 import type { AxiosError } from "axios";
-import { OrderState } from "../interfaces/OrderInterface";
 
 export const orderApi = {
     async getUserOrders() {

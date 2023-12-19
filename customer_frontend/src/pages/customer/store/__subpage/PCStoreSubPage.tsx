@@ -1,10 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-    FilterType,
-    StoreProps,
-    SortType,
-} from "../../../../interfaces/StoreInterface";
-import { Layout, Typography, Badge } from "antd";
+import { FilterType, StoreProps } from "../../../../interfaces/StoreInterface";
+import { Layout, Typography, Badge, Flex } from "antd";
 import StoreContent from "../../../../components/customer/store/StoreContent";
 import FoodFilter from "../../../../components/customer/store/FoodFilter";
 import { fallbackSRC } from "../../../../interfaces/FoodInterface";
@@ -13,7 +9,9 @@ const { Header, Sider, Content } = Layout;
 
 const PCStoreSubPage = ({ store, foods }: StoreProps) => {
     const [collapsed, setCollapsed] = useState(true);
-    const [foodPicture, setFoodPicture] = useState(store.picture_url);
+    const [storePicture, setStorePicture] = useState(store.picture_url);
+
+    console.log("sub", store);
 
     const foodMaxPrice = useMemo(() => {
         return foods.reduce((prev, current) =>
@@ -21,87 +19,95 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
         ).price;
     }, [foods]);
 
-    const tagsList = useMemo(() => {
+    const categoriesList = useMemo(() => {
         return foods
             .flatMap((food) => {
-                return food.tags.map((tag) => tag);
+                return food.categories.map((category) => category);
             })
             .filter((v, i, arr) => arr.indexOf(v) === i);
     }, [foods]);
 
-    // TODO: danger zone -- Restaurant status
     const [searchValue, setSearchValue] = useState("");
-    const [sortValue, setSortValue] = useState(SortType.NONE);
+    // const [sortValue, setSortValue] = useState(SortType.NONE);
     const [priceRange, setPriceRange] = useState([0, foodMaxPrice + 1]);
     const [filterArray, setFilterArray] = useState([
         FilterType.ONSTOCK,
         FilterType.SOLDOUT,
     ]);
-    const [filterTags, setFilterTags] = useState(tagsList);
+    const [filterCategories, setFilterCategories] = useState(categoriesList);
 
     const isInFilter = useMemo(() => {
-        return !(searchValue === "" && sortValue === SortType.NONE);
-    }, [searchValue, sortValue]);
+        return !(searchValue === "");
+    }, [searchValue]);
 
     const clearFilter = () => {
         setSearchValue("");
-        setSortValue(SortType.NONE);
+        // setSortValue(SortType.NONE);
         setPriceRange([0, foodMaxPrice + 1]);
         setFilterArray([FilterType.ONSTOCK, FilterType.SOLDOUT]);
-        setFilterTags(tagsList);
+        setFilterCategories(categoriesList);
     };
 
     const filterFoods = useMemo(() => {
         let result = [...foods];
         if (searchValue !== "")
             result = result.filter((food) => food.name.includes(searchValue));
-        if (sortValue === SortType.POPULAR) {
-            result = result.sort(
-                (foodA, foodB) => foodB.soldAmount - foodA.soldAmount
-            );
-        } else if (sortValue === SortType.RATING) {
-            // TODO:
-        }
 
         return result.filter((food) => {
-            const foodStatus = food.status
+            const foodStatus = food.is_available
                 ? FilterType.ONSTOCK
                 : FilterType.SOLDOUT;
             return (
                 food.price >= priceRange[0] &&
                 food.price <= priceRange[1] &&
                 filterArray.findIndex((f) => f === foodStatus) !== -1 &&
-                food.tags.filter(
-                    (f) => filterTags.findIndex((ftag) => ftag === f) !== -1
+                food.categories.filter(
+                    (f) =>
+                        filterCategories.findIndex(
+                            (fcategory) => fcategory === f
+                        ) !== -1
                 ).length > 0
             );
         });
-    }, [foods, searchValue, sortValue, priceRange, filterArray, filterTags]);
+    }, [foods, searchValue, priceRange, filterArray, filterCategories]);
 
     return (
         <Layout className="w-full">
             <Header className="p-0 h-[100px]">
                 <img
                     alt={store.name}
-                    src={foodPicture}
-                    onError={() => setFoodPicture(fallbackSRC)}
+                    src={storePicture}
+                    onError={() => setStorePicture(fallbackSRC)}
+                    className="object-none h-full w-full"
                 />
             </Header>
             <Layout hasSider>
                 <Content className="bg-white">
-                    <div className="flex flex-col justify-center items-center">
-                        <Typography.Title className="flex flex-row justify-center pt-4">
+                    <Flex justify="center" align="center" vertical>
+                        <Typography.Title className="p-3" style={{ margin: 0 }}>
                             {store.name}
                         </Typography.Title>
+                        <Typography.Paragraph>
+                            {store.description}
+                        </Typography.Paragraph>
+                        <Flex gap="large">
+                            <Typography.Text>
+                                地址：{store.address}
+                            </Typography.Text>
+                            <Typography.Text>
+                                電話：{store.phone}
+                            </Typography.Text>
+                        </Flex>
                         <Badge
                             status={store.status ? "success" : "default"}
                             text={store.status ? "OPENING" : "CLOSE"}
                         />
-                    </div>
+                    </Flex>
                     <StoreContent
                         isInFilter={isInFilter}
                         foods={filterFoods}
-                        tagsList={filterTags}
+                        categoriesList={filterCategories}
+                        store={store}
                     />
                 </Content>
                 <Sider
@@ -110,7 +116,7 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
                     collapsed={collapsed}
                     onCollapse={(value) => setCollapsed(value)}
                     collapsedWidth={0}
-                    width="300"
+                    width={300}
                     zeroWidthTriggerStyle={{
                         position: "fixed",
                         left: collapsed
@@ -123,19 +129,19 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
                 >
                     <FoodFilter
                         collapsed={collapsed}
-                        sortValue={sortValue}
+                        // sortValue={sortValue}
                         foodMaxPrice={foodMaxPrice}
                         priceRange={priceRange}
                         filterArray={filterArray}
-                        filterTags={filterTags}
-                        fullTagsList={tagsList}
+                        filterCategories={filterCategories}
+                        fullCategoriesList={categoriesList}
                         initStoreStatus={store.status}
-                        initStoreTimes={[store.open_time, store.close_time]}
+                        initStoreTimes={store.hours}
                         setSearchValue={setSearchValue}
-                        setSortValue={setSortValue}
+                        // setSortValue={setSortValue}
                         setPriceRange={setPriceRange}
                         setFilterArray={setFilterArray}
-                        setFilterTags={setFilterTags}
+                        setFilterCategories={setFilterCategories}
                         clearFilter={clearFilter}
                     />
                 </Sider>

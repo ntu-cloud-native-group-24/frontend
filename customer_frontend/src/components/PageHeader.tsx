@@ -10,24 +10,53 @@ import {
 
 import { useCookies } from "react-cookie";
 import api from "../api/axiosClient";
+import { useEffect, useState } from "react";
+import { UserType } from "../interfaces/UserInterface";
 
 const { Search } = Input;
 
 export interface HeaderProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
-    currentUser: any;
+    currentUser: UserType;
+}
+
+function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+        width,
+        height,
+    };
+}
+
+function useWindowDimensions() {
+    const [windowDimensions, setWindowDimensions] = useState(
+        getWindowDimensions()
+    );
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowDimensions(getWindowDimensions());
+        }
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    return windowDimensions;
 }
 
 const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
     // TODO: find more graceful navigate way
+    const { height, width } = useWindowDimensions();
+
     const navigate = useNavigate();
     const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
     // TODO: complete Props
     const onSearch = (value: string) => {
         console.log(value);
-        navigate("/search");
+        navigate(`/search`, { state: { keyword: value } });
     };
 
     const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -105,23 +134,25 @@ const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
             </Flex>
             {login ? (
                 <Flex align="center">
-                    <Space.Compact>
-                        <Search
-                            placeholder="input search text"
-                            onSearch={onSearch}
-                            style={{ width: 200 }}
-                        />
-                    </Space.Compact>
+                    <Search
+                        placeholder="input search text"
+                        onSearch={onSearch}
+                        style={width < 767 ? { width: 130 } : { width: 300 }}
+                    />
                     <Button
                         icon={<ShoppingCartOutlined />}
                         onClick={handleCartClick}
                     >
-                        Cart
+                        {width < 767 ? "" : "Cart"}
                     </Button>
                     <Dropdown menu={menuProps}>
-                        <Button icon={<UserOutlined />}>
-                            {currentUser.name}
-                        </Button>
+                        {width < 767 ? (
+                            <Button icon={<UserOutlined />}></Button>
+                        ) : (
+                            <Button icon={<UserOutlined />}>
+                                {width < 767 ? "" : currentUser.name}
+                            </Button>
+                        )}
                     </Dropdown>
                 </Flex>
             ) : (

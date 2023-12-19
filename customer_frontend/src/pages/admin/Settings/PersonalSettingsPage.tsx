@@ -5,36 +5,16 @@ import { useEffect, useState, useMemo } from "react";
 
 import { userApi } from "../../../api/user";
 
+const { success, warning, error } = message;
+
 const PersonalSettingsPage = () => {
     // const [form] = Form.useForm<{name: string; id: string; code: string; subcode: string; account: string;}>();
-    const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm<{
         name: string;
         email: string;
     }>();
 
     const [currentUser, setCurrentUser] = useState({ name: "", email: "" });
-
-    const success = (msg: string) => {
-        messageApi.open({
-            type: "success",
-            content: msg,
-        });
-    };
-
-    const error = (msg: string) => {
-        messageApi.open({
-            type: "error",
-            content: msg,
-        });
-    };
-
-    const warning = (msg: string) => {
-        messageApi.open({
-            type: "warning",
-            content: msg,
-        });
-    };
 
     const onFinish = async () => {
         console.log(form.getFieldsValue());
@@ -71,7 +51,6 @@ const PersonalSettingsPage = () => {
 
     return (
         <Flex vertical gap={48}>
-            {contextHolder}
             <Form
                 form={form}
                 layout="vertical"

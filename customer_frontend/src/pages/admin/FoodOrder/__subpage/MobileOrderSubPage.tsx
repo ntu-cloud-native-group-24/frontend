@@ -5,7 +5,7 @@ import {
     OrderState,
     OrderType,
 } from "../../../../interfaces/OrderInterface";
-import OrderMobileDisplay from "../../../../components/customer/order/OrderMobileDisplay";
+import OrderMobileDisplay from "../../../../components/admin/order/OrderMobileDisplay";
 
 const MobileOrderSubPage = ({ orders }: OrdersProps) => {
     const [orderState, setOrderState] = useState(OrderState.PENDING);
@@ -49,12 +49,20 @@ const MobileOrderSubPage = ({ orders }: OrdersProps) => {
                     PREPARE
                 </Button>
                 <Button
-                    onClick={() => setOrderState(OrderState.DONE)}
-                    {...(orderState === OrderState.DONE
+                    onClick={() => setOrderState(OrderState.PREPARED)}
+                    {...(orderState === OrderState.PREPARED
                         ? { ...onClickButtonProps }
                         : { ...nonClickButtonProps })}
                 >
-                    DONE
+                    PREPARED
+                </Button>
+                <Button
+                    onClick={() => setOrderState(OrderState.COMPLETED)}
+                    {...(orderState === OrderState.COMPLETED
+                        ? { ...onClickButtonProps }
+                        : { ...nonClickButtonProps })}
+                >
+                    COMPLETED
                 </Button>
                 <Button
                     onClick={() => setOrderState(OrderState.CANCELED)}
@@ -66,7 +74,7 @@ const MobileOrderSubPage = ({ orders }: OrdersProps) => {
                 </Button>
             </Flex>
             <Flex vertical gap="middle">
-                {orders.map((order) => (
+                {orders.map((order: OrderType) => (
                     <OrderMobileDisplay
                         key={order.id}
                         order={order}

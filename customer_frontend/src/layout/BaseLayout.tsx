@@ -15,6 +15,7 @@ import { useCookies } from "react-cookie";
 
 import api from "../api/axiosClient";
 import { userApi } from "../api/user";
+import { UserType } from "../interfaces/UserInterface";
 
 const { Header, Footer } = Layout;
 
@@ -22,12 +23,17 @@ const BaseLayout = () => {
     const [login, setLogin] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const [cookies] = useCookies(["token"]);
-    const [currentUser, setCurrentUser] = useState({ name: "" });
+    const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+    const [currentUser, setCurrentUser] = useState<UserType>({
+        name: "",
+        email: "",
+        id: "",
+        privileges: [],
+    });
 
     useEffect(() => {
         const check = async () => {
-            console.log("cookie", cookies);
+            // console.log("cookie", cookies);
             // console.log("login", login);
             const user = localStorage.getItem("user");
             // if (user) {
@@ -40,6 +46,8 @@ const BaseLayout = () => {
                 console.log(res?.data);
                 if (!res || res.status !== 200) {
                     setLogin(res?.data.success);
+                    removeCookie("token");
+                    localStorage.removeItem("user");
                     return;
                 } else {
                     setLogin(res?.data.success);

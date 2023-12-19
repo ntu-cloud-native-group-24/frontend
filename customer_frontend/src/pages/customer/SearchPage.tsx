@@ -1,21 +1,59 @@
 import { Flex, Layout, Typography } from "antd";
 
 import StoreDisplay from "../../components/customer/store/StoreDisplay";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { storeApi } from "../../api/store";
+import { StoreType } from "../../interfaces/StoreInterface";
 
 const { Content } = Layout;
 
 const SearchPage = () => {
     // GET /api/store
+    const location = useLocation();
+    const [keyword, setKeyword] = useState("");
+    const [keyTag, setKeyTag] = useState("");
 
-    const dummyStore = {
-        name: "ML Pasta",
-        picture_url:
-            "https://png.pngtree.com/back_origin_pic/05/05/68/52e6ab3fde77ad0a01b5d03c03e982f8.jpg",
-        open_time: new Date("08:00 AM"),
-        close_time: new Date("08:00 PM"),
-        status: true,
-        day: 27,
-    };
+    // const keyword = location.state.keyword;
+    // const keyTag = location.state.keyTag;
+
+    const [stores, setStores] = useState<StoreType[]>([]);
+
+    useEffect(() => {
+        const getAllStores = async () => {
+            // get stores and store tags
+            const storesRes = await storeApi.getAllStores();
+            console.log(storesRes?.data);
+            if (!storesRes || storesRes.status !== 200) {
+                return;
+            } else {
+                const tmpStores = [];
+                for (let i = 0; i < storesRes?.data.stores.length; i++) {
+                    const storeTagsRes = await storeApi.getStoreTags(
+                        storesRes?.data.stores[i].id
+                    );
+
+                    console.log(storeTagsRes?.data);
+
+                    if (!storeTagsRes || storeTagsRes.status !== 200) {
+                        return;
+                    } else {
+                        const tmpStore = {
+                            ...storesRes?.data.stores[i],
+                            tags: storeTagsRes?.data.tags,
+                        };
+                        tmpStores.push(tmpStore);
+                    }
+                }
+                setStores(tmpStores);
+            }
+        };
+        if (location.state) {
+            setKeyword(location.state.keyword);
+            setKeyTag(location.state.keyTag);
+        }
+        getAllStores();
+    }, [location.state]);
 
     return (
         <Content className="bg-blue-300 max-h-full">
@@ -34,7 +72,8 @@ const SearchPage = () => {
                                     padding: 0,
                                 }}
                             >
-                                Search Store
+                                {keyword ? keyword : ""}
+                                {keyTag ? keyTag : ""}
                             </Typography.Title>
                         </Flex>
                     </Flex>
@@ -46,10 +85,30 @@ const SearchPage = () => {
                     gap="small"
                 >
                     {/* iterative store */}
-                    <StoreDisplay store={dummyStore} foods={[]} />
-                    <StoreDisplay store={dummyStore} foods={[]} />
-                    <StoreDisplay store={dummyStore} foods={[]} />
-                    <StoreDisplay store={dummyStore} foods={[]} />
+                    {stores
+                        .filter((store) => {
+                            if (keyword) {
+                                const regex = new RegExp(
+                                    keyword.split("").join(".*")
+                                );
+                                console.log(regex);
+                                return store.name.match(regex);
+                            } else if (keyTag) {
+                                return store.tags.some(
+                                    (tag) => tag.name === keyTag
+                                );
+                            }
+                        })
+                        .map((store) => {
+                            console.log(stores);
+                            return (
+                                <StoreDisplay
+                                    key={store.id}
+                                    store={store}
+                                    foods={[]}
+                                />
+                            );
+                        })}
                 </Flex>
             </Flex>
         </Content>

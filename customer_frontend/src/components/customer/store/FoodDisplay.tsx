@@ -1,16 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
 
-import { FoodDisplayProps } from "../../../interfaces/FoodInterface";
+import {
+    FoodDisplayProps,
+    fallbackSRC,
+} from "../../../interfaces/FoodInterface";
+import { useState } from "react";
 
 const { Meta } = Card;
 
-const FoodDisplay = ({ food }: FoodDisplayProps) => {
+const FoodDisplay = ({ food, store }: FoodDisplayProps) => {
     const navigate = useNavigate();
 
-    const onStoreClick = () => {
-        // TODO: navigate to store/:store-id/:meal-id
-        navigate("/store/1/dsajk");
+    const [foodPicture, setFoodPicture] = useState(food.picture);
+
+    const onFoodClick = () => {
+        navigate(`/store/${store.id}/${food.id}`);
     };
 
     return (
@@ -20,12 +25,13 @@ const FoodDisplay = ({ food }: FoodDisplayProps) => {
                 style={{ padding: 10 }}
                 cover={
                     <img
-                        alt="example"
-                        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                        className="h-[160px]"
+                        alt={food.name}
+                        src={foodPicture}
+                        className="h-[180px] object-cover"
+                        onError={() => setFoodPicture(fallbackSRC)}
                     />
                 }
-                onClick={onStoreClick}
+                onClick={onFoodClick}
             >
                 <Meta title={food.name} description={`$ ${food.price}`} />
             </Card>

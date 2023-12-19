@@ -35,8 +35,9 @@ const CustomerLayout = ({ login, setLogin }: CustomerProps) => {
                     element={<SignUpPage login={login} setLogin={setLogin} />}
                 />
                 <Route path="/search" element={<SearchPage />} />
+
                 <Route path="/store/:id" element={<StorePage />} />
-                <Route path="/store/:id/:product" element={<ProductPage />} />
+                <Route path="/store/:id/:productID" element={<ProductPage />} />
 
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/payment" element={<PaymentPage />} />

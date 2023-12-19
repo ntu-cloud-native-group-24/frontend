@@ -5,36 +5,16 @@ import { useEffect } from "react";
 
 import { userApi } from "../../../api/user";
 
+const { success, warning, error } = message;
+
 const PasswordSettingsPage = () => {
     const { Password } = Input;
-    const [messageApi, contextHolder] = message.useMessage();
 
     const [form] = Form.useForm<{
         prePassword: string;
         newPassword: string;
         validPassword: string;
     }>();
-
-    const success = (msg: string) => {
-        messageApi.open({
-            type: "success",
-            content: msg,
-        });
-    };
-
-    const error = (msg: string) => {
-        messageApi.open({
-            type: "error",
-            content: msg,
-        });
-    };
-
-    const warning = (msg: string) => {
-        messageApi.open({
-            type: "warning",
-            content: msg,
-        });
-    };
 
     const onFinish = async () => {
         //TODO: send these form to backend
@@ -77,7 +57,6 @@ const PasswordSettingsPage = () => {
 
     return (
         <Flex vertical gap={48}>
-            {contextHolder}
             <Form
                 form={form}
                 layout="vertical"

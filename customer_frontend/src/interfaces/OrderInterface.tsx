@@ -1,5 +1,5 @@
-import { MealType } from "./FoodInterface";
 // import { UserType } from "./UserInterface";
+import { FoodSelectionGroups } from "./FoodInterface";
 
 export enum PaymentType {
     CASH = "cash",
@@ -15,7 +15,8 @@ export enum DeliveryMethod {
 export enum OrderState {
     PENDING = "pending",
     PREPARING = "preparing",
-    DONE = "done",
+    PREPARED = "prepared",
+    COMPLETED = "completed",
     CANCELED = "cancelled",
 }
 
@@ -24,6 +25,7 @@ export interface OrderType {
     user_id: number;
     store_id: number;
     notes: string;
+    calculated_total_price: number;
     state: OrderState;
     payment_type: PaymentType;
     delivery_method: DeliveryMethod;
@@ -35,12 +37,29 @@ export interface OrderDetailType {
     user_id: number;
     store_id: number;
     notes: string;
+    calculated_total_price: number;
     state: OrderState;
     payment_type: PaymentType;
     delivery_method: DeliveryMethod;
     created_at: Date;
-    total_price: number;
-    details: MealType[];
+    details: OrderMealType[];
+}
+
+export interface OrderMealType {
+    id: number;
+    order_id: number;
+    meal_id: number;
+    quantity: number;
+    notes: string;
+    customizations: FoodSelectionGroups;
+    calculated_price_per_item: number;
+    picture: string;
+    name: string;
+    price: number;
+}
+
+export interface OrderMealDisplayProps {
+    food: OrderMealType;
 }
 
 export interface OrdersProps {

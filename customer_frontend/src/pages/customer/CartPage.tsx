@@ -79,7 +79,7 @@ const columns: ColumnsType<DataType> = [
     {
         title: "刪除",
         key: "act",
-        render: (_) => (
+        render: () => (
             <Space size="middle">
                 <a>Delete</a>
             </Space>
@@ -122,6 +122,12 @@ const data: DataType[] = [
 
 const CartPage = () => {
     const navigate = useNavigate();
+
+    const cartOrder = localStorage.getItem("cart")
+        ? JSON.parse(localStorage.getItem("cart") as string)
+        : null;
+
+    console.log(cartOrder);
 
     const handlePayment = () => {
         navigate("/payment");

@@ -9,10 +9,14 @@ import {
     Radio,
     Select,
     message,
+    Checkbox,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { FoodType, fallbackSRC } from "../../../../interfaces/FoodInterface";
+import { CategoryType, StoreType } from "../../../../interfaces/StoreInterface";
+import { storeApi } from "../../../../api/store";
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
@@ -24,38 +28,139 @@ const ProductPage = () => {
     // using api when
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const pathnameSplited = location.pathname.split("/");
+    const meal_id = pathnameSplited[pathnameSplited.length - 1];
+    const store_id = pathnameSplited[pathnameSplited.length - 2];
+
+    const [food, setFood] = useState<FoodType>();
+    const [store, setStore] = useState<StoreType>();
+    const [foodPicture, setFoodPicture] = useState(food?.picture);
+
+    useEffect(() => {
+        const getMeal = async () => {
+            // get store from store_id
+            const storeRes = await storeApi.getStore(Number(store_id));
+            console.log(storeRes?.data);
+            if (!storeRes || storeRes.status !== 200) {
+                return;
+            } else {
+                setStore(storeRes?.data.store);
+            }
+
+            // get meals from store
+            const foodsRes = await storeApi.getStoreMeal(store_id, meal_id);
+            console.log(foodsRes?.data);
+            if (!foodsRes || foodsRes.status !== 200) {
+                return;
+            } else {
+                const foodCategoriesRes = await storeApi.getStoreMealCategories(
+                    store_id,
+                    meal_id
+                );
+
+                console.log(foodCategoriesRes?.data);
+                if (!foodCategoriesRes || foodCategoriesRes.status !== 200) {
+                    return;
+                } else {
+                    const tmpFood = {
+                        ...foodsRes?.data.meal,
+                        categories: foodCategoriesRes?.data.categories.map(
+                            (category: CategoryType) => {
+                                return category.name;
+                            }
+                        ),
+                    };
+                    setFood(tmpFood);
+                    console.log(tmpFood);
+                    setFoodPicture(tmpFood.picture);
+                }
+            }
+        };
+        getMeal();
+        // setStore(dummyStore);
+        // setFoods(dummyData);
+        // console.log(height);
+    }, [store_id, meal_id]);
 
     const handleBackStore = () => {
-        navigate("/store/1");
+        navigate(`/store/${store_id}`);
     };
 
     const [form] = Form.useForm();
 
-    const onFinish = (values: any) => {
-        console.log(values);
+    const onFinish = () => {
+        const oldCart = localStorage.getItem("cart")
+            ? JSON.parse(localStorage.getItem("cart")!)
+            : {
+                  store: store,
+                  meals: [],
+              };
+
+        if (oldCart.store.id !== store?.id) {
+            message.error("Cannot add food from different store!");
+            return;
+        }
+
+        console.log(form.getFieldsValue());
+        const submitValue = form.getFieldsValue();
+        if (!food) {
+            message.error("food not exist!");
+            return;
+        }
+
+        const customization_statuses: boolean[] = [];
+
+        food.customizations.selectionGroups.map((selection) => {
+            selection.items.map((item) => {
+                // console.log(item);
+                if (!item.enabled) {
+                    customization_statuses.push(false);
+                } else {
+                    if (selection.type === "radio") {
+                        customization_statuses.push(
+                            selection.title in submitValue &&
+                                submitValue[selection.title].name === item.name
+                        );
+                    } else if (selection.type === "checkbox") {
+                        customization_statuses.push(
+                            selection.title in submitValue &&
+                                submitValue[selection.title].some(
+                                    (selectItem: {
+                                        name: string;
+                                        price: number;
+                                    }) => selectItem.name === item.name
+                                )
+                        );
+                    }
+                }
+            });
+        });
+
+        console.log(customization_statuses);
+
+        const cartMeal = {
+            meal: food,
+            quantity: submitValue.quantity,
+            notes: submitValue.notes,
+            customization_statuses: customization_statuses,
+        };
+
+        const cartOrder = {
+            store: store,
+            meals: [...oldCart.meals, cartMeal],
+        };
+
+        localStorage.setItem("cart", JSON.stringify(cartOrder));
         message.success("Add to cart successfully!");
     };
 
     const onFinishFailed = () => {
-        message.success("Add to cart failed!");
+        message.error("Add to cart failed!");
     };
 
-    const dummyMeal = {
-        id: 1,
-        name: "curry udon",
-        description:
-            "stringfdsajflkdsjavbdsjakvncdsajkvbdsjabvdsajkvbdsajkbvsdakjbvkjsadfhdsjkafhewjkahfewkajlfheawkjfhl",
-        price: 120,
-        picture: "string",
-        is_available: true,
-        customizations: {
-            selectionGroups: ["dsa", "as", "vdvds"],
-        },
-    };
-
-    const dummyCategories = ["abc", "def"];
-
-    return (
+    return store && food ? (
         <Flex className="grid grid-cols-12">
             <Flex
                 vertical
@@ -76,8 +181,10 @@ const ProductPage = () => {
 
                 <div className="w-full">
                     <img
-                        src="https://images.immediate.co.uk/production/volatile/sites/30/2023/06/Ultraprocessed-food-58d54c3.jpg?quality=90&resize=440,400"
-                        alt="product"
+                        src={foodPicture}
+                        alt={food.name}
+                        className="object-cover w-full h-[400px]"
+                        onError={() => setFoodPicture(fallbackSRC)}
                     />
                 </div>
             </Flex>
@@ -86,36 +193,100 @@ const ProductPage = () => {
                 className="md:col-start-7 md:col-span-4 col-start-1 col-span-12 p-4"
                 gap="little"
             >
-                <Title level={2}>{dummyMeal.name}</Title>
+                <Title level={2}>{food.name}</Title>
                 <Space>
-                    {dummyCategories.map((tag) => (
-                        <Tag color="blue">{tag.toUpperCase()}</Tag>
+                    {food.categories.map((category, index) => (
+                        <Tag color="blue" key={index}>
+                            {category.toUpperCase()}
+                        </Tag>
                     ))}
                 </Space>
-                <Text className="text-lg">$ {dummyMeal.price}</Text>
-                <Paragraph>{dummyMeal.description}</Paragraph>
+                <Text className="text-lg">$ {food.price}</Text>
+                <Paragraph>{food.description}</Paragraph>
                 <Form
                     layout="vertical"
                     form={form}
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                 >
-                    <Form.Item
-                        name="customization_statuses"
-                        label="selections"
-                    >
-                        <Radio.Group>
-                            {dummyMeal.customizations.selectionGroups.map(
-                                (selection) => (
-                                    <Radio value={selection}>{selection}</Radio>
-                                )
-                            )}
-                        </Radio.Group>
-                    </Form.Item>
+                    {food.customizations.selectionGroups.map(
+                        (selection, index) => {
+                            if (selection.type === "radio") {
+                                return (
+                                    <Form.Item
+                                        name={selection.title}
+                                        label={selection.title}
+                                        key={index}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    "Please select required options!",
+                                            },
+                                        ]}
+                                    >
+                                        <Radio.Group>
+                                            {selection.items.map(
+                                                (item, iindex) => (
+                                                    <Radio
+                                                        value={{
+                                                            name: item.name,
+                                                            price: item.price,
+                                                        }}
+                                                        disabled={!item.enabled}
+                                                        key={iindex}
+                                                    >
+                                                        {item.name}: $
+                                                        {item.price}
+                                                    </Radio>
+                                                )
+                                            )}
+                                        </Radio.Group>
+                                    </Form.Item>
+                                );
+                            } else if (selection.type === "checkbox") {
+                                return (
+                                    <Form.Item
+                                        name={selection.title}
+                                        label={selection.title}
+                                        key={index}
+                                    >
+                                        <Checkbox.Group>
+                                            {selection.items.map(
+                                                (item, iindex) => (
+                                                    <Checkbox
+                                                        value={{
+                                                            name: item.name,
+                                                            price: item.price,
+                                                        }}
+                                                        disabled={!item.enabled}
+                                                        key={iindex}
+                                                    >
+                                                        {item.name}: $
+                                                        {item.price}
+                                                    </Checkbox>
+                                                )
+                                            )}
+                                        </Checkbox.Group>
+                                    </Form.Item>
+                                );
+                            }
+                        }
+                    )}
+
                     <Form.Item name="notes" label="備註：">
                         <TextArea rows={4} />
                     </Form.Item>
-                    <Form.Item name="quantity" label="數量：">
+                    <Form.Item
+                        name="quantity"
+                        label="數量："
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input quantity!",
+                            },
+                        ]}
+                    >
                         <Select>
                             {Array.from({ length: 10 }, (_, i) => i + 1).map(
                                 (num) => (
@@ -140,6 +311,8 @@ const ProductPage = () => {
                 </Form>
             </Flex>
         </Flex>
+    ) : (
+        <></>
     );
 };
 

@@ -5,8 +5,8 @@ import {
     OrderState,
     OrderType,
 } from "../../../../interfaces/OrderInterface";
-import OrderDisplay from "../../../../components/customer/order/OrderDisplay";
-import OrderDetailDisplay from "../../../../components/customer/order/OrderDetailDisplay";
+import OrderDisplay from "../../../../components/admin/order/OrderDisplay";
+import OrderDetailDisplay from "../../../../components/admin/order/OrderDetailDisplay";
 
 const PCOrderSubPage = ({ orders }: OrdersProps) => {
     const [orderState, setOrderState] = useState(OrderState.PENDING);
@@ -21,19 +21,16 @@ const PCOrderSubPage = ({ orders }: OrdersProps) => {
         className: "bg-gray-300",
     };
 
-    useEffect(() => {
-        //TODO: backend here
-        // setOrders(dummyOrder);
-    }, [orderState]);
+    useEffect(() => {}, [orderState]);
 
     return (
         <Flex>
-            <Flex vertical>
+            <Flex vertical className="w-1/3">
                 <Flex
                     justify="flex-start"
                     align="center"
                     gap="small"
-                    className="pb-4"
+                    className="pb-4 overflow-x-auto"
                 >
                     <Button
                         onClick={() => setOrderState(OrderState.PENDING)}
@@ -52,12 +49,20 @@ const PCOrderSubPage = ({ orders }: OrdersProps) => {
                         PREPARE
                     </Button>
                     <Button
-                        onClick={() => setOrderState(OrderState.DONE)}
-                        {...(orderState === OrderState.DONE
+                        onClick={() => setOrderState(OrderState.PREPARED)}
+                        {...(orderState === OrderState.PREPARED
                             ? { ...onClickButtonProps }
                             : { ...nonClickButtonProps })}
                     >
-                        DONE
+                        PREPARED
+                    </Button>
+                    <Button
+                        onClick={() => setOrderState(OrderState.COMPLETED)}
+                        {...(orderState === OrderState.COMPLETED
+                            ? { ...onClickButtonProps }
+                            : { ...nonClickButtonProps })}
+                    >
+                        COMPLETED
                     </Button>
                     <Button
                         onClick={() => setOrderState(OrderState.CANCELED)}

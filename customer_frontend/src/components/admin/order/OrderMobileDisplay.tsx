@@ -18,34 +18,50 @@ import {
 } from "../../../interfaces/OrderInterface";
 import { DollarOutlined } from "@ant-design/icons";
 import { useMemo, useEffect, useState } from "react";
-import { MealType, fallbackSRC } from "../../../interfaces/FoodInterface";
-import { FoodDisplayProps } from "../../../interfaces/FoodInterface";
+import { fallbackSRC } from "../../../interfaces/FoodInterface";
+
+import {
+    OrderMealDisplayProps,
+    OrderMealType,
+} from "../../../interfaces/OrderInterface";
 
 import { storeApi } from "../../../api/store";
 import { orderApi } from "../../../api/order";
 
 const { confirm } = Modal;
 
-const OrderFoodDisplay = ({ food }: FoodDisplayProps) => {
+const OrderFoodDisplay = ({ food }: OrderMealDisplayProps) => {
     const OthersDisplay = () => {
+        console.log(food);
         if (food.customizations.selectionGroups.length === 0) {
             return <p className="opacity-70 text-[11px]">配餐：無</p>;
         } else {
             return (
                 <>
-                    {food.customizations.selectionGroups.map((selection) => (
-                        <Flex vertical>
-                            <p className="opacity-70 text-[11px]">
-                                {selection.title}
-                            </p>
-                            {selection.items.map((childSelection) => (
-                                <p className="opacity-50 text-[10px]">
-                                    {childSelection.name} ($
-                                    {childSelection.price})
+                    {food.customizations.selectionGroups.map(
+                        (selection, index) => (
+                            <Flex vertical key={index}>
+                                <p className="opacity-70 text-[11px]">
+                                    {selection.title}：
                                 </p>
-                            ))}
-                        </Flex>
-                    ))}
+                                {selection.items.map(
+                                    (childSelection, index) => {
+                                        if (childSelection.selected) {
+                                            return (
+                                                <p
+                                                    className="opacity-50 text-[10px]"
+                                                    key={index}
+                                                >
+                                                    {childSelection.name} ($
+                                                    {childSelection.price})
+                                                </p>
+                                            );
+                                        }
+                                    }
+                                )}
+                            </Flex>
+                        )
+                    )}
                 </>
             );
         }
@@ -86,7 +102,7 @@ const OrderFoodDisplay = ({ food }: FoodDisplayProps) => {
 
 const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
     const [orderDetail, setOrderDetail] = useState<OrderDetailType>();
-    const [mealDetail, setMealDetail] = useState<MealType[]>([]);
+    const [mealDetail, setMealDetail] = useState<OrderMealType[]>([]);
     const [user, setUser] = useState({ name: "" });
 
     // get user info
@@ -100,6 +116,7 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
                 return;
             } else {
                 const tmpOrderDetail = orderDetailedRes?.data.order;
+                const tmpMealDetail = [];
                 setOrderDetail(tmpOrderDetail);
                 // get food info
                 console.log(tmpOrderDetail.details);
@@ -117,9 +134,10 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
                             picture: mealRes?.data.meal.picture,
                             name: mealRes?.data.meal.name,
                         };
-                        setMealDetail([...mealDetail, tmpMeal]);
+                        tmpMealDetail.push(tmpMeal);
                     }
                 }
+                setMealDetail(tmpMealDetail);
             }
         };
 
@@ -151,10 +169,14 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
             return "PREPARING";
         } else if (state === OrderState.PENDING) {
             return "PENDING";
+        } else if (state === OrderState.PREPARED) {
+            return "PREPARED";
+        } else if (state === OrderState.COMPLETED) {
+            return "COMPLETED";
         } else if (state === OrderState.CANCELED) {
             return "CANCELED";
         } else {
-            return "DONE";
+            return "REJECTED BY STORE";
         }
     }, [orderDetail]);
 
@@ -188,7 +210,26 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
             return;
         } else {
             order.state = OrderState.CANCELED;
-            window.location.reload(false);
+            window.location.reload();
+        }
+    };
+
+    const onCompleteOrder = async () => {
+        if (!order) {
+            return;
+        }
+        console.log(order.id);
+        console.log(order.state);
+        const updateOrderRes = await orderApi.cancelUserOrder(
+            order.id,
+            OrderState.COMPLETED
+        );
+        if (!updateOrderRes || updateOrderRes.status !== 200) {
+            console.log("Mobile change order state to completed error.");
+            return;
+        } else {
+            order.state = OrderState.COMPLETED;
+            window.location.reload();
         }
     };
 
@@ -210,15 +251,16 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
                 </Flex>
                 <Divider />
                 <Flex vertical gap="small">
-                    {mealDetail?.map((food) => (
-                        <OrderFoodDisplay key={food.id} food={food} />
-                    ))}
+                    {mealDetail?.map((food, index) => {
+                        console.log("meal", mealDetail);
+                        return <OrderFoodDisplay key={index} food={food} />;
+                    })}
                 </Flex>
                 <Divider />
                 <Flex gap="small">
                     <DollarOutlined />
                     <p className="font-bold">
-                        Total: ${orderDetail?.total_price}
+                        Total: ${orderDetail?.calculated_total_price}
                     </p>
                 </Flex>
                 <Divider />
@@ -261,6 +303,13 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
                     ) : (
                         <></>
                     )}
+                    {orderDetail?.state === OrderState.PREPARED ? (
+                        <Button type="primary" onClick={onCompleteOrder}>
+                            Complete Order
+                        </Button>
+                    ) : (
+                        <></>
+                    )}
                 </>
             ),
         });
@@ -271,18 +320,14 @@ const OrderMobileDisplay = ({ order, orderState }: OrderMobileProps) => {
             onClick={showOrderDetails}
             hoverable
             style={{ width: "full" }}
-            className={
-                orderDetail?.state === OrderState.CANCELED ? "bg-red-400" : ""
-            }
+            className={order.state === OrderState.CANCELED ? "bg-red-400" : ""}
         >
             <Flex justify="space-between" align="center" gap={20}>
                 <Flex vertical className="w-3/4">
-                    <p className="text-lg font-bold">
-                        Order #{orderDetail?.id}
-                    </p>
-                    {/* <p>$ {totalMoney}</p> */}
+                    <p className="text-lg font-bold">Order #{order.id}</p>
+                    <p>$ {order.calculated_total_price}</p>
                     <p className="truncate opacity-60">
-                        {new Date(orderDetail?.created_at).toLocaleString()}
+                        {new Date(order.created_at).toLocaleString()}
                     </p>
                 </Flex>
             </Flex>

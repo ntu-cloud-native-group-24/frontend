@@ -1,41 +1,26 @@
-import { FilterType, SortType } from "./StoreInterface";
+import { FilterType, HoursType, StoreType } from "./StoreInterface";
 
-export interface MealType {
+export interface FoodType {
     id: number;
-    order_id: number;
-    meal_id: number;
-    quantity: number;
-    notes: string;
-    customizations: FoodSelectionGroups;
-    calculated_price_per_item: number;
-    picture: string;
     name: string;
-    price: number;
+    description: string | null; // string
+    price: number; // money $
+    picture: string; // url
+    is_available: boolean; // onStock or soldOut
+    customizations: FoodSelectionGroups;
+    categories: string[];
 }
 
 export interface FoodDisplayProps {
-    food: MealType;
+    food: FoodType;
+    store: StoreType;
 }
-
-
-// export interface FoodType {
-//     id: number;
-//     name: string;
-//     description: string | null; // string
-//     price: number; // money $
-//     picture: string; // url
-//     is_available: boolean; // onStock or soldOut
-//     customizations: FoodSelectionGroups;
-// }
-
-// export interface FoodDisplayProps {
-//     food: FoodType;
-// }
 
 export interface FoodSelectionType {
     name: string;
     price: number;
     selected: boolean;
+    enabled: boolean;
 }
 
 export interface FoodSelectionGroupType {
@@ -45,25 +30,25 @@ export interface FoodSelectionGroupType {
 }
 
 export interface FoodSelectionGroups {
-    selectionGroups: Array<FoodSelectionGroupType>
+    selectionGroups: Array<FoodSelectionGroupType>;
 }
 
 export interface FoodFilterProps {
     collapsed: boolean;
-    sortValue: SortType;
+    // sortValue: SortType;
     priceRange: number[];
     filterArray: FilterType[];
-    filterTags: string[];
-    fullTagsList: string[];
+    filterCategories: string[];
+    fullCategoriesList: string[];
     foodMaxPrice: number;
     initStoreStatus: boolean;
-    initStoreTimes: Date[];
+    initStoreTimes: HoursType[];
 
     setSearchValue: React.Dispatch<React.SetStateAction<string>>;
-    setSortValue: React.Dispatch<React.SetStateAction<SortType>>;
+    // setSortValue: React.Dispatch<React.SetStateAction<SortType>>;
     setPriceRange: React.Dispatch<React.SetStateAction<number[]>>;
     setFilterArray: React.Dispatch<React.SetStateAction<FilterType[]>>;
-    setFilterTags: React.Dispatch<React.SetStateAction<string[]>>;
+    setFilterCategories: React.Dispatch<React.SetStateAction<string[]>>;
     clearFilter: () => void;
 }
 

@@ -6,6 +6,8 @@ import { useCookies } from "react-cookie";
 
 import { userApi } from "../api/user";
 
+const { success, warning, error } = message;
+
 export interface loginProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,7 +15,6 @@ export interface loginProps {
 
 const LoginPage = ({ login, setLogin }: loginProps) => {
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
     const [cookies, setCookie] = useCookies(["token"]);
 
     const [form] = Form.useForm<{
@@ -23,27 +24,6 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
 
     const handleSignUpClick = () => {
         navigate("/signup");
-    };
-
-    const success = (msg: string) => {
-        messageApi.open({
-            type: "success",
-            content: msg,
-        });
-    };
-
-    const error = (msg: string) => {
-        messageApi.open({
-            type: "error",
-            content: msg,
-        });
-    };
-
-    const warning = (msg: string) => {
-        messageApi.open({
-            type: "warning",
-            content: msg,
-        });
     };
 
     const onLogin = async () => {
@@ -79,7 +59,6 @@ const LoginPage = ({ login, setLogin }: loginProps) => {
             align="center"
             className='h-[calc(100vh_-_64px_-_30px)] w-full bg-cover bg-[url("/src/assets/background/bg_login.jpg")]'
         >
-            {contextHolder}
             <Card
                 title={
                     <Typography.Title level={2} className="pt-4">

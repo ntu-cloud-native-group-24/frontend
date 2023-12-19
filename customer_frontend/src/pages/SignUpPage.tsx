@@ -6,6 +6,8 @@ import { useCookies } from "react-cookie";
 
 import { userApi } from "../api/user";
 
+const { success, warning, error } = message;
+
 export interface SignUpProps {
     login: boolean;
     setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,7 +15,6 @@ export interface SignUpProps {
 
 const SignUpPage = ({ login, setLogin }: SignUpProps) => {
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
     const [cookies, setCookie] = useCookies(["token"]);
 
     const [form] = Form.useForm<{
@@ -25,27 +26,6 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
 
     const handleLoginClick = () => {
         navigate("/login");
-    };
-
-    const success = (msg: string) => {
-        messageApi.open({
-            type: "success",
-            content: msg,
-        });
-    };
-
-    const error = (msg: string) => {
-        messageApi.open({
-            type: "error",
-            content: msg,
-        });
-    };
-
-    const warning = (msg: string) => {
-        messageApi.open({
-            type: "warning",
-            content: msg,
-        });
     };
 
     const onSignUp = async () => {
@@ -86,7 +66,6 @@ const SignUpPage = ({ login, setLogin }: SignUpProps) => {
             align="center"
             className='h-[calc(100vh_-_64px_-_30px)] w-full bg-[url("/src/assets/background/bg_signup.jpg")] bg-cover'
         >
-            {contextHolder}
             <Card
                 title={
                     <Typography.Title level={2} className="pt-4">
