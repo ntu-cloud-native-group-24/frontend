@@ -91,9 +91,9 @@ const HomePage = () => {
         setTimeout(() => getOrders(), 0);
     }, []);
 
-    const completedOrders = [...orders].filter(
-        (order: OrderType) => order.state === "completed"
-    );
+    const completedOrders = [...orders]
+        .filter((order: OrderType) => order.state === "completed")
+        .reverse();
 
     console.log(completedOrders);
 
