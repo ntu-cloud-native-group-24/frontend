@@ -67,6 +67,11 @@ const CostOptions = {
             text: "訂單花費統計圖",
         },
     },
+    scales: {
+        x: {
+            offset: true,
+        },
+    },
 };
 
 const HomePage = () => {
@@ -113,12 +118,6 @@ const HomePage = () => {
     }, 0);
 
     const costData = useMemo(() => {
-        // const monthlyData = new Array(12).fill(0);
-        // completedOrders.forEach((order: OrderType) => {
-        //     const month = new Date(order.created_at).getMonth();
-        //     monthlyData[month] += order.calculated_total_price;
-        // });
-        // return monthlyData;
         const cumulativeData: number[] = [];
 
         completedOrders.reduce((acc, cur: OrderType) => {
@@ -137,8 +136,8 @@ const HomePage = () => {
                     label: "累計完成訂單花費統計圖",
                     data: cumulativeData,
                     fill: true,
-                    backgroundColor: "rgb(0, 233, 242)",
-                    borderColor: "rgba(0, 233, 242, 0.2)",
+                    backgroundColor: "rgb(1, 75, 78)",
+                    borderColor: "rgba(1, 75, 78, 0.2)",
                 },
             ],
         };
@@ -150,8 +149,8 @@ const HomePage = () => {
             className="h-full pb-32"
             gap={width > 767 ? 128 : width < 380 ? 128 : 32}
         >
-            <Flex vertical align="center" style={{ width: "100%" }}>
-                <Typography.Title level={4}>訂單花費折線圖</Typography.Title>
+            <Flex vertical align="center">
+                <Typography.Title level={4}>訂單花費統計</Typography.Title>
                 <Flex justify="center" gap="large" wrap="wrap">
                     <Statistic title="最近一個月花費金額" value={monthlyCost} />
                     <Statistic
@@ -160,7 +159,14 @@ const HomePage = () => {
                     />
                     <Statistic title="總訂單金額" value={allOrderCost} />
                 </Flex>
-                <Line data={costData} options={CostOptions} />
+                <Line
+                    data={costData}
+                    options={CostOptions}
+                    width={"70vw"}
+                    height={
+                        width > 767 ? (width > 1280 ? "30vh" : "40vh") : "70vh"
+                    }
+                />
             </Flex>
         </Flex>
     );

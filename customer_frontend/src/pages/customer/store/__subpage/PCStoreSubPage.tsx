@@ -82,7 +82,7 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
                 />
             </Header>
             <Layout hasSider>
-                <Content className="bg-white">
+                <Content className="bg-white p-8">
                     <Flex justify="center" align="center" vertical>
                         <Typography.Title className="p-3" style={{ margin: 0 }}>
                             {store.name}
