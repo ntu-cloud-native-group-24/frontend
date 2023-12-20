@@ -8,6 +8,7 @@ import {
     Statistic,
     Col,
     Row,
+    message,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
@@ -20,11 +21,13 @@ import {
 } from "../../interfaces/CartInterface";
 import { useEffect, useState } from "react";
 
+const { success, warning, error } = message;
+
 const CartPage = () => {
     const navigate = useNavigate();
-    const cartOrder = JSON.parse(
-        localStorage.getItem("cart") || "{ store: {}, meals: [] }"
-    );
+    const strCartOrder = JSON.stringify({ store: {}, meals: [] });
+
+    const cartOrder = JSON.parse(localStorage.getItem("cart") || strCartOrder);
 
     console.log(cartOrder);
     const { store, meals } = cartOrder;
@@ -170,7 +173,11 @@ const CartPage = () => {
     ];
 
     const handlePayment = () => {
-        navigate("/payment");
+        if (cartOrder.store.id) {
+            navigate("/payment");
+        } else {
+            warning("There's no meals in your cart!");
+        }
     };
 
     return (

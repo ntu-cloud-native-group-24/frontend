@@ -98,8 +98,9 @@ const ProductPage = () => {
                   store: store,
                   meals: [],
               };
-
-        if (oldCart.store.id !== store?.id) {
+        if (
+            !(oldCart.store.id === store?.id || oldCart.store.id === undefined)
+        ) {
             message.error("Cannot add food from different store!");
             return;
         }
@@ -182,7 +183,7 @@ const ProductPage = () => {
     };
 
     const onFinishFailed = () => {
-        message.error("Add to cart failed!");
+        // message.error("Add to cart failed!");
     };
 
     return store && food ? (
