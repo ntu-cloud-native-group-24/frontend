@@ -61,14 +61,14 @@ export interface OrderMealType {
 // payment page create an order
 export interface OrderSubmitType {
     store_id: number;
-    notes: string;
-    payment_type: PaymentType;
-    delivery_method: DeliveryMethod;
     order: OrderMealSubmitType;
 }
 
 export interface OrderMealSubmitType {
     items: OrderMealItemSubmitType[];
+    notes: string;
+    payment_type: PaymentType;
+    delivery_method: DeliveryMethod;
 }
 
 export interface OrderMealItemSubmitType {

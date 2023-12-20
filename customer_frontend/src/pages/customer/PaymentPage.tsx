@@ -49,18 +49,19 @@ const PaymentPage = () => {
         console.log("Received values of form: ", values);
         const orderSubmit: OrderSubmitType = {
             store_id: store.id,
-            notes: values.notes,
-            payment_type: payment,
-            delivery_method: delivery,
+
             order: {
                 items: meals.map((meal: CartMealType) => {
                     return {
                         meal_id: meal.meal.id,
                         quantity: meal.quantity,
-                        notes: meal.notes,
+                        notes: meal.notes ? meal.notes : "",
                         customization_statuses: meal.customization_statuses,
                     };
                 }),
+                notes: values.notes ? values.notes : "",
+                payment_type: payment,
+                delivery_method: delivery,
             },
         };
 
@@ -71,7 +72,7 @@ const PaymentPage = () => {
             error(res?.data.message);
         } else {
             console.log(res?.data);
-            success(res?.data.message);
+            success("Successfully created order!");
             localStorage.setItem(
                 "cart",
                 JSON.stringify({ store: {}, meals: [] })
