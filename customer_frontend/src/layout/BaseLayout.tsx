@@ -62,9 +62,9 @@ const BaseLayout = () => {
                 // set axios default header with token
                 // setLogin(true);
             }
-            if (!login) {
+            if (!login && !user) {
                 const { pathname } = location;
-                // console.log(pathname);
+                console.log(pathname);
                 if (
                     ["/", "/login", "/signup", "/logout"].indexOf(pathname) ==
                     -1

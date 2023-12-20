@@ -53,7 +53,6 @@ const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
     const navigate = useNavigate();
     const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
-    // TODO: complete Props
     const onSearch = (value: string) => {
         console.log(value);
         if (value.trim() === "") {

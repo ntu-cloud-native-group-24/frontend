@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { FoodType, fallbackSRC } from "../../../../interfaces/FoodInterface";
 import { CategoryType, StoreType } from "../../../../interfaces/StoreInterface";
 import { storeApi } from "../../../../api/store";
-import { OptionType } from "../../../../interfaces/CartInterface";
+import { CartMealType, OptionType } from "../../../../interfaces/CartInterface";
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
@@ -105,7 +105,11 @@ const ProductPage = () => {
             return;
         }
 
-        if (oldCart.meals.some((meal: any) => meal.meal.id === food?.id)) {
+        if (
+            oldCart.meals.some(
+                (meal: CartMealType) => meal.meal.id === food?.id
+            )
+        ) {
             message.error("Food already in cart!");
             return;
         }

@@ -25,7 +25,11 @@ const { success, warning, error } = message;
 
 const CartPage = () => {
     const navigate = useNavigate();
-    const strCartOrder = JSON.stringify({ store: {}, meals: [] });
+    const strCartOrder = JSON.stringify({
+        store: {},
+        meals: [],
+        totalPrice: 0,
+    });
 
     const cartOrder = JSON.parse(localStorage.getItem("cart") || strCartOrder);
 
@@ -37,6 +41,7 @@ const CartPage = () => {
             acc + current.meal.price * current.quantity,
         0
     );
+    localStorage.setItem("cart", JSON.stringify(cartOrder));
 
     useEffect(() => {
         return () => {

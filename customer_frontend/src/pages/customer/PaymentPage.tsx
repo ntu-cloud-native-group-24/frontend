@@ -35,11 +35,15 @@ const PaymentPage = () => {
     const [payment, setPayment] = useState<PaymentType>(PaymentType.CASH);
     const [paymentDiscount, setPaymentDiscount] = useState<number>(0); // [0, 20]
 
-    const cartOrder = JSON.parse(
-        localStorage.getItem("cart") || "{ store: {}, meals: [] }"
-    );
+    const tmpCartOrder = JSON.stringify({
+        store: {},
+        meals: [],
+        totalPrice: 0,
+    });
+    const cartOrder = JSON.parse(localStorage.getItem("cart") || tmpCartOrder);
     const { store, meals, totalPrice } = cartOrder;
-
+    
+    console.log(cartOrder);
     const [form] = Form.useForm();
 
     const navigate = useNavigate();
@@ -49,7 +53,6 @@ const PaymentPage = () => {
         console.log("Received values of form: ", values);
         const orderSubmit: OrderSubmitType = {
             store_id: store.id,
-
             order: {
                 items: meals.map((meal: CartMealType) => {
                     return {
@@ -75,7 +78,7 @@ const PaymentPage = () => {
             success("Successfully created order!");
             localStorage.setItem(
                 "cart",
-                JSON.stringify({ store: {}, meals: [] })
+                JSON.stringify({ store: {}, meals: [], totalPrice: 0 })
             );
             await setTimeout(() => {
                 navigate("/");
@@ -237,7 +240,7 @@ const PaymentPage = () => {
                         <Title level={3}>訂單總計金額</Title>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>小計</Title>
-                            <Title level={5}>${totalPrice}</Title>
+                            <Title level={5}>${cartOrder.totalPrice}</Title>
                         </Flex>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>優惠</Title>
@@ -254,7 +257,10 @@ const PaymentPage = () => {
                         <Flex align="center" justify="space-between">
                             <Title level={3}>總計</Title>
                             <Title level={3}>
-                                ${totalPrice - paymentDiscount + deliveryCost}
+                                $
+                                {cartOrder.totalPrice -
+                                    paymentDiscount +
+                                    deliveryCost}
                             </Title>
                         </Flex>
                     </Card>
