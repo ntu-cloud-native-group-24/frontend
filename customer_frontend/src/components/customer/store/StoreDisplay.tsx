@@ -33,8 +33,8 @@ const StoreDisplay = ({ store }: StoreProps) => {
                 onClick={onStoreClick}
             >
                 <Flex>
-                    {store.tags.map((tag) => (
-                        <Tag>{tag.name}</Tag>
+                    {store.tags.map((tag, index) => (
+                        <Tag key={index}>{tag.name}</Tag>
                     ))}
                 </Flex>
                 <Meta title={store.name} description={store.address} />

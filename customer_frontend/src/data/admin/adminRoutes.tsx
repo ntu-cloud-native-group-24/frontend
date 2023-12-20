@@ -2,6 +2,7 @@ import {
     DatabaseOutlined,
     ToolOutlined,
     QuestionCircleOutlined,
+    HomeOutlined,
 } from "@ant-design/icons";
 
 // import Homepage from "../../pages/admin/Homepage";
@@ -9,21 +10,22 @@ import HelperPage from "../../pages/admin/HelperPage";
 import FoodOrder from "../../pages/admin/FoodOrder/FoodOrderPage";
 import PersonalSettings from "../../pages/admin/Settings/PersonalSettingsPage";
 import PasswordSettings from "../../pages/admin/Settings/PasswordSettingsPage";
+import HomePage from "../../pages/admin/HomePage";
 
 export const PageRoutes = [
-    // {
-    //     id: 1,
-    //     path: "/",
-    //     element: <Homepage />,
-    //     key: "homepage",
-    //     name: "主頁",
-    //     icon: <HomeOutlined />,
-    //     subMenuKey: "",
-    //     childMenu: [],
-    //     description: "查看統計數據",
-    // },
     {
         id: 1,
+        path: "/",
+        element: <HomePage />,
+        key: "homepage",
+        name: "主頁",
+        icon: <HomeOutlined />,
+        subMenuKey: "",
+        childMenu: [],
+        description: "查看統計數據",
+    },
+    {
+        id: 2,
         path: "/order",
         element: <FoodOrder />,
         key: "order",
@@ -34,7 +36,7 @@ export const PageRoutes = [
         description: "訂單管理",
     },
     {
-        id: 2,
+        id: 3,
         path: "/setting",
         element: <></>,
         key: "setting",
@@ -43,7 +45,7 @@ export const PageRoutes = [
         subMenuKey: "sub2",
         childMenu: [
             {
-                id: 3,
+                id: 4,
                 path: "/setting/personal",
                 element: <PersonalSettings />,
                 key: "personalSetting",
@@ -54,7 +56,7 @@ export const PageRoutes = [
                 description: "檢視及編輯個人資料",
             },
             {
-                id: 4,
+                id: 5,
                 path: "/setting/changepassword",
                 element: <PasswordSettings />,
                 key: "passwordSetting",
@@ -68,7 +70,7 @@ export const PageRoutes = [
         description: "",
     },
     {
-        id: 5,
+        id: 6,
         path: "/help",
         element: <HelperPage />,
         key: "helpCenter",
