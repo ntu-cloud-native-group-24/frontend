@@ -127,7 +127,7 @@ const HomePage = () => {
 
         return {
             labels: completedOrders.map((order: OrderType) => {
-                return `${new Date(order.created_at).getMonth()}/${new Date(
+                return `${new Date(order.created_at).getMonth() + 1}/${new Date(
                     order.created_at
                 ).getDate()}`;
             }),
