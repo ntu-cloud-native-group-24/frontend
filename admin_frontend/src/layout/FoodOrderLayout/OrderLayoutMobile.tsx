@@ -1,4 +1,4 @@
-import { Button, Flex } from "antd";
+import { Button, Flex, Empty, Spin } from "antd";
 import { useEffect, useState, useContext, useCallback, useMemo } from "react";
 import { OrderType } from "../../interfaces/OrderInterface";
 import OrderDisplay from "../../components/MobileViews/OrderDisplay";
@@ -11,6 +11,7 @@ const OrderLayoutMobile = ( ) => {
 
     const [orderStatus, setOrderStatus] = useState('pending');
     const [orders, setOrders] = useState<OrderType[]>([])
+    const [spinning, setSpinning] = useState<boolean>(true);
     const storeId = useContext<number>(StoreIdContext);
 
     const onClickButtonProps = {
@@ -34,12 +35,12 @@ const OrderLayoutMobile = ( ) => {
         } else {
             console.log(response);
         }
-        
     }, [storeId]);
 
     useEffect(() => {
         fetchOrders();
-    }, [])
+        setSpinning(false);
+    }, [fetchOrders])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -60,6 +61,7 @@ const OrderLayoutMobile = ( ) => {
 
     return (
         <Flex vertical gap="large" className="w-full">
+            <Spin spinning={spinning} fullscreen/>
             <Flex justify="flex-start" align="center" gap="small" className="overflow-x-auto">
             <Button onClick={() => {setOrderStatus('pending')}} {...orderStatus === 'pending' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PENDING</Button>
                     <Button onClick={() => {setOrderStatus('preparing');}} {...orderStatus === 'preparing' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PREPARING</Button>
@@ -67,9 +69,9 @@ const OrderLayoutMobile = ( ) => {
             </Flex>
             <Flex vertical gap="middle">
                 {
-                    filterOrders.map((order) => (
+                    filterOrders && filterOrders.length > 0 ? filterOrders.map((order) => (
                         <OrderDisplay key={order.id} order={order} fetchOrders={fetchOrders} />
-                    ))
+                    )) : <Empty key={'empty'} description='無訂單' />
                 }
             </Flex>
         </Flex>

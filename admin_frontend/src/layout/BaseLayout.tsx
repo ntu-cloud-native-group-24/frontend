@@ -31,7 +31,6 @@ const BaseLayout = ({ login, setLogin } : LoginProps ) => {
     }, [login, navigate])
 
     useEffect(() => {
-        console.log(height);
     }, [height])
 
     useEffect(() => {

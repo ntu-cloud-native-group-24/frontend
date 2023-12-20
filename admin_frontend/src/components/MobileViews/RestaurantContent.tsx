@@ -1,5 +1,5 @@
 import { RestaurantContentProps } from "../../interfaces/StoreInterface";
-import { useMemo } from 'react';
+import React,{ useMemo } from 'react';
 import FoodDisplay from "./FoodDisplay";
 import { Flex, Space, Typography } from "antd";
 
@@ -38,7 +38,7 @@ const RestaurantContent = ({ foods, isInFilter, tagsList, fetchMeals } : Restaur
                                 {item.foods.map((food, i) => <FoodDisplay key={food.key + i} food={food} fetchMeals={fetchMeals} tagsList={tagsList}/>)}
                             </Space>
                         </Space>
-                    ) : (<div key={i}></div>)
+                    ) : (<React.Fragment key={'div' + i}></React.Fragment>)
                     )
                     )
                 }

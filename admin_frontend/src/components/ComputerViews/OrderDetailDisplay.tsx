@@ -1,6 +1,6 @@
-import { Button, Card, Flex, Typography, Statistic, Divider, Image, message, Spin, Modal } from "antd"
+import { Button, Card, Flex, Typography, Statistic, Divider, Image, Spin, Modal } from "antd"
 import { OrderDetailProps, OrderDetailType } from "../../interfaces/OrderInterface"
-import { useState, useMemo, useEffect, useCallback, useContext } from "react"
+import React, { useState, useMemo, useEffect, useCallback, useContext } from "react"
 import { FoodType, fallbackSRC } from "../../interfaces/FoodInterface"
 import { orderApi } from "../../api/order"
 import { mealApi } from "../../api/meal"
@@ -22,7 +22,7 @@ const OrderFoodDisplay = ({ food, error, setSpinning }: OrderFoodDisplayProps ) 
         if( response && response.status === 200 ){
             setMeal(response.data.meal);
         } else {
-            error(response.data);
+            error(response.data.message);
         }
     }, [error, food.meal_id, storeId])
 
@@ -83,12 +83,11 @@ const OrderFoodDisplay = ({ food, error, setSpinning }: OrderFoodDisplayProps ) 
     )
 }
 
-const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder } : OrderDetailProps) => {
+const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder, messageApi } : OrderDetailProps) => {
 
     const userPicture = 'https://xsgames.co/randomusers/avatar.php?g=pixel';
     const [foods, setFoods] = useState<OrderDetailType[]>([]);
     const [spinning, setSpinning] = useState(true);
-    const [messageApi, contextHolder] = message.useMessage();
 
     const success = useCallback((msg: string) => {
         messageApi.success(msg);
@@ -164,7 +163,6 @@ const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder } : OrderDetail
 
     const onDoneOrder = useCallback(async () => {
         if( !order ) return;
-        console.log(order.state)
         Modal.confirm({
             title: 'Are you sure to notify customer this order is ready to go?',
             content: 'This action cannot be undone',
@@ -249,7 +247,6 @@ const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder } : OrderDetail
 
     return order ? (
         <Flex vertical gap='middle' className="pl-8 pr-8 w-full">
-            {contextHolder}
             <Spin spinning={spinning} fullscreen />
             <Typography.Title level={5}>Order Details</Typography.Title>
             <Card 
@@ -261,7 +258,7 @@ const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder } : OrderDetail
                     </Flex>)}
                 extra={<Flex wrap='wrap' gap="middle" align="center"  >
                             <img src={userPicture} width={64} height={64} />
-                            <Statistic title="Username" value={order.user_id} />
+                            <Statistic title="User_id" value={order.user_id} />
                         </Flex>
                       }
                 
@@ -310,7 +307,7 @@ const OrderDetailDisplay = ({ order, fetchOrders, setTargetOrder } : OrderDetail
                 {PrimaryButton}
             </Flex>
         </Flex>
-    ) : <div key={'asdf'}></div>
+    ) : <React.Fragment key={'div'}></React.Fragment>
 }
 
 export default OrderDetailDisplay

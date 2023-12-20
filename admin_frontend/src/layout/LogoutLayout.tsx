@@ -36,7 +36,7 @@ const LogoutLayout: React.FC = () => {
             title="成功登出訂餐管理系統！"
             subTitle={subTitle}
             extra={[
-                <Button type="default" key="logout" className="bg-blue-100" onClick={jumpLogin}>
+                <Button data-testid='logout-btn' type="default" key="logout" className="bg-blue-100" onClick={jumpLogin}>
                     去登入
                 </Button>
             ]}

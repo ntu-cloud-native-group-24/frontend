@@ -1,4 +1,4 @@
-import { Button, Flex, Spin } from "antd";
+import { Button, Empty, Flex, Spin, message } from "antd";
 import { useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { OrderType } from "../../interfaces/OrderInterface";
 import OrderDisplay from "../../components/ComputerViews/OrderDisplay";
@@ -12,6 +12,7 @@ const OrderLayoutComputer = () => {
     const [orders, setOrders] = useState<OrderType[]>([])
     const [spinning, setSpinning] = useState<boolean>(true);
     const [targetOrder, setTargetOrder] = useState<OrderType>()
+    const [messageApi, contextHolder] = message.useMessage();
     const storeId = useContext<number>(StoreIdContext);
 
     const onClickButtonProps = {
@@ -42,7 +43,7 @@ const OrderLayoutComputer = () => {
 
     useEffect(() => {
         fetchOrders();
-    }, [])
+    }, [fetchOrders])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -64,6 +65,7 @@ const OrderLayoutComputer = () => {
     return (
         <Flex>
             <Spin spinning={spinning} />
+            {contextHolder}
             <Flex vertical>
                 <Flex justify="flex-start" align="center" gap="small" className="pb-4">
                     <Button onClick={() => {setOrderStatus('pending'); setTargetOrder(undefined)}} {...orderStatus === 'pending' ? {...onClickButtonProps} : {...nonClickButtonProps} }>PENDING</Button>
@@ -72,13 +74,13 @@ const OrderLayoutComputer = () => {
                 </Flex>
                 <Flex vertical gap='middle'>
                     {
-                        filterOrders ? filterOrders.map((order) => (
+                        filterOrders  && filterOrders.length > 0 ? filterOrders.map((order) => (
                             <OrderDisplay key={order.id} order={order} targetOrder={targetOrder} setTargetOrder={setTargetOrder} />
-                        )) : <></>
+                        )) : <Empty key={'empty'} description='無訂單' />
                     }
                 </Flex>
             </Flex>
-            <OrderDetailDisplay order={targetOrder} fetchOrders={fetchOrders} setTargetOrder={setTargetOrder}/>
+            <OrderDetailDisplay messageApi={messageApi} order={targetOrder} fetchOrders={fetchOrders} setTargetOrder={setTargetOrder}/>
         </Flex>
     )
 }

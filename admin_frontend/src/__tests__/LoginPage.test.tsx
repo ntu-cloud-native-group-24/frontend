@@ -80,7 +80,7 @@ describe('LoginPage', () => {
 
         // test click login with valid input and valid crendentials
         fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'wzwr1029' } });
-        fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123123123123' } });
+        fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123123123123123' } });
         fireEvent.click(screen.getByTestId('btn-input'));
 
         await waitFor(() => {

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { RestaurantContentProps } from "../../interfaces/StoreInterface";
 import { Flex, Space, Typography } from 'antd';
 import FoodDisplay from './FoodDisplay';
@@ -31,14 +31,14 @@ const RestaurantContent = ({ foods, isInFilter, tagsList, fetchMeals } : Restaur
                     foodList.map((item, i) => (
                         item.foods.length > 0 ? (
                         <Space key={item.tag.id} direction='vertical' size="small">
-                            <Typography.Text key={item.tag.id} className='font-bold text-xl'>
+                            <Typography.Text key={item.tag.id + 'tag'} className='font-bold text-xl'>
                                 {item.tag.name.toUpperCase()}
                             </Typography.Text>
                             <Space key={'space' + i} direction='horizontal' size='middle' className='w-full overflow-x-auto p-3'>
                                 {item.foods.map((food) => <FoodDisplay key={food.key} food={food} fetchMeals={fetchMeals} tagsList={tagsList} />)}
                             </Space>
                         </Space>
-                        ) : (<div key={i}></div>)
+                        ) : (<React.Fragment key={'div' + i}></React.Fragment>)
                     ))
                 }
             </Flex>

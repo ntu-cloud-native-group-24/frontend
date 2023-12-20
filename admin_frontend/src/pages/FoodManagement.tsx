@@ -1,4 +1,4 @@
-import { Button, Flex, Table, Image, Badge, Tag, Space, Input, Modal, message, Typography } from "antd"
+import { Button, Flex, Table, Image, Badge, Tag, Space, Input, Modal, message, Typography, Spin } from "antd"
 import { PlusOutlined,
          ClearOutlined,
 } from '@ant-design/icons';
@@ -19,17 +19,11 @@ import { mealApi } from "../api/meal";
 const { Search } = Input;
 const { confirm } = Modal;
 
-//TODO:
-// 1. food management
-// 2. food restaurant render food
-// 3. order
-// 4. mainpage
-// 5. Unit test
-
 const FoodManagement = () => {
     const [data, setData] = useState(Array<FoodType>());
     const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
     const [sortedInfo, setSortedInfo] = useState<SorterResult<FoodType>>({});
+    const [spinning, setSpinning] = useState(true);
     const [searchValue, setSearchValue] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
     const [open, setOpen] = useState(false);
@@ -69,12 +63,14 @@ const FoodManagement = () => {
 
 
     const fetchCategories = useCallback(async () => {
+        setSpinning(true);
         const response = await categoryApi.getAllCategory(storeId);
         if( response && response.status === 200 ){
             setTagsList(response.data.categories);
         } else {
             onError(response.data.message || '取得分類失敗');
         }
+        setSpinning(false);
     }, [onError, storeId])
     const fetchCategoriesByMealId = useCallback(async (mealId: number) => {
         const response = await categoryApi.getCategoryByMealId(storeId, mealId);
@@ -84,8 +80,17 @@ const FoodManagement = () => {
             return [];
         }
     }, [storeId]);
+    const fetchSoldAmountByMealId = useCallback(async (mealId: number) => {
+        const response = await mealApi.getSalesCount([mealId]);
+        if( response && response.status === 200 ){
+            const result = response.data.results.find((res: any) => res.meal_id === mealId);
+            return result ? result.count : 0;
+        }
+        return undefined;
+    }, [])
 
     const fetchMeals = useCallback(async () => {
+        setSpinning(true);
         const response = await storeApi.getAllMeal(storeId);
         if( response && response.status === 200 ){
             const meals = await Promise.all(response.data.meals.map(async (meal: FoodBackendType) => {
@@ -98,8 +103,7 @@ const FoodManagement = () => {
                     is_available: meal.is_available,
                     customizations: meal.customizations,
                     categories: await fetchCategoriesByMealId(meal.id),
-                    //TODO: soldAmount
-                    soldAmount: 0,
+                    soldAmount: await fetchSoldAmountByMealId(meal.id),
                     key: meal.id, // prevent key missing props
                 }
             }));
@@ -108,7 +112,8 @@ const FoodManagement = () => {
             // If something wrong...
             onError(response.data.message || '取得餐點失敗')
         }
-    }, [fetchCategoriesByMealId, onError, storeId])
+        setSpinning(false);
+    }, [fetchCategoriesByMealId, onError, storeId, fetchSoldAmountByMealId])
 
     useEffect(() => {
         setTableLoading(true);
@@ -256,7 +261,7 @@ const FoodManagement = () => {
             )
         },
         {
-            title: '餐點今日售賣次數',
+            title: '餐點總售賣次數',
             dataIndex: 'soldAmount',
             key: 'soldAmount',
             filters: Array.from({ length: 20 }, (_, index) => {
@@ -338,6 +343,7 @@ const FoodManagement = () => {
         <Flex vertical gap="middle">
             <p>餐點管理表單</p>
             {contextHolder}
+            <Spin spinning={spinning} fullscreen />
             <FoodModalContent food={targetFood} 
                               tagList={tagsList}
                               type={targetType}

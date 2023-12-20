@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useContext } from "react";
 import { FilterType, SortType, StoreType } from "../../interfaces/StoreInterface";
-import { Layout, Typography, Badge, FloatButton, Spin, Button, Upload } from "antd";
+import { Layout, Typography, Badge, FloatButton, Spin, Button, Upload, Empty } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import RestaurantContent from "../../components/ComputerViews/RestaurantContent";
 import FoodFilter from "../../components/ComputerViews/FoodFilter";
@@ -64,7 +64,7 @@ const ComputerRestaurantPage = ( ) => {
                     picture: meal.picture,
                     is_available: meal.is_available,
                     soldAmount: 0,
-                    key: meal.id,
+                    key: meal.id + 10,
                     categories: await fetchCategoriesByMealId(meal.id),
                     customizations: meal.customizations,
                 }
@@ -216,7 +216,7 @@ const ComputerRestaurantPage = ( ) => {
                     <Button shape='circle' icon={<UploadOutlined/> } />
                 </Upload>
                 <img alt={store?.name} src={foodPicture} onError={() => setFoodPicture(fallbackSRC)}
-                className="w-full h-full" />
+                className="w-full h-full object-fill" />
             </Header>
             <Layout hasSider>
                 <Content className="bg-white">
@@ -237,7 +237,11 @@ const ComputerRestaurantPage = ( ) => {
                                 onFilter={onFilter}
                                 onClean={onClean}
                     />
-                    <RestaurantContent isInFilter={isInFilter} foods={filterFoods} tagsList={tagsList} fetchMeals={fetchFoods}/>
+                    {
+                        filterFoods && filterFoods.length > 0 ? (
+                            <RestaurantContent isInFilter={isInFilter} foods={filterFoods} tagsList={tagsList} fetchMeals={fetchFoods}/>
+                        ) : <Empty className="pt-12" key={'empty'} description='無存在餐點'><Button type="primary" onClick={() => window.location.href = '/food'}>去新增餐點</Button></Empty>
+                    }
                 </Content>
                 {
                     /*

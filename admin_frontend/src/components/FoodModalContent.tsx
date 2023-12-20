@@ -181,11 +181,10 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
     const handleAdd = async () => {
         if( !preCheck() ) return;
         const picture_url = await createImageToAzure();
-        console.log(picture_url);
+        
         if( picture_url === undefined ) return;
     
         const customizations = constructCustomizationsByForm();
-        console.log(picture_url, foodName, foodDescription, foodPrice, foodStatus, foodEditCategory, customizations)
         
         const response = await mealApi.createMeal(storeId, foodName.trim(), foodDescription, foodPrice, picture_url, foodStatus, customizations)
         if( response && response.status === 200 ){
@@ -193,7 +192,6 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
                 title: '餐點新增成功',
                 content: '餐點新增成功',
             })
-            console.log(response.data)
         } else {
             Modal.error({
                 title: '餐點新增失敗',
@@ -227,14 +225,13 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
         const picture_url = imageFile ? await createImageToAzure() : food.picture;
         if( picture_url === undefined ) return;
         const customizations = constructCustomizationsByForm();
-        console.log(picture_url, foodName, foodDescription, foodPrice, foodStatus, foodEditCategory, customizations)
+        
         const response = await mealApi.updateMeal(storeId, food.id, foodName.trim(), foodDescription, foodPrice, picture_url, foodStatus, customizations)
         if( response && response.status === 200 ){
             Modal.success({
                 title: '餐點更新成功',
                 content: '餐點更新成功',
             })
-            console.log(response.data)
         } else {
             Modal.error({
                 title: '餐點更新失敗',
@@ -247,8 +244,6 @@ const FoodModalContent = ({ food, tagList, type, open, setOpen, fetchMeals } : M
         const foodOriginalCategory = food.categories.map((category) => `${category.id}`);
         const addedCategories = foodEditCategory.filter((category) => !foodOriginalCategory.includes(category));
         const deletedCategories = foodOriginalCategory.filter((category) => !foodEditCategory.includes(category));
-        console.log('Added Categories:', addedCategories);
-        console.log('Deleted Categories:', deletedCategories);
         
         for(let i = 0;i < addedCategories.length; i++){
             const category_id = addedCategories[i];

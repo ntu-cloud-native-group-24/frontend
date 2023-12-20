@@ -1,4 +1,4 @@
-import { Flex, message, Spin, Form, Button, Modal, TimePicker, Select, Typography, Divider, Space } from "antd"
+import { Flex, message, Spin, Form, Button, Modal, TimePicker, Select, Typography, Divider, Space, Badge } from "antd"
 import { useContext, useCallback, useState, useEffect } from "react";
 import { StoreIdContext } from "../../App";
 import { IssuesCloseOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -137,15 +137,15 @@ const WorkTimeSettings = () => {
                 <Flex vertical gap={32}>
                     {weekDay.map((day, index) => (
                         <Flex vertical gap={16} key={index}>
-                            <Typography.Text>{day.toUpperCase()}</Typography.Text>
+                            <Typography.Text className="text-[18px]">{day.toUpperCase()}</Typography.Text>
                             <Flex vertical gap='small'>
                                 {
-                                    hourData ? (hourData.filter((hour) => hour.day === index + 1).length === 0 ? <p>OFF DAY</p> : hourData.filter((hour) => hour.day === index + 1).map((time, i) => (
+                                    hourData ? (hourData.filter((hour) => hour.day === index + 1).length === 0 ? <Badge status='default' text='OFF DAY' /> : hourData.filter((hour) => hour.day === index + 1).map((time, i) => (
                                         <Space className="w-full" key={i}>
                                             <TimePicker.RangePicker  format='HH:mm:ss' defaultValue={[dayjs(time.open_time, 'HH:mm:ss'), dayjs(time.close_time, 'HH:mm:ss')]} disabled />
                                             <Button danger  type='primary' icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(time.id, day, time.open_time, time.close_time)} />
                                         </Space>
-                                    ))) : <p>OFF DAY</p>
+                                    ))) : <Badge status='default' text='OFF DAY' />
                                 }
                             </Flex>
                             <Divider />

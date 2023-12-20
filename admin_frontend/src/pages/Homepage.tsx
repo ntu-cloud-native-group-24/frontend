@@ -19,8 +19,11 @@ import {
 } from 'chart.js';
 import { Loading3QuartersOutlined } from '@ant-design/icons';
 import { Line } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import useWindowDimensions from "../utilities/windows";
 import { OrderResultType } from "../interfaces/StoreInterface";
+import { FoodBackendType } from "../interfaces/FoodInterface";
+import { mealApi } from "../api/meal";
 
 ChartJS.register(
     CategoryScale,
@@ -62,6 +65,11 @@ const moneyOptions = {
     },
 };
 
+interface mealSalesType {
+    meal_id: number,
+    count: number,
+}
+
 const Homepage = () => {
 
     const storeId = useContext<number>(StoreIdContext);
@@ -69,6 +77,8 @@ const Homepage = () => {
     const [result, setResult] = useState<OrderResultType[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
     const { width, height } = useWindowDimensions();
+    const [meals, setMeals] = useState<FoodBackendType[]>([]);
+    const [mealSales, setMealSales] = useState<mealSalesType[]>([]);
 
     const error = useCallback((msg: string) => {
         messageApi.error(msg);
@@ -80,15 +90,30 @@ const Homepage = () => {
         if( response && response.status === 200 ){
             setResult(response.data.results.reverse());
         } else {
-            error(response.data);
+            error(response.data.message);
+        }
+        setSpinning(false);
+    }, [storeId, error])
+    const fetchMealRevenue = useCallback(async () => {
+        setSpinning(true);
+        const response = await storeApi.getAllMeal(storeId);
+        if( response && response.status === 200 ){
+            const meal_ids = response.data.meals.map((meal: FoodBackendType) => meal.id);
+            const saleResponse = await mealApi.getSalesCount(meal_ids);
+            
+            setMeals(response.data.meals);
+            setMealSales(saleResponse.data.results.sort((a: mealSalesType, b: mealSalesType) => b.count - a.count));
+        } else {
+            error(response.data.message);
         }
         setSpinning(false);
     }, [storeId, error])
 
     useEffect(() => {
         fetchMonthlyRevenue();
+        fetchMealRevenue();
         setSpinning(false);
-    }, [fetchMonthlyRevenue])
+    }, [fetchMonthlyRevenue, fetchMealRevenue])
     useEffect(() => {
     }, [height])
 
@@ -145,8 +170,7 @@ const Homepage = () => {
         const latestMonthData = uniqueUserIdsByMonth[uniqueUserIdsByMonth.length - 1];
         const pastMonthData = uniqueUserIdsByMonth.slice(0, uniqueUserIdsByMonth.length - 1);
         const collectedData = pastMonthData.flatMap((item) => item.uniqueUserIds);
-        const newUsers = latestMonthData.uniqueUserIds.filter((item) => collectedData.includes(item));
-        
+        const newUsers = latestMonthData.uniqueUserIds.filter((item) => !collectedData.includes(item));
         return newUsers
     }, [uniqueUserIdsByMonth])
 
@@ -169,11 +193,52 @@ const Homepage = () => {
         return thisMonthData.orders.reduce((acc, cur) => acc + cur.calculated_total_price, 0);
     }, [result])
 
+    const mealData = useMemo(() => {
+        if( !mealSales ) return {
+            labels: [],
+            datasets: [
+                {
+                    label: '# of Solds',
+                    data: [],
+                    backgroundColor: [],
+                    borderColor: [],
+                    borderWidth: 1,
+                },
+            ]
+        };
+        const chosenMeals = mealSales.slice(0, 5);
+        const namedMeals = chosenMeals.map((item) => meals.find((meal) => meal.id === item.meal_id)?.name );
+        return {
+            labels: namedMeals,
+            datasets: [
+                {
+                    label: '# of Solds',
+                    data: chosenMeals.map((item) => item.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 1,
+                },
+            ]
+        };
+    }, [mealSales, meals])
+
     return (
         <Flex vertical className="h-full pb-32" gap={width > 844 ? 128 : (width < 380 ? 128 : 32)}>
             <Spin spinning={spinning} fullscreen/>
             {contextHolder}
-            <FloatButton onClick={fetchMonthlyRevenue} tooltip={<div>Refresh</div>} icon={<Loading3QuartersOutlined />} />
+            <FloatButton onClick={fetchMonthlyRevenue} tooltip={<div>Refresh</div>} icon={<Loading3QuartersOutlined />} type="primary" />
             <Flex vertical align="center" style={{ position: "relative", height: "40vh", width: "70vw" }}>
                 <Typography.Title level={4}>顧客數量（月）</Typography.Title>
                 <Flex justify='center' gap='large' wrap="wrap">
@@ -193,12 +258,12 @@ const Homepage = () => {
                 <Line options={moneyOptions} data={moneyData} />
             </Flex>
             {
-                /*
+                
                 <Flex vertical align="center" style={{ position: "relative", height: "40vh", width: "70vw" }}>
-                <Typography.Title level={4}>餐點排行榜</Typography.Title>
-                <Pie data={data2} />
+                        <Typography.Title level={4}>餐點排行榜</Typography.Title>
+                        <Pie data={mealData} />
                 </Flex>
-                */
+                
             }
         </Flex>
     )

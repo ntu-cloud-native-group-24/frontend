@@ -93,7 +93,7 @@ const UserSettings = () => {
             form.setFieldValue('username', response.data.user.name);
             form.setFieldValue('mail', response.data.user.email);
         } else {
-            error(response.data);
+            error(response.data.message);
         }
     }, [error, form]);
 

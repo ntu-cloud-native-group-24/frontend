@@ -109,5 +109,22 @@ export const mealApi = {
                 status: error.response?.status
             }
         }
+    },
+    async getSalesCount(meal_ids: number[]){
+        try{
+            const response = await api.post(`/stats/meal/sales`, {
+                meal_ids: meal_ids
+            });
+            return {
+                data: response.data,
+                status: response.status
+            }
+        } catch (err) {
+            const error = err as AxiosError;
+            return {
+                data: error.response?.data,
+                status: error.response?.status
+            }
+        }
     }
 }

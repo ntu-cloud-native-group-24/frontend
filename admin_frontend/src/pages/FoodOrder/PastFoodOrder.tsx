@@ -7,7 +7,6 @@ const PastFoodOrder = () => {
     const { height, width } = useWindowDimensions();
 
     useEffect(() => {
-      console.log(height);
     }, [height])
   
     return (

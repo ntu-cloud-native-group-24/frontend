@@ -58,14 +58,16 @@ const PageHeader = ({ setLogin } : HeaderProps) => {
 
     const handleButtonClick = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('storeId');
         setToken('');
         setLogin(false);
         navigate('/logout')
     };
+
+    useEffect(() => {
+    }, [height])
     
     const handleMenuClick: MenuProps['onClick'] = (e) => {
-        console.log('click', e);
-        console.log(height);
         if( e.key === '0' ){
             localStorage.removeItem('storeId');
             window.location.href = '/store';

@@ -1,3 +1,5 @@
+import { MessageInstance } from "antd/es/message/interface";
+
 export enum PaymentType {
     CASH = 'cash',
     CREDIT_CARD = 'credit_card',
@@ -91,6 +93,7 @@ export interface OrderDetailProps {
     order: OrderType | undefined;
     fetchOrders: () => Promise<void>
     setTargetOrder: React.Dispatch<React.SetStateAction<OrderType | undefined>>;
+    messageApi: MessageInstance;
 }
 
 export interface OrderCProps {

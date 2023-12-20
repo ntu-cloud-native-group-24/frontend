@@ -1,4 +1,4 @@
-import { Badge, Button, Flex, Spin, Typography, Upload } from "antd"
+import { Badge, Button, Empty, Flex, Spin, Typography, Upload } from "antd"
 import { FilterType, SortType, StoreType } from "../../interfaces/StoreInterface"
 import { useState, useContext, useEffect, useCallback, useMemo } from "react"
 import { FoodBackendType, FoodCategory, FoodType, fallbackSRC } from "../../interfaces/FoodInterface"
@@ -230,7 +230,11 @@ const MobileRestaurantPage = () => {
                 onFilterByCategory={onFilterByCategory}
                 onClean={onClean}
             />
-            <RestaurantContent isInFilter={isInFilter} foods={filterFoods} tagsList={tagsList} fetchMeals={fetchFoods} />
+            {
+                filterFoods && filterFoods.length > 0 ? (
+                    <RestaurantContent isInFilter={isInFilter} foods={filterFoods} tagsList={tagsList} fetchMeals={fetchFoods} />
+                ) : <Empty className="pt-12" key={'empty'} description='無存在餐點'><Button type="primary" onClick={() => window.location.href = '/food'}>去新增餐點</Button></Empty>
+            }
         </Flex>
     )
 }

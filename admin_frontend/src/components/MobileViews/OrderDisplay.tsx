@@ -99,7 +99,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
         if( response && response.status === 200 ){
             setOrderDetails(response.data.order.details);
         } else {
-            error(response.data);
+            error(response.data.message);
         }
     }, [order.id, error]);
 
@@ -153,7 +153,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
             success('Reject Order Success');
             fetchOrders();
         } else {
-            error(response.data);
+            error(response.data.message);
         }
     }
 
@@ -203,7 +203,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
                 <Divider />
                 <Flex wrap='wrap' gap="middle" align="center"  >
                     <img src={userPicture} width={64} height={64} />
-                    <Statistic title="Username" value={order.user_id} />
+                    <Statistic title="User_id" value={order.user_id} />
                 </Flex>
             </Flex>
         )
@@ -223,7 +223,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
                         success('Accept Order Success');
                         fetchOrders();
                     } else {
-                        error(response.data);
+                        error(response.data.message);
                     }
                 }
                 else if( order.state === 'preparing' ){
@@ -232,7 +232,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
                         success('Done Order Success');
                         fetchOrders();
                     } else {
-                        error(response.data);
+                        error(response.data.message);
                     }
                 }
             },
@@ -252,7 +252,7 @@ const OrderDisplay = ({ order, fetchOrders } : OrderProps ) => {
 
     return (
         <>
-            <Card onClick={showOrderDetails} hoverable style={{ width: 'full' }} className={order.state === 'cancelled' ? 'bg-red-400' : ''}>
+            <Card data-testid="test-card" onClick={showOrderDetails} hoverable style={{ width: 'full' }} className={order.state === 'cancelled' ? 'bg-red-400' : ''}>
                 <Flex justify="space-between" align="center" gap={20}>
                     <Flex vertical className="w-3/4">
                         <p className="text-lg font-bold">Order #{order.id}</p>
