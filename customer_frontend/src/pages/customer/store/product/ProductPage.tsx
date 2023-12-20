@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { FoodType, fallbackSRC } from "../../../../interfaces/FoodInterface";
 import { CategoryType, StoreType } from "../../../../interfaces/StoreInterface";
 import { storeApi } from "../../../../api/store";
+import { OptionType } from "../../../../interfaces/CartInterface";
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
@@ -110,7 +111,11 @@ const ProductPage = () => {
             return;
         }
 
+        // shallow copy of food
+        const tmpFood = { ...food };
+
         const customization_statuses: boolean[] = [];
+        const tmpCustomization: OptionType[] = [];
 
         food.customizations.selectionGroups.map((selection) => {
             selection.items.map((item) => {
@@ -119,20 +124,39 @@ const ProductPage = () => {
                     customization_statuses.push(false);
                 } else {
                     if (selection.type === "radio") {
-                        customization_statuses.push(
-                            selection.title in submitValue &&
-                                submitValue[selection.title].name === item.name
-                        );
+                        console.log(selection.title, item.name);
+                        console.log(submitValue.customization[selection.title]);
+                        if (
+                            selection.title in submitValue.customization &&
+                            submitValue.customization[selection.title].name ==
+                                item.name
+                        ) {
+                            customization_statuses.push(true);
+                            tmpCustomization.push({
+                                name: item.name,
+                                value: item.price,
+                            });
+                            tmpFood.price += item.price;
+                        } else {
+                            customization_statuses.push(false);
+                        }
                     } else if (selection.type === "checkbox") {
-                        customization_statuses.push(
-                            selection.title in submitValue &&
-                                submitValue[selection.title].some(
-                                    (selectItem: {
-                                        name: string;
-                                        price: number;
-                                    }) => selectItem.name === item.name
-                                )
-                        );
+                        if (
+                            selection.title in submitValue.customization &&
+                            submitValue.customization[selection.title].some(
+                                (selectItem: { name: string; price: number }) =>
+                                    selectItem.name === item.name
+                            )
+                        ) {
+                            customization_statuses.push(true);
+                            tmpCustomization.push({
+                                name: item.name,
+                                value: item.price,
+                            });
+                            tmpFood.price += item.price;
+                        } else {
+                            customization_statuses.push(false);
+                        }
                     }
                 }
             });
@@ -141,10 +165,11 @@ const ProductPage = () => {
         console.log(customization_statuses);
 
         const cartMeal = {
-            meal: food,
+            meal: tmpFood,
             quantity: submitValue.quantity,
             notes: submitValue.notes,
             customization_statuses: customization_statuses,
+            customization: tmpCustomization,
         };
 
         const cartOrder = {
@@ -214,7 +239,10 @@ const ProductPage = () => {
                             if (selection.type === "radio") {
                                 return (
                                     <Form.Item
-                                        name={selection.title}
+                                        name={[
+                                            "customization",
+                                            selection.title,
+                                        ]}
                                         label={selection.title}
                                         key={index}
                                         rules={[
@@ -247,7 +275,10 @@ const ProductPage = () => {
                             } else if (selection.type === "checkbox") {
                                 return (
                                     <Form.Item
-                                        name={selection.title}
+                                        name={[
+                                            "customization",
+                                            selection.title,
+                                        ]}
                                         label={selection.title}
                                         key={index}
                                     >

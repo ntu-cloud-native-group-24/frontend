@@ -1,3 +1,4 @@
+// /admin/helpPage
 export interface QuestionType {
     title: string;
     description: JSX.Element;

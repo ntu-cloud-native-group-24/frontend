@@ -60,7 +60,7 @@ const SearchPage = () => {
             <Flex vertical gap={0}>
                 <div className="w-full bg-cover bg-[url('/src/assets/background/bg_home.jpg')]">
                     <Flex
-                        className="h-full w-full text-white pl-32 bg-black bg-opacity-50"
+                        className="h-full w-full text-white px-20 bg-black bg-opacity-50"
                         align="center"
                     >
                         <Flex vertical className="py-10">

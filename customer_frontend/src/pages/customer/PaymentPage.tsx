@@ -4,234 +4,247 @@ import {
     Typography,
     Input,
     Radio,
-    Space,
-    Divider,
     List,
-    Skeleton,
     Button,
     Flex,
     Badge,
+    Form,
+    message,
 } from "antd";
-import type { RadioChangeEvent } from "antd";
 import { useState, useEffect } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import {
+    DeliveryMethod,
+    OrderSubmitType,
+    PaymentType,
+} from "../../interfaces/OrderInterface";
+import { CartMealType } from "../../interfaces/CartInterface";
+import { useNavigate } from "react-router-dom";
+
+import { orderApi } from "../../api/order";
+
+const { success, warning, error } = message;
 
 const { Title } = Typography;
 const { TextArea } = Input;
-interface DataType {
-    name: string;
-    totalPrice: number;
-    quantity: number;
-}
+
 const PaymentPage = () => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<DataType[]>([]);
-    const [value, setValue] = useState("自取");
-    const [payment, setPayment] = useState("Cash");
+    const [delivery, setDelivery] = useState<DeliveryMethod>(
+        DeliveryMethod.PICKUP
+    );
+    const [deliveryCost, setDeliveryCost] = useState<number>(0); // [0, 50
+    const [payment, setPayment] = useState<PaymentType>(PaymentType.CASH);
+    const [paymentDiscount, setPaymentDiscount] = useState<number>(0); // [0, 20]
 
-    const foodData = [
-        {
-            name: "牛肉麵",
-            totalPrice: 120,
-            quantity: 1,
-        },
-        {
-            name: "花甘",
-            totalPrice: 50,
-            quantity: 1,
-        },
-        {
-            name: "牛肉湯麵",
-            totalPrice: 100,
-            quantity: 1,
-        },
-    ];
-    const newData = [
-        {
-            name: "John Brown",
-            totalPrice: 32,
-            quantity: 1,
-        },
-        {
-            name: "Jim Green",
-            totalPrice: 42,
-            quantity: 2,
-        },
-        {
-            name: "Joe Black",
-            totalPrice: 32,
-            quantity: 1,
-        },
-        {
-            name: "John Brown",
-            totalPrice: 32,
-            quantity: 1,
-        },
-        {
-            name: "Jim Green",
-            totalPrice: 42,
-            quantity: 2,
-        },
-        {
-            name: "Joe Black",
-            totalPrice: 32,
-            quantity: 1,
-        },
-        {
-            name: "John Brown",
-            totalPrice: 32,
-            quantity: 1,
-        },
-        {
-            name: "Jim Green",
-            totalPrice: 42,
-            quantity: 2,
-        },
-        {
-            name: "Joe Black",
-            totalPrice: 32,
-            quantity: 1,
-        },
-    ];
+    const cartOrder = JSON.parse(
+        localStorage.getItem("cart") || "{ store: {}, meals: [] }"
+    );
+    const { store, meals, totalPrice } = cartOrder;
 
-    const loadMoreData = () => {
-        if (loading) {
-            return;
+    const [form] = Form.useForm();
+
+    const navigate = useNavigate();
+
+    const onCreateOrder = async () => {
+        const values = form.getFieldsValue();
+        console.log("Received values of form: ", values);
+        const orderSubmit: OrderSubmitType = {
+            store_id: store.id,
+            notes: values.notes,
+            payment_type: payment,
+            delivery_method: delivery,
+            order: {
+                items: meals.map((meal: CartMealType) => {
+                    return {
+                        meal_id: meal.meal.id,
+                        quantity: meal.quantity,
+                        notes: meal.notes,
+                        customization_statuses: meal.customization_statuses,
+                    };
+                }),
+            },
+        };
+
+        console.log(orderSubmit);
+
+        const res = await orderApi.createUserOrder(orderSubmit);
+        if (!res || res.status !== 200) {
+            error(res?.data.message);
+        } else {
+            console.log(res?.data);
+            success(res?.data.message);
+            localStorage.setItem(
+                "cart",
+                JSON.stringify({ store: {}, meals: [] })
+            );
+            await setTimeout(() => {
+                navigate("/");
+            }, 1000);
         }
-        setLoading(true);
-        setData([...data, ...newData]);
-        setLoading(false);
     };
-    useEffect(() => {
-        loadMoreData();
-    }, []);
 
-    const onChange = (e: RadioChangeEvent) => {
-        console.log(`radio checked:${e.target.value}`);
-        setValue(e.target.value);
+    const onCreateOrderFailed = () => warning("Create Order Failed!");
+
+    const onChangeDelivery = (value: DeliveryMethod) => {
+        console.log(`radio checked:${value}`);
+        console.log(value);
+        setDelivery(value);
+        setDeliveryCost(value === DeliveryMethod.DELIVERY ? 50 : 0);
     };
-    const onChangePayment = (e: RadioChangeEvent) => {
-        console.log(`Payment method checked:${e.target.value}`);
-        setPayment(e.target.value);
+    const onChangePayment = (value: PaymentType) => {
+        console.log(`Payment method checked:${value}`);
+        console.log(value);
+        setPayment(value);
+        setPaymentDiscount(value === PaymentType.MONTHLY ? 20 : 0);
     };
+
     return (
         <>
-            <Flex justify="space-evenly" align="center">
-                <Card style={{ width: 500 }}>
-                    {" "}
-                    <Title>Store Name</Title>
+            <Flex
+                wrap="wrap"
+                justify="space-evenly"
+                align="center"
+                className="grid grid-cols-12 gap-4"
+            >
+                <Card className="xl:col-start-3 xl:col-span-4 md:col-span-6 col-span-12">
+                    <Title>{store.name}</Title>
                     <Flex vertical justify="space-evenly">
-                        <Title level={3}>取餐方式</Title>
-                        <Radio.Group
-                            defaultValue="a"
-                            buttonStyle="solid"
-                            onChange={onChange}
-                            value={value}
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            name="payment"
+                            onFinish={onCreateOrder}
+                            onFinishFailed={onCreateOrderFailed}
                         >
-                            <Radio value={"自取"}>自取</Radio>
-                            <Radio value={"外送"}>外送</Radio>
-                        </Radio.Group>
-                        <Title level={5}>
-                            地址
-                            <Input placeholder="台北市大安區羅斯福路四段1號" />
-                        </Title>
+                            <Title level={3}>取餐方式</Title>
+                            <Form.Item
+                                name="delivery_method"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            "Please select delivery method!",
+                                    },
+                                ]}
+                            >
+                                <Radio.Group
+                                    onChange={(e) =>
+                                        onChangeDelivery(e.target.value)
+                                    }
+                                >
+                                    <Radio value={DeliveryMethod.PICKUP}>
+                                        自取
+                                    </Radio>
+                                    <Radio value={DeliveryMethod.DELIVERY}>
+                                        外送
+                                    </Radio>
+                                </Radio.Group>
+                            </Form.Item>
+                            <Form.Item label="地址" name="address">
+                                <Input
+                                    placeholder={store.address}
+                                    disabled={
+                                        delivery === DeliveryMethod.PICKUP
+                                    }
+                                />
+                            </Form.Item>
+                            <Title level={3}>付款方式</Title>
 
-                        <Title level={3}>付款方式</Title>
-                        <Radio.Group onChange={onChangePayment} value={payment}>
-                            <Space direction="vertical">
-                                <Radio value={"Cash"}>Cash</Radio>
-                                <Radio value={"Credit Card"}>Credit Card</Radio>
-                                <Radio value={"Monthly"}>Monthly</Radio>
-                            </Space>
-                        </Radio.Group>
-                        <Title level={3}>訂單備註</Title>
-                        <TextArea placeholder="請輸入備註" rows={6} />
+                            <Form.Item
+                                name="payment_type"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please select payment!",
+                                    },
+                                ]}
+                            >
+                                <Radio.Group
+                                    onChange={(e) =>
+                                        onChangePayment(e.target.value)
+                                    }
+                                >
+                                    <Radio value={PaymentType.CASH}>Cash</Radio>
+                                    <Radio value={PaymentType.CREDIT_CARD}>
+                                        Credit Card
+                                    </Radio>
+                                    <Radio value={PaymentType.MONTHLY}>
+                                        Monthly
+                                    </Radio>
+                                </Radio.Group>
+                            </Form.Item>
+                            <Title level={3}>訂單備註</Title>
+                            <Form.Item name="notes">
+                                <TextArea placeholder="請輸入備註" rows={6} />
+                            </Form.Item>
+                        </Form>
+
                         <Title level={3}>訂單摘要</Title>
                         <div
                             id="scrollableDiv"
-                            style={{
-                                height: 400,
-                                overflow: "auto",
-                                padding: "0 16px",
-                                border: "1px solid rgba(140, 140, 140, 0.35)",
-                            }}
+                            className="h-[500px] overflow-auto p-4 border border-gray-300"
                         >
-                            <InfiniteScroll
-                                dataLength={data.length}
-                                next={loadMoreData}
-                                hasMore={data.length < 50}
-                                loader={
-                                    <Skeleton
-                                        avatar
-                                        paragraph={{ rows: 1 }}
-                                        active
-                                    />
-                                }
-                                endMessage={
-                                    <Divider plain>
-                                        It is all, nothing more 🤐
-                                    </Divider>
-                                }
-                                scrollableTarget="scrollableDiv"
-                            >
-                                <List
-                                    dataSource={foodData}
-                                    renderItem={(item) => (
-                                        <List.Item key={item.name}>
-                                            <Badge
-                                                count={item.quantity}
-                                                color="#52c41a"
-                                                style={{ marginRight: "10px" }}
-                                            />
-                                            <List.Item.Meta
-                                                title={
-                                                    <a href="https://ant.design">
-                                                        {item.name}
-                                                    </a>
-                                                }
-                                            />
-                                            <div>{"$" + item.totalPrice}</div>
-                                        </List.Item>
-                                    )}
-                                />
-                                <List
-                                    dataSource={data}
-                                    renderItem={(item) => (
-                                        <List.Item key={item.name}>
-                                            <Badge
-                                                count={item.quantity}
-                                                color="#52c41a"
-                                                style={{ marginRight: "10px" }}
-                                            />
-                                            <List.Item.Meta
-                                                title={
-                                                    <a href="https://ant.design">
-                                                        {item.name}
-                                                    </a>
-                                                }
-                                            />
-                                            <div>{item.totalPrice}</div>
-                                        </List.Item>
-                                    )}
-                                />
-                            </InfiniteScroll>
+                            <List
+                                dataSource={meals}
+                                renderItem={(item: CartMealType) => (
+                                    <List.Item key={item.meal.name}>
+                                        <Badge
+                                            count={item.quantity}
+                                            color="#52c41a"
+                                            style={{ marginRight: "10px" }}
+                                        />
+                                        <List.Item.Meta
+                                            title={
+                                                <a
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/stores/${store.id}/${item.meal.id}`
+                                                        )
+                                                    }
+                                                >
+                                                    {item.meal.name}
+                                                </a>
+                                            }
+                                            description={
+                                                <p>
+                                                    {item.customization.map(
+                                                        (custom) => {
+                                                            return (
+                                                                custom.name +
+                                                                " "
+                                                            );
+                                                        }
+                                                    )}
+                                                </p>
+                                            }
+                                        />
+                                        <div>
+                                            {"$" +
+                                                item.meal.price * item.quantity}
+                                        </div>
+                                    </List.Item>
+                                )}
+                            />
                         </div>
                     </Flex>
                 </Card>
-                <Space direction="vertical">
-                    <Card style={{ width: 500 }}>
+                <Flex
+                    className="xl:col-start-7 xl:col-span-4 md:col-span-6 col-span-12"
+                    wrap="wrap"
+                    vertical
+                >
+                    <Card className="w-full">
                         <Title level={3}>訂單總計金額</Title>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>小計</Title>
-                            <Title level={5}>$270</Title>
+                            <Title level={5}>${totalPrice}</Title>
                         </Flex>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>優惠</Title>
-                            <Title level={5}>-$0</Title>
+                            <Title level={5}>-${paymentDiscount}</Title>
                         </Flex>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>外送費</Title>
-                            <Title level={5}>$0</Title>
+                            <Title level={5}>${deliveryCost}</Title>
                         </Flex>
                         <Flex align="center" justify="space-between">
                             <Title level={5}>其他費用</Title>
@@ -239,21 +252,26 @@ const PaymentPage = () => {
                         </Flex>
                         <Flex align="center" justify="space-between">
                             <Title level={3}>總計</Title>
-                            <Title level={3}>$270</Title>
+                            <Title level={3}>
+                                ${totalPrice - paymentDiscount + deliveryCost}
+                            </Title>
                         </Flex>
                     </Card>
                     <Button
                         type="primary"
                         block
+                        htmlType="submit"
+                        onClick={() => form.submit()}
                         style={{
                             background: "yellowgreen",
                             height: "75px",
                             fontSize: "23px",
                         }}
+                        className="w-full"
                     >
                         送出訂單
                     </Button>
-                </Space>
+                </Flex>
             </Flex>
         </>
     );

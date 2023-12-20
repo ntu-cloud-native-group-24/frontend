@@ -1,4 +1,4 @@
-import { Button, Flex, Layout, Row, Col } from "antd";
+import { Button, Flex, Layout, Row, Col, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { storeApi } from "../../api/store";
@@ -66,8 +66,8 @@ const HomePage = ({ login }: CustomerProps) => {
     return (
         <Flex>
             {login ? (
-                <Content className="max-h-full">
-                    <Flex vertical gap={10} className="px-6">
+                <Content className="max-h-full p-4">
+                    <Flex vertical gap={20} className="px-6">
                         {/* TODO: wrap into a tag component */}
                         <Flex
                             className="grid xl:grid-cols-10 lg:grid-cols-8 md:grid-cols-6 grid-cols-5"
@@ -78,7 +78,7 @@ const HomePage = ({ login }: CustomerProps) => {
                                 return (
                                     <Button
                                         type="primary"
-                                        className="p-0 xl:h-20 h-10 lg:text-lg md:text-md text-sm font-bold"
+                                        className="p-0 xl:h-20 md:h-14 h-12 lg:text-lg md:text-md text-xs font-bold"
                                         key={tag.id}
                                         value={tag.id}
                                         onClick={() => {
@@ -175,6 +175,7 @@ const HomePage = ({ login }: CustomerProps) => {
                             </Card>
                         </Flex> */}
                         {/* default stores */}
+                        <Typography.Title level={3}>所有餐廳</Typography.Title>
                         <Row>
                             <Col span={24}>
                                 <Flex

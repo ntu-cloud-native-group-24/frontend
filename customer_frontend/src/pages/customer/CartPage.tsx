@@ -11,151 +11,207 @@ import {
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
-
-interface DataType {
-    key: string;
-    image: string;
-    name: string;
-    note: string;
-    price: number;
-    piece: number;
-    total: number;
-    act: string;
-}
-
-const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
-};
-
-const columns: ColumnsType<DataType> = [
-    {
-        title: "圖片",
-        dataIndex: "image",
-        key: "image",
-        render: (image) => (
-            <img src={image} alt="food" width={100} height={100} />
-        ),
-    },
-    {
-        title: "商品",
-        dataIndex: "name",
-        key: "name",
-        render: (text) => <a>{text}</a>,
-    },
-    {
-        title: "備註",
-        dataIndex: "note",
-        key: "note",
-    },
-    {
-        title: "單價",
-        dataIndex: "price",
-        key: "price",
-        render: (price) => <>{"$" + price}</>,
-    },
-    {
-        title: "數量",
-        key: "piece",
-        dataIndex: "piece",
-        render: (piece) => (
-            <Select
-                defaultValue={piece}
-                style={{ width: 120 }}
-                onChange={handleChange}
-            >
-                <Select.Option value="1">1</Select.Option>
-                <Select.Option value="2">2</Select.Option>
-                <Select.Option value="3">3</Select.Option>
-                <Select.Option value="4">4</Select.Option>
-            </Select>
-        ),
-    },
-    {
-        title: "小計",
-        dataIndex: "total",
-        key: "total",
-        render: (total) => <>{"$" + total}</>,
-    },
-    {
-        title: "刪除",
-        key: "act",
-        render: () => (
-            <Space size="middle">
-                <a>Delete</a>
-            </Space>
-        ),
-    },
-];
-
-const data: DataType[] = [
-    {
-        key: "1",
-        image: "pic1",
-        name: "牛肉麵",
-        note: "不要香菜",
-        price: 120,
-        piece: 1,
-        total: 120,
-        act: "Delete",
-    },
-    {
-        key: "2",
-        image: "pic2",
-        name: "花干",
-        note: "不要醬油",
-        price: 50,
-        piece: 1,
-        total: 50,
-        act: "Delete",
-    },
-    {
-        key: "3",
-        image: "pic3",
-        name: "牛肉湯麵",
-        note: "不要香菜",
-        price: 100,
-        piece: 1,
-        total: 100,
-        act: "Delete",
-    },
-];
+import { FoodType, fallbackSRC } from "../../interfaces/FoodInterface";
+import {
+    CartMealDataType,
+    CartMealType,
+    CartOrderType,
+    OptionType,
+} from "../../interfaces/CartInterface";
+import { useEffect, useState } from "react";
 
 const CartPage = () => {
     const navigate = useNavigate();
-
-    const cartOrder = localStorage.getItem("cart")
-        ? JSON.parse(localStorage.getItem("cart") as string)
-        : null;
+    const cartOrder = JSON.parse(
+        localStorage.getItem("cart") || "{ store: {}, meals: [] }"
+    );
 
     console.log(cartOrder);
+    const { store, meals } = cartOrder;
+
+    cartOrder.totalPrice = meals.reduce(
+        (acc: number, current: CartMealType) =>
+            acc + current.meal.price * current.quantity,
+        0
+    );
+
+    useEffect(() => {
+        return () => {
+            localStorage.setItem("cart", JSON.stringify(cartOrder));
+        };
+    });
+
+    const mealsData = cartOrder.meals.map(
+        (meal: CartMealType, index: number) => {
+            const {
+                meal: food,
+                quantity,
+                notes,
+                customization,
+                customization_statuses,
+            } = meal;
+            return {
+                key: food.id.toString() + index.toString(),
+                image: food.picture ? food.picture : fallbackSRC,
+                name: food.name,
+                customization: customization,
+                note: notes,
+                price: food.price,
+                quantity: meal,
+                total: food.price * quantity,
+                act: meal,
+            };
+        }
+    );
+
+    const handleChange = (meal: CartMealType, value: string) => {
+        console.log(`selected`, meal, value);
+        cartOrder.meals.find((m: CartMealType) => m === meal).quantity = value;
+        localStorage.setItem("cart", JSON.stringify(cartOrder));
+        window.location.reload();
+    };
+
+    const handleDelete = (meal: CartMealDataType) => {
+        console.log(`selected`, meal.act);
+        cartOrder.meals = cartOrder.meals.filter(
+            (m: CartMealType) => m !== meal.act
+        );
+        if (cartOrder.meals.length === 0) {
+            localStorage.removeItem("cart");
+        } else {
+            localStorage.setItem("cart", JSON.stringify(cartOrder));
+        }
+        window.location.reload();
+    };
+
+    const columns: ColumnsType<CartMealDataType> = [
+        {
+            title: "圖片",
+            dataIndex: "image",
+            key: "image",
+            render: (image) => (
+                <div className="w-24">
+                    <img src={image} alt="meal" width={100} height={100} />
+                </div>
+            ),
+        },
+        {
+            title: "商品",
+            dataIndex: "name",
+            key: "name",
+            render: (text) => (
+                <p className="w-12">
+                    <b>{text}</b>
+                </p>
+            ),
+        },
+        {
+            title: "客製化",
+            dataIndex: "customization",
+            key: "customization",
+            render: (customization) => (
+                <Flex vertical className="w-16">
+                    {customization.map((option: OptionType) => (
+                        <p key={option.name}>{option.name}</p>
+                    ))}
+                </Flex>
+            ),
+        },
+        {
+            title: "備註",
+            dataIndex: "note",
+            key: "note",
+        },
+        {
+            title: "單價",
+            dataIndex: "price",
+            key: "price",
+            render: (price) => <p>{"$" + price}</p>,
+        },
+        {
+            title: "數量",
+            key: "quantity",
+            dataIndex: "quantity",
+            render: (meal) => (
+                <Select
+                    defaultValue={meal.quantity}
+                    style={{ width: 120 }}
+                    onChange={(value) => {
+                        handleChange(meal, value);
+                    }}
+                >
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                        <Select.Option key={num} value={num}>
+                            {num}
+                        </Select.Option>
+                    ))}
+                </Select>
+            ),
+        },
+        {
+            title: "小計",
+            dataIndex: "total",
+            key: "total",
+            render: (total) => <>{"$" + total}</>,
+        },
+        {
+            title: "刪除",
+            key: "act",
+            render: (meal) => (
+                <Button
+                    type="primary"
+                    danger
+                    onClick={() => handleDelete(meal)}
+                >
+                    Delete
+                </Button>
+            ),
+        },
+    ];
 
     const handlePayment = () => {
         navigate("/payment");
     };
 
     return (
-        <Flex vertical gap="small" style={{ width: "100%" }}>
-            <Card title="ML Pasta">
-                <Table columns={columns} dataSource={data} />
+        <Flex vertical gap="small">
+            <Card title={store.name}>
+                {/* TODO: table => wrap as a component */}
+                <Table
+                    columns={columns}
+                    dataSource={mealsData}
+                    className="overflow-x-auto"
+                />
+                <Flex align="center" className="grid grid-cols-12">
+                    <Flex className="col-span-3">
+                        <Statistic title="" value={`共${meals.length}項`} />
+                    </Flex>
+                    <Flex className="col-span-3">
+                        <Statistic
+                            title=""
+                            value={
+                                "總計: $" +
+                                meals.reduce(
+                                    (acc: number, current: CartMealType) =>
+                                        acc +
+                                        current.meal.price * current.quantity,
+                                    0
+                                )
+                            }
+                        />
+                    </Flex>
+                    <Flex className="col-span-6">
+                        <Button
+                            type="primary"
+                            block
+                            className="h-14 text-lg"
+                            onClick={handlePayment}
+                        >
+                            Go to Checkout
+                        </Button>
+                    </Flex>
+                </Flex>
             </Card>
-            <Row gutter={50} justify={"center"} align={"middle"}>
-                <Col span={3} offset={3}>
-                    <Statistic title="共" value={3 + "項"} />
-                </Col>
-                <Col span={3} offset={3}>
-                    <Statistic title="總計" value={"$" + 270} />
-                </Col>
-                <Col span={10} offset={2}>
-                    <Button
-                        type="primary"
-                        block
-                        style={{ width: "60%" }}
-                        onClick={handlePayment}
-                    >
-                        Go to Checkout
-                    </Button>
-                </Col>
-            </Row>
         </Flex>
     );
 };

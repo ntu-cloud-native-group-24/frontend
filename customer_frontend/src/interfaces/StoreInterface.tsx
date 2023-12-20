@@ -1,16 +1,11 @@
 import { FoodType } from "./FoodInterface";
 
-// export enum SortType {
-//     NONE,
-//     RATING,
-//     POPULAR,
-// }
-
 export enum FilterType {
     ONSTOCK = "ONSTOCK",
     SOLDOUT = "SOLDOUT",
 }
 
+// HomePage, SearchPage show Stores
 export interface StoreType {
     id: number;
     name: string;

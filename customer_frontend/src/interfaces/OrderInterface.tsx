@@ -58,6 +58,26 @@ export interface OrderMealType {
     price: number;
 }
 
+// payment page create an order
+export interface OrderSubmitType {
+    store_id: number;
+    notes: string;
+    payment_type: PaymentType;
+    delivery_method: DeliveryMethod;
+    order: OrderMealSubmitType;
+}
+
+export interface OrderMealSubmitType {
+    items: OrderMealItemSubmitType[];
+}
+
+export interface OrderMealItemSubmitType {
+    meal_id: number;
+    quantity: number;
+    notes: string;
+    customizations: FoodSelectionGroups;
+}
+
 export interface OrderMealDisplayProps {
     food: OrderMealType;
 }

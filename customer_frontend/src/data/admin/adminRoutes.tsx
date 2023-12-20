@@ -6,60 +6,7 @@ import {
 
 // import Homepage from "../../pages/admin/Homepage";
 import HelperPage from "../../pages/admin/HelperPage";
-
 import FoodOrder from "../../pages/admin/FoodOrder/FoodOrderPage";
-// import PendingFoodOrder from "../../pages/admin/FoodOrder/PendingFoodOrder";
-// import PreparedFoodOrder from "../../pages/admin/FoodOrder/PreparedFoodOrder";
-// import DoneFoodOrder from "../../pages/admin/FoodOrder/DoneFoodOrder";
-// import CanceledFoodOrder from "../../pages/admin/FoodOrder/CanceledFoodOrder";
-
-// childMenu: [
-//     {
-//         id: 3,
-//         path: "/order/pending",
-//         element: <PendingFoodOrder />,
-//         key: "pendingOrder",
-//         name: "待接受的訂單",
-//         icon: <></>,
-//         subMenuKey: "",
-//         childMenu: [],
-//         description: "檢視待接受的訂單",
-//     },
-//     {
-//         id: 4,
-//         path: "/order/prepared",
-//         element: <PreparedFoodOrder />,
-//         key: "preparedOrder",
-//         name: "準備中的訂單",
-//         icon: <></>,
-//         subMenuKey: "",
-//         childMenu: [],
-//         description: "檢視準備中的訂單",
-//     },
-//     {
-//         id: 5,
-//         path: "/order/done",
-//         element: <DoneFoodOrder />,
-//         key: "doneOrder",
-//         name: "完成的訂單",
-//         icon: <></>,
-//         subMenuKey: "",
-//         childMenu: [],
-//         description: "檢視完成的訂單",
-//     },
-//     {
-//         id: 6,
-//         path: "/order/canceled",
-//         element: <CanceledFoodOrder />,
-//         key: "canceledOrder",
-//         name: "取消的訂單",
-//         icon: <></>,
-//         subMenuKey: "",
-//         childMenu: [],
-//         description: "檢視取消的訂單",
-//     },
-// ],
-
 import PersonalSettings from "../../pages/admin/Settings/PersonalSettingsPage";
 import PasswordSettings from "../../pages/admin/Settings/PasswordSettingsPage";
 

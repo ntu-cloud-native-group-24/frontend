@@ -1,3 +1,4 @@
+import { OrderSubmitType } from "../interfaces/OrderInterface";
 import api from "./axiosClient";
 import type { AxiosError } from "axios";
 
@@ -20,7 +21,7 @@ export const orderApi = {
             return err.response;
         }
     },
-    async createUserOrder(order: any) {
+    async createUserOrder(order: OrderSubmitType) {
         try {
             const response = await api.post("/orders", { ...order });
             return response;

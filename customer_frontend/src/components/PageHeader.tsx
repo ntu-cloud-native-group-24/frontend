@@ -56,6 +56,9 @@ const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
     // TODO: complete Props
     const onSearch = (value: string) => {
         console.log(value);
+        if (value.trim() === "") {
+            return;
+        }
         navigate(`/search`, { state: { keyword: value } });
     };
 
@@ -87,6 +90,7 @@ const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
             // clear user info in localStorage and cookies
             removeCookie("token");
             localStorage.removeItem("user");
+            localStorage.removeItem("cart");
             api.defaults.headers.common["x-api-key"] = "";
 
             // set axios default page header false

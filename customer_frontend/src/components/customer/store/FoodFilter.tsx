@@ -1,22 +1,16 @@
-import { ExclamationCircleFilled } from "@ant-design/icons";
 import {
     Flex,
     Input,
     Space,
     Typography,
-    Radio,
     Slider,
     Checkbox,
     Select,
     Button,
 } from "antd";
-import {
-    FoodCategoryType,
-    FoodFilterProps,
-} from "../../../interfaces/FoodInterface";
+import { FoodFilterProps } from "../../../interfaces/FoodInterface";
 import type { SearchProps } from "antd/es/input";
 import type { CheckboxValueType } from "antd/es/checkbox/Group";
-// import type { RadioChangeEvent } from "antd/lib";
 import type { SelectProps } from "antd";
 import { useMemo, useState } from "react";
 import { FilterType } from "../../../interfaces/StoreInterface";
@@ -83,18 +77,6 @@ const FoodFilter = ({
                         style={{ width: 170 }}
                     />
                 </Space>
-                {/* <Space direction="vertical">
-                    <Typography.Text>Sort</Typography.Text>
-                    <Radio.Group onChange={onChangeRadio} value={sortValue}>
-                        <Space direction="vertical">
-                            <Radio value={SortType.NONE}>None</Radio>
-                            <Radio value={SortType.RATING}>Rating</Radio>
-                            <Radio value={SortType.POPULAR}>
-                                Most Popular All Time
-                            </Radio>
-                        </Space>
-                    </Radio.Group>
-                </Space> */}
                 <Space direction="vertical">
                     <Typography.Text>Price Range</Typography.Text>
                     <Slider

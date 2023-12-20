@@ -1,5 +1,6 @@
 import { FilterType, HoursType, StoreType } from "./StoreInterface";
 
+// Store Meal display
 export interface FoodType {
     id: number;
     name: string;
@@ -33,6 +34,7 @@ export interface FoodSelectionGroups {
     selectionGroups: Array<FoodSelectionGroupType>;
 }
 
+// filter Store Meal
 export interface FoodFilterProps {
     collapsed: boolean;
     // sortValue: SortType;
