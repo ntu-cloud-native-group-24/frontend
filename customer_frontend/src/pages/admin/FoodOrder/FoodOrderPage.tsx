@@ -43,7 +43,7 @@ const FoodOrderPage = () => {
                 setOrders(res?.data.orders);
             }
         };
-        getOrders();
+        setTimeout(() => getOrders(), 0);
     }, []);
 
     return (

@@ -13,16 +13,17 @@ export interface AdminProps {
 
 const AdminLayout = ({ login }: AdminProps) => {
     const navigate = useNavigate();
-
     const [collapsed, setCollapsed] = useState(false);
+
+    const user = localStorage.getItem("user");
 
     const toggleCollapsed = () => setCollapsed(!collapsed);
 
     useEffect(() => {
-        if (!login) {
+        if (!login && !user) {
             navigate("/");
         }
-    }, [login, navigate]);
+    }, [login, user, navigate]);
 
     return (
         <Layout hasSider>
