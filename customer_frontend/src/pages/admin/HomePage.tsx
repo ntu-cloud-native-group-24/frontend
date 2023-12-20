@@ -148,15 +148,20 @@ const HomePage = () => {
         <Flex
             vertical
             className="h-full pb-32"
-            gap={width > 767 ? 64 : width < 380 ? 128 : 32}
+            gap={width > 767 ? 128 : width < 380 ? 128 : 32}
         >
-            <Typography.Title level={4}>訂單花費折線圖</Typography.Title>
-            <Flex justify="center" gap="large" wrap="wrap">
-                <Statistic title="最近一個月內花費金額" value={monthlyCost} />
-                <Statistic title="單筆訂單最高金額" value={highestOrderCost} />
-                <Statistic title="總訂單金額" value={allOrderCost} />
+            <Flex vertical align="center" style={{ width: "100%" }}>
+                <Typography.Title level={4}>訂單花費折線圖</Typography.Title>
+                <Flex justify="center" gap="large" wrap="wrap">
+                    <Statistic title="最近一個月花費金額" value={monthlyCost} />
+                    <Statistic
+                        title="單筆訂單最高金額"
+                        value={highestOrderCost}
+                    />
+                    <Statistic title="總訂單金額" value={allOrderCost} />
+                </Flex>
+                <Line data={costData} options={CostOptions} />
             </Flex>
-            <Line data={costData} options={CostOptions} />
         </Flex>
     );
 };
