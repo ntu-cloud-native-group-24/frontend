@@ -92,7 +92,6 @@ const PageHeader = ({ login, setLogin, currentUser }: HeaderProps) => {
             localStorage.removeItem("user");
             localStorage.removeItem("cart");
             api.defaults.headers.common["x-api-key"] = "";
-
             // set axios default page header false
             setLogin(false);
             // navigate to logout page

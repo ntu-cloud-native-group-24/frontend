@@ -105,8 +105,14 @@ const ProductPage = () => {
             return;
         }
 
+        if (oldCart.meals.some((meal: any) => meal.meal.id === food?.id)) {
+            message.error("Food already in cart!");
+            return;
+        }
+
         console.log(form.getFieldsValue());
         const submitValue = form.getFieldsValue();
+
         if (!food) {
             message.error("food not exist!");
             return;

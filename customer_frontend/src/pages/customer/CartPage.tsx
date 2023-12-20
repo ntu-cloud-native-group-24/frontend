@@ -40,7 +40,7 @@ const CartPage = () => {
 
     useEffect(() => {
         return () => {
-            localStorage.setItem("cart", JSON.stringify(cartOrder));
+            // localStorage.setItem("cart", JSON.stringify(cartOrder));
         };
     });
 
