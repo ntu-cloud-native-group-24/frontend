@@ -143,6 +143,7 @@ const MobileRestaurantPage = () => {
         fetchCatagories();
         fetchStore();
         fetchFoods();
+        fetchHours();
         setSpinning(false);
     }, [fetchCatagories, fetchStore, fetchFoods, fetchHours]);
 
