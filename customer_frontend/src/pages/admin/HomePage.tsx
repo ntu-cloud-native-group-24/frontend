@@ -100,9 +100,7 @@ const HomePage = () => {
     // 本月花費金額
     const monthlyCost = completedOrders.reduce((acc, cur: OrderType) => {
         const month = new Date(cur.created_at).getMonth();
-        const date = new Date(cur.created_at).getDate();
-        const today = new Date().getDate();
-        return month === new Date().getMonth() && date === today
+        return month === new Date().getMonth()
             ? acc + cur.calculated_total_price
             : acc;
     }, 0);
