@@ -46,7 +46,7 @@ const MobileOrderSubPage = ({ orders }: OrdersProps) => {
                         ? { ...onClickButtonProps }
                         : { ...nonClickButtonProps })}
                 >
-                    PREPARE
+                    PREPARING
                 </Button>
                 <Button
                     onClick={() => setOrderState(OrderState.PREPARED)}
