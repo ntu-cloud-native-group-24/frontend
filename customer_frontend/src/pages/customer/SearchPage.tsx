@@ -81,7 +81,7 @@ const SearchPage = () => {
 
                 <Flex
                     wrap="wrap"
-                    className="grid 2xl:grid-cols-6 xl:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2"
+                    className="grid xxl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1"
                     gap="small"
                 >
                     {/* iterative store */}
