@@ -73,15 +73,19 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
     }, [foods, searchValue, priceRange, filterArray, filterCategories]);
 
     const isCurrentTimeBetweenOpeningHours = (
+        day: number,
         openTime: string,
         closeTime: string
     ) => {
         const currentTime = new Date();
+        const currentDay = currentTime.getDay() + 1;
         const currentHour = currentTime.getHours();
         const currentMinute = currentTime.getMinutes();
 
         const [openHour, openMinute] = openTime.split(":").map(Number);
         const [closeHour, closeMinute] = closeTime.split(":").map(Number);
+
+        if (currentDay !== day) return false;
 
         if (currentHour > openHour && currentHour < closeHour) {
             return true;
@@ -97,6 +101,7 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
     useEffect(() => {
         const isOpen = store.hours.some((hour) => {
             return isCurrentTimeBetweenOpeningHours(
+                hour.day,
                 hour.open_time,
                 hour.close_time
             );
