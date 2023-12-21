@@ -99,6 +99,10 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
     };
 
     useEffect(() => {
+        if (store.hours.length === 0) {
+            setOpenHoursState(true);
+            return;
+        }
         const isOpen = store.hours.some((hour) => {
             return isCurrentTimeBetweenOpeningHours(
                 hour.day,
@@ -106,6 +110,7 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
                 hour.close_time
             );
         });
+
         setOpenHoursState(isOpen);
     });
 
