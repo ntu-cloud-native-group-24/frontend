@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useContext } from "react";
-import { FilterType, SortType, StoreType } from "../../interfaces/StoreInterface";
+import { FilterType, HourType, SortType, StoreType } from "../../interfaces/StoreInterface";
 import { Layout, Typography, Badge, FloatButton, Spin, Button, Upload, Empty } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import RestaurantContent from "../../components/ComputerViews/RestaurantContent";
@@ -17,6 +17,25 @@ import { BlockBlobClient } from "@azure/storage-blob";
 
 const { Header, Content } = Layout;
 
+const isCurrentTimeBetweenOpeningHours = (openTime: string, closeTime: string) => {
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+    const currentMinute = currentTime.getMinutes();
+
+    const [openHour, openMinute] = openTime.split(':').map(Number);
+    const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+
+    if (currentHour > openHour && currentHour < closeHour) {
+        return true;
+    } else if (currentHour === openHour && currentMinute >= openMinute) {
+        return true;
+    } else if (currentHour === closeHour && currentMinute <= closeMinute) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 const ComputerRestaurantPage = ( ) => {    
     const [foods, setFoods] = useState<FoodType[]>([]);
     const [store, setStore] = useState<StoreType>();
@@ -24,6 +43,7 @@ const ComputerRestaurantPage = ( ) => {
     const [tagsList, setTagsList] = useState<FoodCategory[]>([]);
     const storeId = useContext<number>(StoreIdContext);
     const [spinning, setSpinning] = useState<boolean>(true);
+    const [todayOpening, setTodayOpening] = useState<HourType[]>();
 
     const fetchCatagories = useCallback(async () => {
         const response = await categoryApi.getAllCategory(storeId);
@@ -75,13 +95,24 @@ const ComputerRestaurantPage = ( ) => {
             console.log(response);
         }
     }, [storeId, fetchCategoriesByMealId])
+    const fetchHours = useCallback(async () => {
+        setSpinning(true);
+        const response = await storeApi.getStoreTimeById(storeId);
+        if( response && response.status === 200 ){
+            const work_time = response.data.hours.filter((hour: HourType) => hour.day === new Date().getDay());
+            setTodayOpening(work_time ? work_time : []);
+        } else {
+            console.log(response);
+        }
+    }, [storeId])
 
     useEffect(() => {
         fetchCatagories();
         fetchStore();
         fetchFoods();
+        fetchHours();
         setSpinning(false);
-    }, [fetchCatagories, fetchStore, fetchFoods])
+    }, [fetchCatagories, fetchStore, fetchFoods, fetchHours])
 
     const foodMaxPrice = useMemo(() => {
         return foods && foods.length > 0 ? foods.reduce((prev, current) => (prev.price > current.price ? prev : current)).price : 0;
@@ -89,6 +120,14 @@ const ComputerRestaurantPage = ( ) => {
     const foodMinPrice = useMemo(() => {
         return foods && foods.length > 0 ? foods.reduce((prev, current) => (prev.price < current.price ? prev : current)).price : 0;
     }, [foods])
+    const isTodayWorking = useMemo(() => {
+        if( !store || store?.status === false ) return false;
+        if( !todayOpening || todayOpening.length === 0 ) return false;
+        const isCurrentTimeBetweenOpening = todayOpening.some((opening) =>
+            isCurrentTimeBetweenOpeningHours(opening.open_time, opening.close_time)
+        );
+        return isCurrentTimeBetweenOpening;
+    }, [todayOpening, store])
 
     // filterList
     const [searchValue, setSearchValue] = useState('');
@@ -222,7 +261,7 @@ const ComputerRestaurantPage = ( ) => {
                 <Content className="bg-white">
                     <div className="flex flex-col justify-center items-center">
                         <Typography.Title className="flex flex-row justify-center pt-4">{store?.name}</Typography.Title>
-                        <Badge status={store && store.status ? 'success' : 'default' } text={store && store.status ? 'OPENING' : 'CLOSE'} />
+                        <Badge status={store && store.status && isTodayWorking ? 'success' : 'default' } text={store && store.status && isTodayWorking ? 'OPENING' : 'CLOSE'} />
                     </div>
                     <FoodFilter open={openFilter} 
                                 setOpen={setOpenFilter}
