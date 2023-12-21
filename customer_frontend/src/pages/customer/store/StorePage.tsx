@@ -24,7 +24,16 @@ const StorePage = () => {
             if (!storeRes || storeRes.status !== 200) {
                 return;
             } else {
-                setStore(storeRes?.data.store);
+                const hoursRes = await storeApi.getStoreHours(Number(store_id));
+                console.log(hoursRes?.data);
+                if (!hoursRes || hoursRes.status !== 200) {
+                    return;
+                } else {
+                    setStore({
+                        ...storeRes?.data.store,
+                        hours: hoursRes?.data.hours,
+                    });
+                }
             }
 
             // get meals from store

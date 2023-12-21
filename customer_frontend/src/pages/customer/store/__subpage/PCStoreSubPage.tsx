@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FilterType, StoreProps } from "../../../../interfaces/StoreInterface";
 import { Layout, Typography, Badge, Flex } from "antd";
 import StoreContent from "../../../../components/customer/store/StoreContent";
@@ -35,6 +35,7 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
         FilterType.SOLDOUT,
     ]);
     const [filterCategories, setFilterCategories] = useState(categoriesList);
+    const [openHoursState, setOpenHoursState] = useState(false);
 
     const isInFilter = useMemo(() => {
         return !(searchValue === "");
@@ -71,6 +72,38 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
         });
     }, [foods, searchValue, priceRange, filterArray, filterCategories]);
 
+    const isCurrentTimeBetweenOpeningHours = (
+        openTime: string,
+        closeTime: string
+    ) => {
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+        const currentMinute = currentTime.getMinutes();
+
+        const [openHour, openMinute] = openTime.split(":").map(Number);
+        const [closeHour, closeMinute] = closeTime.split(":").map(Number);
+
+        if (currentHour > openHour && currentHour < closeHour) {
+            return true;
+        } else if (currentHour === openHour && currentMinute >= openMinute) {
+            return true;
+        } else if (currentHour === closeHour && currentMinute <= closeMinute) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    useEffect(() => {
+        const isOpen = store.hours.some((hour) => {
+            return isCurrentTimeBetweenOpeningHours(
+                hour.open_time,
+                hour.close_time
+            );
+        });
+        setOpenHoursState(isOpen);
+    });
+
     return (
         <Layout className="w-full">
             <Header className="p-0 h-[100px]">
@@ -99,8 +132,16 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
                             </Typography.Text>
                         </Flex>
                         <Badge
-                            status={store.status ? "success" : "default"}
-                            text={store.status ? "OPENING" : "CLOSE"}
+                            status={
+                                store.status && openHoursState
+                                    ? "success"
+                                    : "default"
+                            }
+                            text={
+                                store.status && openHoursState
+                                    ? "OPENING"
+                                    : "CLOSE"
+                            }
                         />
                     </Flex>
                     <StoreContent

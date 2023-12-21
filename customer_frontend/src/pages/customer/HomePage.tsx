@@ -179,7 +179,7 @@ const HomePage = ({ login }: CustomerProps) => {
                         <Row>
                             <Col span={24}>
                                 <Flex
-                                    className="grid md:grid-cols-3 grid-cols-1"
+                                    className="grid xxl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-1"
                                     wrap="wrap"
                                     gap={10}
                                 >
