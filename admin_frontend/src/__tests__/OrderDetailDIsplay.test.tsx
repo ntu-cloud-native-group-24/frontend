@@ -2,7 +2,7 @@ import { describe, it, vi } from "vitest";
 import { render, screen }  from '@testing-library/react'
 import OrderDetailDisplay from "../components/ComputerViews/OrderDetailDisplay";
 import { OrderType } from "../interfaces/OrderInterface";
-
+import { message } from "antd";
 
 describe('FoodManagement', () => {
     it('should render the FoodManagementPage', () => {
@@ -21,7 +21,8 @@ describe('FoodManagement', () => {
 
         const fetchOrders = vi.fn();
         const fetchOrderDetails = vi.fn();
-        render(<OrderDetailDisplay order={order} fetchOrders={fetchOrders} setTargetOrder={fetchOrderDetails} />)
+        const [messageApi, ] = message.useMessage();
+        render(<OrderDetailDisplay order={order} fetchOrders={fetchOrders} setTargetOrder={fetchOrderDetails} messageApi={messageApi} />)
         screen.debug();
     });
 });
