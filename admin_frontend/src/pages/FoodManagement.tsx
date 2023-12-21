@@ -27,7 +27,7 @@ const FoodManagement = () => {
     const [searchValue, setSearchValue] = useState("");
     const [messageApi, contextHolder] = message.useMessage();
     const [open, setOpen] = useState(false);
-    const [tableLoading, setTableLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(true);
     const [openCategory, setOpenCategory] = useState(false);
     const [targetType, setTargetType] = useState<ModalType>(ModalType.NEW);
     const [targetFood, setTargetFood] = useState<FoodType>({
