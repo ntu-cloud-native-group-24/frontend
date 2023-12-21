@@ -97,12 +97,18 @@ const HomePage = () => {
 
     console.log(completedOrders);
 
+    // 最近一個月花費金額
+    const currentDate = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(currentDate.getMonth() - 1);
+
     // 本月花費金額
     const monthlyCost = completedOrders.reduce((acc, cur: OrderType) => {
-        const month = new Date(cur.created_at).getMonth();
-        return month === new Date().getMonth()
-            ? acc + cur.calculated_total_price
-            : acc;
+        const orderDate = new Date(cur.created_at);
+        if (orderDate > oneMonthAgo && orderDate <= currentDate) {
+            return acc + cur.calculated_total_price;
+        }
+        return acc;
     }, 0);
 
     const highestOrderCost = completedOrders.reduce((acc, cur: OrderType) => {
