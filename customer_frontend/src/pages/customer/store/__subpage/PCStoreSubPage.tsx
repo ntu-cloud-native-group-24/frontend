@@ -78,13 +78,13 @@ const PCStoreSubPage = ({ store, foods }: StoreProps) => {
         closeTime: string
     ) => {
         const currentTime = new Date();
-        const currentDay = currentTime.getDay() + 1;
+        const currentDay = currentTime.getDay();
         const currentHour = currentTime.getHours();
         const currentMinute = currentTime.getMinutes();
 
         const [openHour, openMinute] = openTime.split(":").map(Number);
         const [closeHour, closeMinute] = closeTime.split(":").map(Number);
-
+        console.log(currentDay, day);
         if (currentDay !== day) return false;
 
         if (currentHour > openHour && currentHour < closeHour) {
